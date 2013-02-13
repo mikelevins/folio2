@@ -1,0 +1,14 @@
+folio is copyright (c) 2010-2013 by mikel evins
+
+folio users are granted the rights to distribute and use this software
+under the terms of the Lisp Lesser GNU Public License
+(http://opensource.franz.com/preamble.html), also known as the LLGPL.
+The preamble (which is not included here, as it is copyright Franz,
+Inc.) references the GNU LESSER GENERAL PUBLIC LICENSE although the
+preamble makes certain modifications to that license.
+
+This license provides NO WARRANTY.
+
+Third-party libraries included in the "lib" subdirectory are subject
+to their own license terms. See the included files for details.
+
