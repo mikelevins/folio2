@@ -115,7 +115,7 @@
 ;;; In other words, supposing that f accepts arguments a b c, then
 ;;; f2 accepts the same arguments as c a b
 
-(defun rotate-left (f)
+(defun rotate-right (f)
   (fn (&rest args)
     (apply f `(,@(cdr args) ,(car args)))))
 
