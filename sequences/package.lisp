@@ -21,7 +21,7 @@
                 :element :empty? :every?
                 :filter
                 :generate 
-                :interleave :interpose
+                :indexes :interleave :interpose
                 :join :join2
                 :next-last
                 :partition

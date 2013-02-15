@@ -72,6 +72,9 @@
   (declare (ignore s1 s2))
   'list)
 
+(defun indexes (s)
+  (series:choose (series:positions (series:map-fn 'boolean (constantly t) (scan s)))))
+
 (defmethod %split-at ((n integer)(ls null))
   (declare (ignore n ls))
   (values nil nil))
@@ -186,7 +189,7 @@
 (defmethod append2 ((seq1 null)(seq2 series::foundation-series))(declare (ignore seq1)) seq2)
 
 (defmethod append2 ((seq1 sequence)(seq2 null))(declare (ignore seq2)) seq1)
-(defmethod append2 ((seq1 sequence)(seq2 sequence)) (concatenate (type-for-copy seq1) seq1 seq2))
+(defmethod append2 ((seq1 sequence)(seq2 sequence)) (concatenate (combined-type seq1 seq2) seq1 seq2))
 (defmethod append2 ((seq1 sequence)(seq2 fset:seq))
   (concatenate (combined-type seq1 seq2) seq1 (fset:convert (combined-type seq1 seq2) seq2)))
 (defmethod append2 ((seq1 sequence)(seq2 series::foundation-series))
@@ -261,8 +264,7 @@
 ;;; then the remaining tails of longer sequences are ignored.
 
 (defun coalesce (fn &rest seqs)
-  (let ((SERIES:*SUPPRESS-SERIES-WARNINGS* t)
-        (seqs (mapcar 'scan seqs)))
+  (let ((seqs (mapcar 'scan seqs)))
     (series:collect (apply 'series:map-fn t fn seqs))))
 
 ;;; ---------------------------------------------------------------------
@@ -364,8 +366,7 @@
   (= 0 (fset:size s)))
 
 (defmethod empty? ((s series::foundation-series))
-  (let ((SERIES:*SUPPRESS-SERIES-WARNINGS* t))
-    (= 0 (series:collect-length s))))
+  (= 0 (series:collect-length s)))
 
 ;;; ---------------------------------------------------------------------
 ;;; function every?
@@ -475,8 +476,7 @@
 
 
 (defmethod interleave ((s1 cl:sequence)(s2 cl:sequence))
-  (let* ((SERIES:*SUPPRESS-SERIES-WARNINGS* t)
-         (sr1 (series:scan s1))
+  (let* ((sr1 (series:scan s1))
          (sr2 (series:scan s2))
          (sr3 (interleave sr1 sr2))
          (out-type (combined-type s1 s2)))
@@ -486,9 +486,8 @@
   (interleave s1 (fset:convert 'cl:list s2)))
 
 (defmethod interleave ((s1 cl:sequence)(s2 series::foundation-series))
-  (let ((SERIES:*SUPPRESS-SERIES-WARNINGS* t))
-    (series:collect (combined-type s1 s2) 
-                    (interleave (series:scan s1) s2))))
+  (series:collect (combined-type s1 s2) 
+    (interleave (series:scan s1) s2)))
 
 
 
@@ -513,8 +512,7 @@
   s1)
 
 (defmethod interleave ((s1 series::foundation-series)(s2 cl:sequence))
-  (let ((SERIES:*SUPPRESS-SERIES-WARNINGS* t))
-    (interleave s1 (series:scan s2))))
+  (interleave s1 (series:scan s2)))
 
 (defmethod interleave ((s1 series::foundation-series)(s2 fset:seq))
   (interleave s1 (fset:convert 'cl:list s2)))
@@ -564,7 +562,7 @@
   (interleave s (make-array (1- (fset:size s)) :initial-element x)))
 
 (defmethod interpose (x (s series::foundation-series))
-  (let* ((indexes (series:positions (series:map-fn 'boolean (constantly t) s)))
+  (let* ((indexes (indexes s))
          (xs (series:choose (series:subseries indexes 1)(repeat x))))
     (interleave s xs)))
 
@@ -590,11 +588,10 @@
   (fset:reduce (lambda (a b)(join2 x a b)) s))
 
 (defmethod join (x (s series::foundation-series))
-  (let ((SERIES:*SUPPRESS-SERIES-WARNINGS* t))
-    (series:collect-fn t
-                       (lambda () (series:collect-first s))
-                       (lambda (a b) (join2 x a b))
-                       (series:subseries s 1))))
+  (series:collect-fn t
+                     (lambda () (series:collect-first s))
+                     (lambda (a b) (join2 x a b))
+                     (series:subseries s 1)))
 
 ;;; ---------------------------------------------------------------------
 ;;; function join2
@@ -733,13 +730,42 @@
 
 (defgeneric partition (seq &rest fns))
 
+(defmethod partition ((seq null) &rest fns)
+  (declare (ignore seq fns))
+  nil)
+
+(defmethod partition ((seq sequence) &rest fns)
+  (apply #'values (cl:map 'cl:list
+                          (lambda (fn)(cl:map (combined-type seq seq)
+                                              fn seq))
+                          fns)))
+
+(defmethod partition ((seq fset:seq) &rest fns)
+  (apply #'values (cl:map 'cl:list
+                          (lambda (fn)(fset:image fn seq))
+                          fns)))
+
+(defmethod partition ((seq series::foundation-series) &rest fns)
+  (apply #'values (cl:map 'cl:list
+                          (lambda (fn)(series:map-fn t fn seq))
+                          fns)))
+
+;;; function range
+;;;
+;;; (range start end &key (by 1)) -> integer sequence
+;;; ---------------------------------------------------------------------
+;;; returns a list of integers starting with START and ending with
+;;; (end - 1). Each succeeding integer differs from the previous one by BY.
+
+(defun range (start end &key (by 1))
+  (series:collect 'list (series:scan-range :from start :by by :below end)))
 
 ;;; function range-from
 ;;;
 ;;; (range-from start &key (by 1)) -> integer series
 ;;; ---------------------------------------------------------------------
 ;;; returns a series of integers starting with START and continuing
-;;; forever. Each succeeding integer differes from the previous one by BY.
+;;; forever. Each succeeding integer differs from the previous one by BY.
 
 (defun range-from (n &key (by 1))
   (series:scan-range :from n :by by))
@@ -749,31 +775,33 @@
 ;;; (reduce fn &rest args) => 
 ;;; ---------------------------------------------------------------------
 ;;; applies FN to the first and second elements of ARGS, then applies it
-;;; the the result and the third element of ARGS, and so on until the
+;;; to the result and the third element of ARGS, and so on until the
 ;;; last element of ARGS is consumed. returns the last value produced.
 
-(defgeneric reduce (fn &rest args))
+(defmethod reduce (fn (seq null))
+  (declare (ignore fn seq))
+  nil)
+
+(defmethod reduce (fn (seq sequence))
+  (cl:reduce fn seq))
+
+(defmethod reduce (fn (seq fset:seq))
+  (fset:reduce fn seq))
+
+(defmethod reduce (fn (seq series::foundation-series))
+  (reduce fn (series:collect 'list seq)))
+
 
 ;;; function repeat
 ;;;
 ;;; (repeat val) => cycling series
 ;;; ---------------------------------------------------------------------
-;;; returns an infinitely-repeating sequence of VAL. If VAL is a
-;;; sequence, the elements of VAL appear in order repeatedly.
+;;; returns an infinitely-repeating sequence of VAL.
 
-(defmethod repeat (s)
+(defun repeat (s)
   (series:scan-fn 't 
                   (lambda () s)
                   (lambda (i) s)))
-
-(defmethod repeat ((s cl:sequence))
-  )
-
-(defmethod repeat ((s fset:seq))
-  )
-
-(defmethod repeat ((s series::foundation-series))
-  )
 
 ;;; function rest
 ;;;
@@ -783,6 +811,19 @@
 
 (defgeneric rest (seq))
 
+(defmethod rest ((s null))
+  (declare (ignore s))
+  nil)
+
+(defmethod rest ((s sequence))
+  (cl:subseq s 1))
+
+(defmethod rest ((s fset:seq))
+  (fset::less-first s))
+
+(defmethod rest ((s series::foundation-series))
+  (series:subseries s 1))
+
 ;;; function reverse
 ;;;
 ;;; (reverse SEQ) => seq'
@@ -790,6 +831,19 @@
 ;;; returns the elements of SEQ in reverse order
 
 (defgeneric reverse (seq))
+
+(defmethod reverse ((s null))
+  (declare (ignore s))
+  nil)
+
+(defmethod reverse ((s sequence))
+  (cl:reverse s))
+
+(defmethod reverse ((s fset:seq))
+  (fset::reverse s))
+
+(defmethod reverse ((s series::foundation-series))
+  (series:scan (reverse (series:collect 'list s))))
 
 ;;; function scan
 ;;;
@@ -811,7 +865,12 @@
 ;;; ---------------------------------------------------------------------
 ;;; returns a series equivalent to (map FN SEQ)
 
-(defgeneric scan-map (seq))
+(defgeneric scan-map (fn seq))
+
+(defmethod scan-map (fn (s null)) (declare (ignore fn s)) nil)
+(defmethod scan-map (fn (s sequence)) (scan-map fn (scan s)))
+(defmethod scan-map (fn (s fset:seq)) (scan-map fn (scan s)))
+(defmethod scan-map (fn (s series::foundation-series)) (series:map-fn t fn s))
 
 ;;; function second
 ;;;
@@ -820,6 +879,18 @@
 ;;; returns the second element of SEQ
 
 (defgeneric second (seq))
+
+(defmethod second ((s null))
+  nil)
+
+(defmethod second ((s sequence))
+  (cl:elt s 1))
+
+(defmethod second ((s fset:seq))
+  (fset::@ s 1))
+
+(defmethod second ((s series::foundation-series))
+  (series:collect-nth 1 s))
 
 ;;; function some?
 ;;;
@@ -830,6 +901,49 @@
 
 (defgeneric some? (test seq))
 
+(defmethod some? (test (s null)) (declare (ignore fn s)) nil)
+(defmethod some? (test (s cl:sequence)) (cl:some test s))
+
+(defmethod some? (test (s fset:seq)) 
+  (let ((pos (fset:position-if test s)))
+    (if pos
+        (fset:@ s pos)
+        nil)))
+
+(defmethod some? (test (s series::foundation-series))
+  (series:collect-first
+   (series:choose 
+    (series:map-fn t test s)
+    s)))
+
+;;; function tails
+;;;
+;;; (tails seq) => seq'
+;;; ---------------------------------------------------------------------
+;;; returns a sequence of sequences beginning with SEQ, followed by
+;;; the tail of SEQ, then the tail of the tail of SEQ, and so on,
+;;; ending with the last non-empty tail
+
+(defgeneric tails (seq))
+
+(defmethod tails ((seq null))
+  (declare (ignore fn s))
+  nil)
+
+(defmethod tails ((seq cons))
+  (if (null (cdr seq))
+      (list seq)
+      (cons seq (tails (cdr seq)))))
+
+(defmethod tails ((seq sequence))
+  (let ((indexes (range 0 (cl:length seq))))
+    (mapcar (lambda (i)(cl:subseq seq i)) indexes)))
+
+(defmethod tails ((seq series::foundation-series))
+  (series:map-fn t
+                 #'(lambda (i) (series:subseries seq i))
+                 (indexes seq)))
+
 ;;; function take
 ;;;
 ;;; (take n seq) => seq'
@@ -837,6 +951,22 @@
 ;;; returns a sequence containing the first N elements of SEQ
 
 (defgeneric take (n seq))
+
+(defmethod take ((n (eql 0))(s null))
+  (declare (ignore n))
+  nil)
+
+(defmethod take ((n integer)(s null))
+  (error "index out of range: ~s" n))
+
+(defmethod take ((n integer)(s sequence))
+  (cl:subseq s 0 n))
+
+(defmethod take ((n integer)(s fset:seq))
+  (fset::subseq s 0 n))
+
+(defmethod take ((n integer)(s series::foundation-series))
+  (series:subseries s 0 n))
 
 ;;; function take-by
 ;;;
@@ -847,6 +977,36 @@
 
 (defgeneric take-by (n advance seq))
 
+(defmethod take-by ((n (eql 0))(advance (eql 0))(s null))
+  (declare (ignore n))
+  nil)
+
+(defmethod take-by ((n integer)(advance integer)(s null))
+  (error "index and advance out of range: ~s, ~s" n advance))
+
+(defmethod take-by ((n integer)(advance integer)(s sequence))
+  (let ((out-type (combined-type s s)))
+    (cl:mapcar (lambda (p)(coerce (series:collect 'list p) out-type)) 
+               (series:collect 'list (take-by n advance (series:scan s))))))
+
+(defmethod take-by ((n integer)(advance integer)(s fset:seq))
+  (let ((out-type (combined-type s s)))
+    (cl:mapcar (lambda (p)(coerce (series:collect 'list p) out-type)) 
+               (series:collect 'cl:list
+                 (take-by n advance
+                          (series:scan (fset:convert 'vector s)))))))
+
+(defmethod take-by ((n integer)(advance integer)(s series::foundation-series))
+  (let ((indexes (indexes s)))
+    (multiple-value-bind (is ps)
+        (series:until-if #'null
+                         indexes
+                         (series:map-fn t
+                                        (lambda (i)(series:subseries s i (+ i n)))
+                                        indexes))
+      ps)))
+
+
 ;;; function take-while
 ;;;
 ;;; (take-while test seq) => seq'
@@ -854,6 +1014,20 @@
 ;;; returns elements of SEQ one after the other until TEST returns true
 
 (defgeneric take-while (test seq))
+
+(defmethod take-while (test (s sequence))
+  (cl:subseq s 0 (cl:position-if test s)))
+
+(defmethod take-while (test (s fset:seq))
+  (fset:subseq s 0 (fset:position-if test s)))
+
+(defmethod take-while (test (s series::foundation-series))
+  (multiple-value-bind (is ps)
+      (series:until-if (lambda (x)(not (funcall test x)))
+                       s
+                       s)
+    ps))
+
 
 ;;; function unique
 ;;;
@@ -863,6 +1037,24 @@
 ;;; to test whether two elements SEQ are the same.
 
 (defgeneric unique (seq &key test))
+
+(defmethod unique ((s sequence) &key (test #'equal))
+  (cl:remove-duplicates s :test test))
+
+(defmethod unique ((s fset:seq) &key (test #'equal))
+  (fset:convert 'fset:seq (cl:remove-duplicates (fset:convert 'list s) :test test)))
+
+(defmethod unique ((seq series::foundation-series) &key (test #'equal))
+  (series:choose
+   (series:map-fn t
+                  (lambda (e i)
+                    (not
+                     (some? (lambda (x)(funcall test e x)) 
+                            (series:subseries seq 0 i))))
+                  seq
+                  (indexes seq))
+   seq))
+
 
 ;;; function unzip
 ;;;
@@ -874,6 +1066,21 @@
 
 (defgeneric unzip (seq))
 
+(defmethod unzip ((seq null))
+  (declare (ignore seq))
+  (values nil nil))
+
+(defmethod unzip ((seq cons))
+  (values (mapcar #'car seq)
+          (mapcar #'cdr seq)))
+
+(defmethod unzip ((seq fset:seq))
+  (values (fset:image #'car seq)
+          (fset:image #'cdr seq)))
+
+(defmethod unzip ((seq series::foundation-series))
+  (values (series:map-fn t #'car seq)
+          (series:map-fn t #'cdr seq)))
 
 ;;; function zip
 ;;;
@@ -883,6 +1090,63 @@
 ;;; and each right element is the corresponding one from SEQ2.
 
 (defgeneric zip (seq1 seq2))
+
+(defmethod zip ((seq1 null) seq2)
+  (declare (ignore seq1 seq2))
+  nil)
+
+(defmethod zip (seq1 (seq2 null))
+  (declare (ignore seq1 seq2))
+  nil)
+
+
+(defmethod zip ((seq1 cons)(seq2 cons))
+  (mapcar #'cons seq1 seq2))
+
+(defmethod zip ((seq1 cons)(seq2 sequence))
+  (zip seq1 (coerce seq2 'list)))
+
+(defmethod zip ((seq1 cons)(seq2 fset:seq))
+  (zip (coerce seq1 'list) (fset:convert 'cl:list seq2)))
+
+(defmethod zip ((seq1 cons)(seq2 series::foundation-series))
+  (series:map-fn t #'cons (series:scan seq1) seq2))
+
+
+(defmethod zip ((seq1 sequence)(seq2 cons))
+  (zip (coerce seq1 'list) seq2))
+
+(defmethod zip ((seq1 cl:sequence)(seq2 cl:sequence))
+  (zip (coerce seq1 'list) (coerce seq2 'list)))
+
+(defmethod zip ((seq1 cl:sequence)(seq2 fset:seq))
+  (zip (coerce seq1 'list) (fset:convert 'cl:list seq2)))
+
+(defmethod zip ((seq1 cl:sequence)(seq2 series::foundation-series))
+  (series:map-fn t #'cons (series:scan seq1) seq2))
+
+
+(defmethod zip ((seq1 fset:seq)(seq2 cons))
+  (zip (fset:convert 'cl:list seq1) seq2))
+
+(defmethod zip ((seq1 fset:seq)(seq2 cl:sequence))
+  (zip (fset:convert 'cl:list seq1) (fset:convert 'cl:list seq2)))
+
+(defmethod zip ((seq1 fset:seq)(seq2 fset:seq))
+  (zip (fset:convert 'cl:list seq1) (fset:convert 'cl:list seq2)))
+
+(defmethod zip ((seq1 fset:seq)(seq2 series::foundation-series))
+  (series:map-fn t #'cons (series:scan (fset:convert 'list seq1)) seq2))
+
+
+(defmethod zip ((seq1 series::foundation-series)(seq2 cl:sequence))
+  (series:map-fn t #'cons seq1 (series:scan seq2)))
+
+(defmethod zip ((seq1 series::foundation-series)(seq2 fset:seq))
+  (series:map-fn t #'cons seq1 (series:scan (fset:convert 'list seq2))))
+
+(defmethod zip ((seq1 series::foundation-series)(seq2 series::foundation-series))
+  (series:map-fn t #'cons seq1 seq2))
 
 
 

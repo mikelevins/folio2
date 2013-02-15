@@ -15,7 +15,7 @@
 (defpackage :net.bardcode.folio
   (:nicknames :folio)
   (:shadowing-import-from :net.bardcode.folio.common
-                          :adjoin :append :apply :find :first :last :length
+                          :adjoin :append :apply :find :first :indexes :last :length
                           :map :merge :position :reduce :remove :rest
                           :reverse :second :sequence :sort :union) 
   (:use :cl :net.bardcode.folio.common)
@@ -40,7 +40,7 @@
    :element :empty? :every?
    :filter :find :first
    :generate
-   :interleave :interpose
+   :indexes :interleave :interpose
    :join :join2
    :last :length
    :map

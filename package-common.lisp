@@ -23,7 +23,7 @@
            :element :empty? :every? 
            :filter :find :first :flip :fn 
            :generate :get-key
-           :interleave :interpose :intersect
+           :indexes :interleave :interpose :intersect
            :join :join2 :join-text
            :keys
            :last :left :length
