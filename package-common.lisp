@@ -12,7 +12,7 @@
 (in-package :cl-user)
 
 (defpackage :net.bardcode.folio.common
-  (:shadow :adjoin :append :apply :find :first :get :last :length :map :merge :position :position-if :put 
+  (:shadow :adjoin :append :apply :find :first :get :intersection :last :length :map :merge :position :position-if :put 
            :reduce :remove :rest :reverse :second :sequence :sort :union)
   (:use :cl)
   (:export :$ :^ :-> :> :>= :< :<=
@@ -23,7 +23,7 @@
            :element :empty? :every? 
            :filter :find :first :flip :fn :function? :functional?
            :generate :generic-function? :get-key
-           :indexes :interleave :interpose :intersect
+           :indexes :interleave :interpose  :intersection
            :join :join2 :join-text
            :keys
            :last :left :length

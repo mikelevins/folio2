@@ -10,14 +10,14 @@
 ;;;; ***********************************************************************
 
 (defpackage #:net.bardcode.folio.sets
-  (:use #:cl)
+  (:use :cl)
   (:shadowing-import-from :net.bardcode.folio.common
                           :> :>= :< :<=
-                          :adjoin :append :apply :find :first :get :last :length :map :merge :position :position-if :put 
+                          :adjoin :append :apply :find :first :get :intersection :last :length :map :merge :position :position-if :put 
                           :reduce :remove :rest :reverse :second :sequence :sort :union)
   (:import-from :net.bardcode.folio.common 
-                :contains-value? :difference :set? :subset?)
-  (:export :adjoin :contains-value? :difference :intersection :set? :subset? :union))
+                :difference :set? :subset?)
+  (:export :adjoin :difference :intersection :set? :subset? :union))
 
 
 
