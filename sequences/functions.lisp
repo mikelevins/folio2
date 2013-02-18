@@ -1181,6 +1181,28 @@
   (declare (ignore s))
   t)
 
+;;; function shuffle
+;;;
+;;; (shuffle seq1) => seq2
+;;; ---------------------------------------------------------------------
+;;; returns a new sequence with the same elements as SEQ1, but
+;;; in random order
+
+(defgeneric shuffle (p))
+
+(defmethod shuffle (s)
+  (declare (ignore s))
+  nil)
+
+(defmethod shuffle ((s cl:sequence))
+  (cl:sort (cl:copy-seq s) (lambda (x y)(zerop (random 2)))))
+
+(defmethod shuffle ((s fset:seq))
+  (fset:sort s (lambda (x y)(zerop (random 2)))))
+
+(defmethod shuffle ((s series::foundation-series))
+  (shuffle (series:collect 'cl:list s)))
+
 ;;; function some?
 ;;;
 ;;; (some? test seq) => anything
@@ -1204,6 +1226,109 @@
    (series:choose 
     (series:map-fn t test s)
     s)))
+
+
+;;; function split
+;;;
+;;; (split seq1 subseq) => seq2
+;;; ---------------------------------------------------------------------
+;;; returns a sequence of sequences. the output sequences are proper
+;;; subsequences of SEQ1, obtained by splitting SEQ1 at occurrences
+;;; of SUBSEQ. SUBSEQ does not appear in the output sequences. TEST,
+;;; whose default value is equal, is used to match occurrences of
+;;; SUBSEQ.
+
+(defgeneric split (seq subseq &key test))
+
+(defmethod split ((seq null) subseq &key test)
+  (declare (ignore seq subseq test))
+  nil)
+
+
+(defmethod split ((seq cl:sequence) (subseq null) &key test)
+  (declare (ignore seq subseq test))
+  (cl:map 'cl:list
+          (lambda (e)(coerce (list e) (combined-type seq seq)))
+          seq))
+
+(defmethod split ((seq cl:sequence) (subseq cl:sequence) &key (test 'equal))
+  (let* ((pivot 0)
+         (result '())
+         (sublen (cl:length subseq))
+         (ends (block scanning
+                 (loop
+                    (let* ((pos (search subseq seq :start2 pivot :test test)))
+                      (if pos
+                          (setf result (cons pos result)
+                                pivot (+ pos sublen))
+                          (return-from scanning result))))))
+         (starts (cons 0 (mapcar (lambda (e)(+ e sublen))
+                                 (reverse ends))))
+         (ends (reverse (cons nil ends))))
+    (cl:mapcar (lambda (s e)(cl:subseq seq s e)) starts ends)))
+
+(defmethod split ((seq cl:sequence) (subseq fset:seq) &key (test 'equal))
+  (split seq (fset:convert 'cl:vector subseq) :test test))
+
+(defmethod split ((seq cl:sequence) (subseq series::foundation-series) &key (test 'equal))
+  (split seq (series:collect 'vector subseq) :test test))
+
+
+(defmethod split ((seq fset:seq) (subseq cl:sequence) &key (test 'equal))
+  (fset:convert 'fset:seq
+                (split (fset:convert 'cl:vector seq)
+                       subseq :test test)))
+
+(defmethod split ((seq fset:seq) (subseq fset:seq) &key (test 'equal))
+  (fset:convert 'fset:seq
+                (split (fset:convert 'cl:vector seq)
+                       (fset:convert 'cl:vector subseq)
+                       :test test)))
+
+(defmethod split ((seq fset:seq) (subseq series::foundation-series) &key (test 'equal))
+  (fset:convert 'fset:seq
+                (split (fset:convert 'cl:vector seq)
+                       (series:collect 'cl:vector subseq)
+                       :test test)))
+
+
+(defmethod split ((seq series::foundation-series) (subseq cl:sequence) &key (test 'equal))
+  (series:scan (split (series:collect 'cl:vector seq)
+                      subseq :test test)))
+
+(defmethod split ((seq series::foundation-series) (subseq fset:seq) &key (test 'equal))
+  (series:scan (split (series:collect 'cl:vector seq)
+                      (fset:convert 'cl:vector subseq) :test test)))
+
+(defmethod split ((seq series::foundation-series) (subseq series::foundation-series) &key (test 'equal))
+  (series:scan (split (series:collect 'cl:vector seq)
+                      (series:collect 'cl:vector subseq) :test test)))
+
+
+;;; ---------------------------------------------------------------------
+;;; function subsequence
+;;; ---------------------------------------------------------------------
+;;;
+;;; (subsequence seq start &optional end) => seq2
+;;; ---------------------------------------------------------------------
+;;; returns a new sequence containing the elements of SEQ starting with
+;;; index START. If END is given, the last element of the new sequence is
+;;; the element just before index END; otherwise, it is the last element
+;;; of SEQ.
+
+(defgeneric subsequence (seq start &optional end))
+
+(defmethod subsequence ((s null) (start integer) &optional end)
+  (error "Index out of range on NIL:" start))
+
+(defmethod subsequence ((s cl:sequence) (start integer) &optional end)
+  (cl:subseq s start end))
+
+(defmethod subsequence ((s fset:seq) (start integer) &optional end)
+  (fset:subseq s start end))
+
+(defmethod subsequence ((s series::foundation-series) (start integer) &optional end)
+  (series::subseries s start end))
 
 ;;; function tails
 ;;;

@@ -28,7 +28,7 @@
                 :next-last
                 :partition
                 :range :range-from :repeat
-                :scan :scan-map :select :sequence? :shuffle :slice :some? 
+                :scan :scan-map :select :sequence? :shuffle :some? 
                 :split :subsequence 
                 :tails :take :take-by :take-while :type-for-copy
                 :unique :unzip

@@ -28,7 +28,7 @@
                 :next-last
                 :partition
                 :range :range-from :repeat
-                :scan :scan-map :select :sequence? :series? :shuffle :slice :some? 
+                :scan :scan-map :select :sequence? :series? :shuffle :some? 
                 :split :subsequence 
                 :tails :take :take-by :take-while :type-for-copy
                 :unique :unzip
@@ -47,8 +47,8 @@
            :next-last
            :partition :position :position-if
            :range :range-from :reduce :remove :repeat :rest :reverse
-           :scan :scan-map :second :select :sequence :sequence? :series? :shuffle :slice :some? :sort :split :subsequence
-           :tails :take :take-by :take-while :taken
+           :scan :scan-map :second :select :sequence :sequence? :series? :shuffle :some? :sort :split :subsequence
+           :tails :take :take-by :take-while
            :unique :unzip
            :zip))
 

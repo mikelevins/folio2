@@ -32,7 +32,7 @@
            :ordered-map
            :pair :pair? :partial :partition :plist :plist->alist :position :position-if :put-key
            :range :range-from :reduce :remove :repeat :rest :reverse :right :rotate-left :rotate-right :rpartial
-           :scan :scan-map :second :select :series? :sequence :sequence? :set-box! :set? :shuffle :slice :some?
+           :scan :scan-map :second :select :series? :sequence :sequence? :set-box! :set? :shuffle :some?
            :sort :split :split-text :stream? :subsequence :subset?
            :table :table? :tails :take :take-by :take-while :text? :type-for-copy
            :unbox :union :unique :unzip
