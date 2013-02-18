@@ -17,7 +17,11 @@
 ;;; ---------------------------------------------------------------------
 ;;; shadows cl:apply, providing an extensible generic version.
 
-(defgeneric apply (fn seq &rest more-seqs))
+(defgeneric apply (fn seq))
+
+;;; the default version
+(defmethod apply (applicable (seq cl:cons))
+  (cl:apply applicable seq))
 
 ;;; function compose
 ;;;
@@ -75,6 +79,93 @@
 ;;; arguments a and b, the new function is identical to the old.
 
 (defun flip (f) (lambda (x y) (funcall f y x)))
+
+;;; function function?
+;;;
+;;; (function? thing) => Boolean
+;;; ---------------------------------------------------------------------
+;;; returns a true value if THING is a function (that is, it's a function,
+;;; but not s generic function or method)
+
+(defgeneric function? (thing))
+
+(defmethod function? (thing)
+  (declare (ignore thing))
+  nil)
+
+(defmethod function? ((thing function))
+  (declare (ignore thing))
+  t)
+
+(defmethod function? ((thing generic-function))
+  (declare (ignore thing))
+  nil)
+
+(defmethod function? ((thing method))
+  (declare (ignore thing))
+  nil)
+
+;;; function functional?
+;;;
+;;; (functional? thing) => Boolean
+;;; ---------------------------------------------------------------------
+;;; returns a true value if THING is a function, a generic function,
+;;; or a method
+
+(defgeneric functional? (thing))
+
+(defmethod functional? (thing)
+  (declare (ignore thing))
+  nil)
+
+(defmethod functional? ((thing function))
+  (declare (ignore thing))
+  t)
+
+(defmethod functional? ((thing generic-function))
+  (declare (ignore thing))
+  t)
+
+(defmethod functional? ((thing method))
+  (declare (ignore thing))
+  t)
+
+;;; function generic-function?
+;;;
+;;; (generuc-function? thing) => Boolean
+;;; ---------------------------------------------------------------------
+;;; returns a true value if THING is a generic function
+
+(defgeneric generic-function? (thing))
+
+(defmethod generic-function? (thing)
+  (declare (ignore thing))
+  nil)
+
+(defmethod generic-function? ((thing generic-function))
+  (declare (ignore thing))
+  t)
+
+;;; function method?
+;;;
+;;; (method? thing) => Boolean
+;;; ---------------------------------------------------------------------
+;;; returns a true value if THING is a method
+
+(defgeneric method? (thing))
+
+(defmethod method? (thing)
+  (declare (ignore thing))
+  nil)
+
+(defmethod method? ((thing function))
+  (declare (ignore thing))
+  t)
+
+(defmethod method? ((thing method))
+  (declare (ignore thing))
+  t)
+
 
 ;;; function partial
 ;;;

@@ -22,11 +22,11 @@
 
 (defgeneric contains-key? (map key &key &allow-other-keys))
 
-(defmethod contains-key? ((map sequence) key &key &allow-other-keys)
+(defmethod contains-key? ((map cl:sequence) key &key &allow-other-keys)
   (declare (ignore key))
   nil)
 
-(defmethod contains-key? ((map sequence) (key integer) &key &allow-other-keys)
+(defmethod contains-key? ((map cl:sequence) (key integer) &key &allow-other-keys)
   (< -1 key (length map)))
 
 (defmethod contains-key? ((map fset:seq) key &key &allow-other-keys)
@@ -50,7 +50,7 @@
 
 (defgeneric contains-value? (map key &key &allow-other-keys))
 
-(defmethod contains-value? ((map sequence) val &key (test #'equal) &allow-other-keys)
+(defmethod contains-value? ((map cl:sequence) val &key (test #'equal) &allow-other-keys)
   (some (lambda (i)(funcall test val i)) map))
 
 (defmethod contains-value? ((map fset:seq) val &key &allow-other-keys)
@@ -70,7 +70,7 @@
 
 (defgeneric get-key (map key &key &allow-other-keys))
 
-(defmethod get-key ((map sequence)(key integer) &key (default nil) &allow-other-keys)
+(defmethod get-key ((map cl:sequence)(key integer) &key (default nil) &allow-other-keys)
   (if (< -1 key (length map))
       (elt map key)
       default))
@@ -95,7 +95,7 @@
 
 (defgeneric keys (map))
 
-(defmethod keys ((map sequence))
+(defmethod keys ((map cl:sequence))
   (loop for i from 0 below (length map) collect i))
 
 (defmethod keys ((map fset:seq))
@@ -118,7 +118,7 @@
 
 (defgeneric merge-tables (map1 map2 &key &allow-other-keys))
 
-(defmethod merge-tables ((map1 sequence)(map2 sequence) &key &allow-other-keys)
+(defmethod merge-tables ((map1 cl:sequence)(map2 cl:sequence) &key &allow-other-keys)
   (if (<= (length map1)(length map2))
       map2
       (concatenate 'list map2 (subseq map1 (length map2)))))
@@ -133,18 +133,18 @@
       map2
       (concatenate 'vector map2 (subseq map1 (length map2)))))
 
-(defmethod merge-tables ((map1 sequence)(map2 fset:seq) &key &allow-other-keys)
+(defmethod merge-tables ((map1 cl:sequence)(map2 fset:seq) &key &allow-other-keys)
   (merge-tables map1 (fset:convert 'list map2)))
 
-(defmethod merge-tables ((map1 sequence)(map2 fset:map) &key &allow-other-keys)
+(defmethod merge-tables ((map1 cl:sequence)(map2 fset:map) &key &allow-other-keys)
   (merge-tables map1 (fset:convert 'list map2)))
 
-(defmethod merge-tables ((map1 sequence)(map2 series::foundation-series) &key &allow-other-keys)
+(defmethod merge-tables ((map1 cl:sequence)(map2 series::foundation-series) &key &allow-other-keys)
   (merge-tables (series:scan map1) map2))
 
 
 
-(defmethod merge-tables ((map1 fset:seq)(map2 sequence) &key &allow-other-keys)
+(defmethod merge-tables ((map1 fset:seq)(map2 cl:sequence) &key &allow-other-keys)
   (merge-tables map1 (fset:convert 'fset:seq map2)))
 
 (defmethod merge-tables ((map1 fset:seq)(map2 fset:seq) &key &allow-other-keys)
@@ -160,7 +160,7 @@
 
 
 
-(defmethod merge-tables ((map1 fset:map)(map2 sequence) &key &allow-other-keys)
+(defmethod merge-tables ((map1 fset:map)(map2 cl:sequence) &key &allow-other-keys)
   (merge-tables map1 (fset:convert 'fset:seq map2)))
 
 (defmethod merge-tables ((map1 fset:map)(map2 fset:seq) &key &allow-other-keys)
@@ -181,7 +181,7 @@
                                map2)))
 
 
-(defmethod merge-tables ((map1 series::foundation-series)(map2 sequence) &key &allow-other-keys)
+(defmethod merge-tables ((map1 series::foundation-series)(map2 cl:sequence) &key &allow-other-keys)
   (merge-tables map1 (series:scan map2)))
 
 (defmethod merge-tables ((map1 series::foundation-series)(map2 fset:seq) &key &allow-other-keys)
@@ -218,7 +218,7 @@
 
 (defgeneric put-key (map key val &key &allow-other-keys))
 
-(defmethod put-key ((map sequence) (key integer) val &key &allow-other-keys)
+(defmethod put-key ((map cl:sequence) (key integer) val &key &allow-other-keys)
   (if (< -1 key (length map))
       (let ((outmap (copy-seq map)))
         (setf (elt outmap key) val)
@@ -267,7 +267,7 @@
 
 (defgeneric vals (map))
 
-(defmethod vals ((map sequence)) map)
+(defmethod vals ((map cl:sequence)) map)
 (defmethod vals ((map fset:seq)) map)
 (defmethod vals ((map fset:map)) (fset:range map))
 (defmethod vals ((map series::foundation-series)) map)

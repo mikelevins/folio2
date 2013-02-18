@@ -11,6 +11,14 @@
 
 (in-package :net.bardcode.folio.boxes)
 
+;;; type box
+;;;
+;;; ---------------------------------------------------------------------
+;;; the type of boxes
+
+(deftype box ()
+ '(and cons (satisfies box?)))
+
 ;;; function box
 ;;;
 ;;; (box val) => a box

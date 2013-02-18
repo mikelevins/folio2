@@ -52,7 +52,7 @@
 ;;; a replacement for LAMBDA, but as a convenience for cases in
 ;;; which the clarity of functional code benefits from compactness.
 
-(defmacro fn (args &body body)
+(defmacro ^ (args &body body)
   `(lambda ,args ,@body))
 
 ;;; macro fn
@@ -64,7 +64,7 @@
 ;;; cases in which the clarity of functional code benefits from
 ;;; compactness.
 
-(defmacro ^ (args &body body)
+(defmacro fn (args &body body)
   `(lambda ,args ,@body))
 
 ;;; macro cascade

@@ -106,17 +106,6 @@
                         :components ((:file "package")
                                      (:file "functions")))))
 
-(asdf:defsystem :net.bardcode.folio.sequence-syntax
-  :serial t
-  :description "syntactic sugar for sequences"
-  :author "mikel evins <mevins@me.com>"
-  :license "Lisp Lesser GNU Public License"
-  :depends-on (:fset :series :net.bardcode.folio.sequences :net.bardcode.folio.packages)
-  :components ((:module "sequences"
-                        :serial t
-                        :components ((:file "package")
-                                     (:file "syntax")))))
-
 (asdf:defsystem :net.bardcode.folio.sets
   :serial t
   :description "treating sequences as sets"
@@ -191,7 +180,6 @@
                :net.bardcode.folio.functions
                :net.bardcode.folio.ordering
                :net.bardcode.folio.pairs
-               :net.bardcode.folio.sequence-syntax
                :net.bardcode.folio.sequences
                :net.bardcode.folio.set-syntax
                :net.bardcode.folio.sets
