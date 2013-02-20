@@ -29,7 +29,7 @@
 (defmethod %funcall-applicable ((f function) &rest args)
   (apply f args))
 
-(defmethod %funcall-applicable ((f sequence) &rest args)
+(defmethod %funcall-applicable ((f cl:sequence) &rest args)
   (net.bardcode.folio.tables:get-key f (car args)))
 
 (defmethod %funcall-applicable ((f fset:seq) &rest args)

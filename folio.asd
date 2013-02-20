@@ -145,7 +145,8 @@
   :depends-on (:series :net.bardcode.folio.packages)
   :components ((:module "streams"
                         :serial t
-                        :components ((:file "package")))))
+                        :components ((:file "package")
+                                     (:file "functions")))))
 
 (asdf:defsystem :net.bardcode.folio.tables
   :serial t

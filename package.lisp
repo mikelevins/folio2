@@ -43,9 +43,10 @@
    :generate
    :indexes :interleave :interpose
    :join :join2
-   :last :length
+   :last :length :lines
    :map
    :next-last
+   :objects :octets :ordered-map
    :partition :position :position-if
    :range :range-from :reduce :remove :repeat :rest :reverse 
    :scan :scan-map :second :select :sequence :sequence? :series? :shuffle :some? :sort :split :subsequence

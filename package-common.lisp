@@ -18,7 +18,7 @@
   (:export :$ :^ :-> :> :>= :< :<=
            :adjoin :add-first :add-last :alist :alist->plist :any :append :append2 :apply :as :associate
            :box :box? :by
-           :cascade :coalesce :combined-type :compose :concat :conjoin :contains-key? :contains-value?
+           :cascade :characters :coalesce :combined-type :compose :concat :conjoin :contains-key? :contains-value?
            :difference :disjoin :dissociate :drop :drop-while 
            :element :empty? :every? 
            :filter :find :first :flip :fn :function? :functional?
@@ -26,10 +26,10 @@
            :indexes :interleave :interpose  :intersection
            :join :join2 :join-text
            :keys
-           :last :left :length
+           :last :left :length :lines
            :make :map :merge :method?
            :next-last
-           :ordered-map
+           :objects :octets :ordered-map
            :pair :pair? :partial :partition :plist :plist->alist :position :position-if :put-key
            :range :range-from :reduce :remove :repeat :rest :reverse :right :rotate-left :rotate-right :rpartial
            :scan :scan-map :second :select :series? :sequence :sequence? :set-box! :set? :shuffle :some?

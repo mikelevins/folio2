@@ -23,7 +23,7 @@
 ;;;
 ;;; (adjoin item set1) => set2
 ;;; ---------------------------------------------------------------------
-;;; returns a new setuence that contains X prepended to the elements of
+;;; returns a new set that contains X prepended to the elements of
 ;;; SET
 
 (defgeneric adjoin (item set &key test key))
@@ -70,60 +70,205 @@
 ;;; returns a new set that contains the elements of SET1 that are
 ;;; not in SET2
 
-(defgeneric difference (set1 set2)) => set3
+(defgeneric difference (set1 set2 &key key test)) => set3
 
-(defmethod difference () 
-  )
+(defmethod difference ((set1 null) set2 &key key test) 
+  (declare (ignore set1))
+  nil)
+
+(defmethod difference (set1 (set2 null) &key key test) 
+  (declare (ignore set2))
+  set1)
+
+(defmethod difference ((set1 cl:sequence) (set2 cl:sequence) &key (key 'cl:identity) (test 'cl:equal)) 
+  (cl:set-difference (cl:coerce set1 'cl:list)
+                     (cl:coerce set2 'cl:list)
+                     :key key :test test))
+
+(defmethod difference ((set1 cl:sequence) (set2 fset:seq) &key (key 'cl:identity) (test 'cl:equal)) 
+  (cl:set-difference (cl:coerce set1 'cl:list)
+                     (fset:convert 'cl:list set2)
+                     :key key :test test))
+
+(defmethod difference ((set1 cl:sequence) (set2 series::foundation-series) &key (key 'cl:identity) (test 'cl:equal)) 
+  (cl:set-difference (cl:coerce set1 'cl:list)
+                     (series:collect 'cl:list set2)
+                     :key key :test test))
+
+(defmethod difference ((set1 fset:seq) (set2 cl:sequence) &key (key 'cl:identity) (test 'cl:equal)) 
+  (cl:set-difference (fset:convert 'cl:list set1)
+                     (cl:coerce set2 'cl:list)
+                     :key key :test test))
+
+(defmethod difference ((set1 fset:seq) (set2 fset:seq) &key (key 'cl:identity) (test 'cl:equal)) 
+  (cl:set-difference (fset:convert 'cl:list set1)
+                     (fset:convert 'cl:list set2)
+                     :key key :test test))
+
+(defmethod difference ((set1 fset:seq) (set2 series::foundation-series) &key (key 'cl:identity) (test 'cl:equal)) 
+  (cl:set-difference (fset:convert 'cl:list set1)
+                     (series:collect 'cl:list set2)
+                     :key key :test test))
+
+(defmethod difference ((set1 series::foundation-series) (set2 cl:sequence) &key (key 'cl:identity) (test 'cl:equal)) 
+  (cl:set-difference (series:collect 'cl:list set1)
+                     (cl:coerce set2 'cl:list)
+                     :key key :test test))
+
+(defmethod difference ((set1 series::foundation-series) (set2 fset:seq) &key (key 'cl:identity) (test 'cl:equal)) 
+  (cl:set-difference (series:collect 'cl:list set1)
+                     (fset:convert 'cl:list set2)
+                     :key key :test test))
+
+(defmethod difference ((set1 series::foundation-series) (set2 series::foundation-series) &key (key 'cl:identity) (test 'cl:equal)) 
+  (cl:set-difference (series:collect 'cl:list set1)
+                     (series:collect 'cl:list set2)
+                     :key key :test test))
+
 
 ;;; ---------------------------------------------------------------------
 ;;; function intersection
 ;;; ---------------------------------------------------------------------
 ;;;
-;;; (intersection ) => 
+;;; (intersection set1 set2) => set3
 ;;; ---------------------------------------------------------------------
-;;; returns a new setuence that contains X prepended to the elements of
-;;; SET
+;;; returns a sequence that contains those elements that appear in both 
+;;; SET1 and SET2
 
-(defgeneric intersection ())
+(defgeneric intersection (set1 set2 &key key test))
 
-(defmethod intersection () )
+(defmethod intersection ((set1 null) set2 &key key test) 
+  (declare (ignore set1))
+  nil)
+
+(defmethod intersection (set1 (set2 null) &key key test) 
+  (declare (ignore set2))
+  set1)
+
+(defmethod intersection ((set1 cl:sequence) (set2 cl:sequence) &key (key 'cl:identity) (test 'cl:equal)) 
+  (cl:intersection (cl:coerce set1 'cl:list)
+                   (cl:coerce set2 'cl:list)
+                   :key key :test test))
+
+(defmethod intersection ((set1 cl:sequence) (set2 fset:seq) &key (key 'cl:identity) (test 'cl:equal)) 
+  (cl:intersection (cl:coerce set1 'cl:list)
+                   (fset:convert 'cl:list set2)
+                   :key key :test test))
+
+(defmethod intersection ((set1 cl:sequence) (set2 series::foundation-series) &key (key 'cl:identity) (test 'cl:equal)) 
+  (cl:intersection (cl:coerce set1 'cl:list)
+                   (series:collect 'cl:list set2)
+                   :key key :test test))
+
+(defmethod intersection ((set1 fset:seq) (set2 cl:sequence) &key (key 'cl:identity) (test 'cl:equal)) 
+  (cl:intersection (fset:convert 'cl:list set1)
+                   (cl:coerce set2 'cl:list)
+                   :key key :test test))
+
+(defmethod intersection ((set1 fset:seq) (set2 fset:seq) &key (key 'cl:identity) (test 'cl:equal)) 
+  (cl:intersection (fset:convert 'cl:list set1)
+                   (fset:convert 'cl:list set2)
+                   :key key :test test))
+
+(defmethod intersection ((set1 fset:seq) (set2 series::foundation-series) &key (key 'cl:identity) (test 'cl:equal)) 
+  (cl:intersection (fset:convert 'cl:list set1)
+                   (series:collect 'cl:list set2)
+                   :key key :test test))
+
+(defmethod intersection ((set1 series::foundation-series) (set2 cl:sequence) &key (key 'cl:identity) (test 'cl:equal)) 
+  (cl:intersection (series:collect 'cl:list set1)
+                   (cl:coerce set2 'cl:list)
+                   :key key :test test))
+
+(defmethod intersection ((set1 series::foundation-series) (set2 fset:seq) &key (key 'cl:identity) (test 'cl:equal)) 
+  (cl:intersection (series:collect 'cl:list set1)
+                   (fset:convert 'cl:list set2)
+                   :key key :test test))
+
+(defmethod intersection ((set1 series::foundation-series) (set2 series::foundation-series) &key (key 'cl:identity) (test 'cl:equal)) 
+  (cl:intersection (series:collect 'cl:list set1)
+                   (series:collect 'cl:list set2)
+                   :key key :test test))
 
 ;;; ---------------------------------------------------------------------
 ;;; function set?
 ;;; ---------------------------------------------------------------------
 ;;;
-;;; (set? ) => 
+;;; (set? s) => boolean
 ;;; ---------------------------------------------------------------------
-;;; returns a new setuence that contains X prepended to the elements of
-;;; SET
 
 (defgeneric set? ())
-
-(defmethod set? () )
 
 ;;; ---------------------------------------------------------------------
 ;;; function subset?
 ;;; ---------------------------------------------------------------------
 ;;;
-;;; (subset? ) => 
+;;; (subset? set1 set2) => boolean
 ;;; ---------------------------------------------------------------------
-;;; returns a new setuence that contains X prepended to the elements of
-;;; SET
+;;; returns true if every element of SET1 also appears in SET2
 
 (defgeneric subset? ())
-
-(defmethod subset? () )
 
 ;;; ---------------------------------------------------------------------
 ;;; function union
 ;;; ---------------------------------------------------------------------
 ;;;
-;;; (union ) => 
+;;; (union set1 set2) => set3
 ;;; ---------------------------------------------------------------------
-;;; returns a new setuence that contains X prepended to the elements of
-;;; SET
+;;; returns a set that contains all elements that appear either in
+;;; SET1 or in SET2
 
-(defgeneric union ())
+(defgeneric union (set1 set2 &key key test))
 
-(defmethod union () )
+(defmethod union ((set1 null) set2 &key key test) 
+  (declare (ignore set1))
+  nil)
 
+(defmethod union (set1 (set2 null) &key key test) 
+  (declare (ignore set2))
+  set1)
+
+(defmethod union ((set1 cl:sequence) (set2 cl:sequence) &key (key 'cl:identity) (test 'cl:equal)) 
+  (cl:union (cl:coerce set1 'cl:list)
+                   (cl:coerce set2 'cl:list)
+                   :key key :test test))
+
+(defmethod union ((set1 cl:sequence) (set2 fset:seq) &key (key 'cl:identity) (test 'cl:equal)) 
+  (cl:union (cl:coerce set1 'cl:list)
+                   (fset:convert 'cl:list set2)
+                   :key key :test test))
+
+(defmethod union ((set1 cl:sequence) (set2 series::foundation-series) &key (key 'cl:identity) (test 'cl:equal)) 
+  (cl:union (cl:coerce set1 'cl:list)
+                   (series:collect 'cl:list set2)
+                   :key key :test test))
+
+(defmethod union ((set1 fset:seq) (set2 cl:sequence) &key (key 'cl:identity) (test 'cl:equal)) 
+  (cl:union (fset:convert 'cl:list set1)
+                   (cl:coerce set2 'cl:list)
+                   :key key :test test))
+
+(defmethod union ((set1 fset:seq) (set2 fset:seq) &key (key 'cl:identity) (test 'cl:equal)) 
+  (cl:union (fset:convert 'cl:list set1)
+                   (fset:convert 'cl:list set2)
+                   :key key :test test))
+
+(defmethod union ((set1 fset:seq) (set2 series::foundation-series) &key (key 'cl:identity) (test 'cl:equal)) 
+  (cl:union (fset:convert 'cl:list set1)
+                   (series:collect 'cl:list set2)
+                   :key key :test test))
+
+(defmethod union ((set1 series::foundation-series) (set2 cl:sequence) &key (key 'cl:identity) (test 'cl:equal)) 
+  (cl:union (series:collect 'cl:list set1)
+                   (cl:coerce set2 'cl:list)
+                   :key key :test test))
+
+(defmethod union ((set1 series::foundation-series) (set2 fset:seq) &key (key 'cl:identity) (test 'cl:equal)) 
+  (cl:union (series:collect 'cl:list set1)
+                   (fset:convert 'cl:list set2)
+                   :key key :test test))
+
+(defmethod union ((set1 series::foundation-series) (set2 series::foundation-series) &key (key 'cl:identity) (test 'cl:equal)) 
+  (cl:union (series:collect 'cl:list set1)
+                   (series:collect 'cl:list set2)
+                   :key key :test test))
