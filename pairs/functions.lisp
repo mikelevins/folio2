@@ -23,14 +23,6 @@
 (defmethod left ((p cons))
   (car p))
 
-;;; type pair
-;;;
-;;; ---------------------------------------------------------------------
-;;; the type of pairs
-
-(deftype pair ()
- '(satisfies pair?))
-
 ;;; function pair
 ;;;
 ;;; (pair a b) => Pair
@@ -41,26 +33,6 @@
 
 (defmethod pair (a b)
   (cons a b))
-
-;;; function pair?
-;;;
-;;; (pair? p) => Boolean
-;;; ---------------------------------------------------------------------
-;;; returns a true value if p is a pair
-
-(defgeneric pair? (p))
-
-(defmethod pair? (p)
-  (declare (ignore p))
-  nil)
-
-(defmethod pair? ((p null))
-  (declare (ignore p))
-  t)
-
-(defmethod pair? ((p cons))
-  (declare (ignore p))
-  t)
 
 ;;; function right
 ;;;

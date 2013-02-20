@@ -11,6 +11,84 @@
 
 (in-package #:net.bardcode.folio.tables)
 
+;;; ---------------------------------------------------------------------
+;;; utils
+;;; ---------------------------------------------------------------------
+
+(defmethod %find-entry ((om ordered-map) key &key (test 'equal))
+  (assoc key (%table-entries om) :test test))
+
+;;; ---------------------------------------------------------------------
+;;; API
+;;; ---------------------------------------------------------------------
+
+;;; generic function alist->plist
+;;;
+;;; (alist->plist alist) => plist
+;;; ---------------------------------------------------------------------
+;;; returns a plist--a list of alternating key/value elements
+;;; constructed from the keys and values of the alist
+
+(defgeneric alist->plist (thing))
+
+(defmethod alist->plist (x)
+  (error "Not an alist:" thing))
+
+(defmethod alist->plist ((x null))
+  (declare (ignore x))
+  nil)
+
+(defmethod alist->plist ((x cons))
+  (loop for (a . b) in x appending (list a b)))
+
+;;; generic function associate
+;;;
+;;; (associate table1 key val &key (test 'equal) &allow-other-keys) => table2
+;;; ---------------------------------------------------------------------
+;;; returns a table TABLE2 that contains the elements of TABLE1, plus the
+;;; key/value pair of KEY and VAL. If TABLE1 contains KEY then its value is
+;;; replaced by VAL in TABLE2.
+
+(defgeneric associate (table key val &key test &allow-other-keys))
+
+(defmethod associate ((m ordered-map) key val &key (test 'equal) &allow-other-keys)
+  (if (%find-entry m key :test test)
+      m
+      (let* ((outm (make-instance 'ordered-map :entries (cl:copy-seq (%table-entries m))))
+             (already (assoc key (%table-entries outm) :test test)))
+        (if already
+            (setf (cdr already) val)
+            (setf (%table-entries outm)
+                  (append (%table-entries outm)
+                          (list (cons key val)))))
+        outm)))
+
+(defmethod associate ((table alist) key val &key (test 'equal) &allow-other-keys)
+  (let ((old-value (value table)))
+    (make-instance 'alist
+                   :value (cl:acons key val
+                                    (cl:remove key old-value :test test :key 'car)))))
+
+(defmethod associate ((table plist) key val &key (test 'equal) &allow-other-keys)
+  (let* ((old-value (value table))
+         (new-table (make-instance 'alist
+                   :value (cl:copy-seq old-value)))
+         (new-already (cl:member key (value new-table) :test test)))
+    (if new-already
+        (progn
+          (setf (cdr new-already)
+                (cons val (cddr new-already)))
+          new-table)
+        (progn
+          (setf (value new-table)
+                (append (value new-table)
+                        (list key val)))
+          new-table))))
+
+(defmethod associate ((table fset:map) key val &key &allow-other-keys)
+  (fset:with table key val))
+
+
 ;;; generic function contains-key?
 ;;;
 ;;; (contains-key? map key &key (test 'equal)) => a generalized boolean
@@ -28,6 +106,16 @@
 
 (defmethod contains-key? ((map cl:sequence) (key integer) &key &allow-other-keys)
   (< -1 key (length map)))
+
+(defmethod contains-key? ((map alist) key &key (test 'equal) &allow-other-keys)
+  (and (cl:assoc key map :test test) t))
+
+(defmethod contains-key? ((map plist) key &key (test 'equal) &allow-other-keys)
+  (block searching
+    (loop (for x on (value map) by 'cddr
+               do (when (funcall test val (car x))
+                    (return-from searching t))))
+    nil))
 
 (defmethod contains-key? ((map fset:seq) key &key &allow-other-keys)
   (fset:domain-contains? map key))
@@ -51,7 +139,17 @@
 (defgeneric contains-value? (map key &key &allow-other-keys))
 
 (defmethod contains-value? ((map cl:sequence) val &key (test #'equal) &allow-other-keys)
-  (some (lambda (i)(funcall test val i)) map))
+  (cl:some (lambda (i)(funcall test val i)) map))
+
+(defmethod contains-value? ((map alist) val &key (test #'equal) &allow-other-keys)
+  (cl:some (lambda (i)(funcall test val (cdr i))) (value map)))
+
+(defmethod contains-value? ((map plist) val &key (test #'equal) &allow-other-keys)
+  (block searching
+    (loop (for x on (value map) by 'cddr
+               do (when (funcall test val (cadr x))
+                    (return-from searching t))))
+    nil))
 
 (defmethod contains-value? ((map fset:seq) val &key &allow-other-keys)
   (fset:range-contains? map val))
@@ -75,6 +173,19 @@
       (elt map key)
       default))
 
+(defmethod get-key ((map alist) key &key (test 'equal) (default nil) &allow-other-keys)
+  (let ((entry (cl:assoc key (value map) :test test)))
+    (if entry
+        (cdr entry)
+        default)))
+
+(defmethod get-key ((map plist) val &key (test #'equal) (default nil)&allow-other-keys)
+  (block searching
+    (loop (for x on (value map) by 'cddr
+               do (when (funcall test key (car x))
+                    (return-from searching (cadr x)))))
+    default))
+
 (defmethod get-key ((map fset:seq)(key integer) &key (default nil) &allow-other-keys)
   (multiple-value-bind (result found?)(fset:lookup map key)
     (if found? result default)))
@@ -97,6 +208,13 @@
 
 (defmethod keys ((map cl:sequence))
   (loop for i from 0 below (length map) collect i))
+
+(defmethod keys ((map alist))
+  (mapcar 'car (value map)))
+
+(defmethod keys ((map plist))
+  (loop (for x on (value map) by 'cddr
+             collecting (car x))))
 
 (defmethod keys ((map fset:seq))
   (fset:domain map))

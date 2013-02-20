@@ -93,7 +93,9 @@
   :depends-on (:net.bardcode.folio.packages)
   :components ((:module "pairs"
                         :serial t
-                        :components ((:file "package")))))
+                        :components ((:file "package")
+                                     (:file "types")
+                                     (:file "functions")))))
 
 (asdf:defsystem :net.bardcode.folio.sequences
   :serial t
@@ -104,6 +106,7 @@
   :components ((:module "sequences"
                         :serial t
                         :components ((:file "package")
+                                     (:file "types")
                                      (:file "functions")))))
 
 (asdf:defsystem :net.bardcode.folio.sequences-syntax
@@ -125,7 +128,9 @@
   :depends-on (:fset :series :net.bardcode.folio.packages)
   :components ((:module "sets"
                         :serial t
-                        :components ((:file "package")))))
+                        :components ((:file "package")
+                                     (:file "types")
+                                     (:file "functions")))))
 
 (asdf:defsystem :net.bardcode.folio.set-syntax
   :serial t
@@ -157,6 +162,7 @@
   :components ((:module "tables"
                         :serial t
                         :components ((:file "package")
+                                     (:file "types")
                                      (:file "functions")))))
 
 (asdf:defsystem :net.bardcode.folio.table-syntax

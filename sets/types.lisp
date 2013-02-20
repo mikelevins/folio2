@@ -3,27 +3,19 @@
 ;;;;
 ;;;; Name:          types.lisp
 ;;;; Project:       folio - the Bard runtime
-;;;; Purpose:       the box type
+;;;; Purpose:       the set type
 ;;;; Author:        mikel evins
 ;;;; Copyright:     2013 by mikel evins
 ;;;;
 ;;;; ***********************************************************************
 
-(in-package #:net.bardcode.folio.boxes)
+(in-package :net.bardcode.folio.sets)
 
-;;; function box?
+;;; type sequence
 ;;;
-;;; (box? val) => a boolean
 ;;; ---------------------------------------------------------------------
-;;; return true if and only if val is a box
+;;; the type of sets
 
-(defmethod box? (x) 
-  (declare (ignore x))
-  nil)
+(deftype set ()
+ '(satisfies set?))
 
-(defmethod box? ((x cons)) 
-  (eq :box (car x)))
-
-
-(deftype box ()
-  `(and cons (satisfies box?)))

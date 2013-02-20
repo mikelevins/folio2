@@ -10,28 +10,11 @@
 ;;;; ***********************************************************************
 
 (defpackage :net.bardcode.folio.tables
-  (:use :cl)
+  (:use :cl :net.bardcode.folio.common)
   (:shadowing-import-from :net.bardcode.folio.common
                           :> :>= :< :<=
-                          :adjoin :append :apply :find :first :get :last :length :map :merge :position :position-if :put 
-                          :reduce :remove :rest :reverse :second :sequence :sort :union)
-  (:export
-   :alist
-   :alist->plist
-   :associate
-   :contains-key?
-   :contains-value?
-   :dissociate
-   :get-key
-   :keys
-   :merge
-   :ordered-map
-   :plist
-   :plist->alist
-   :put-key
-   :table
-   :vals
-   :zipmap))
+                          :adjoin :append :apply :find :first :get :intersection :last :length :map :merge :position :position-if :put 
+                          :reduce :remove :rest :reverse :second :sequence :sort :union))
 
 
 

@@ -32,25 +32,7 @@
                 :split :subsequence 
                 :tails :take :take-by :take-while :type-for-copy
                 :unique :unzip
-                :zip)
-  (:export :add-first :add-last :any :append :append2 
-           :by
-           :coalesce :concat
-           :drop :drop-while
-           :element :empty? :every?
-           :filter :find :first
-           :generate
-           :indexes :interleave :interpose
-           :join :join2
-           :last :length 
-           :map
-           :next-last
-           :partition :position :position-if
-           :range :range-from :reduce :remove :repeat :rest :reverse
-           :scan :scan-map :second :select :sequence :sequence? :series? :shuffle :some? :sort :split :subsequence
-           :tails :take :take-by :take-while
-           :unique :unzip
-           :zip))
+                :zip))
 
 
 

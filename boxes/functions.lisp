@@ -27,19 +27,6 @@
 
 (defun box (val)(cons :box val))
 
-;;; function box?
-;;;
-;;; (box? val) => a boolean
-;;; ---------------------------------------------------------------------
-;;; return true if and only if val is a box
-
-(defmethod box? (x) 
-  (declare (ignore x))
-  nil)
-
-(defmethod box? ((x cons)) 
-  (eq :box (car x)))
-
 ;;; function set-box!
 ;;;
 ;;; (set-box! b val) => val

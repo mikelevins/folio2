@@ -70,7 +70,7 @@
 ;;; returns a new set that contains the elements of SET1 that are
 ;;; not in SET2
 
-(defgeneric difference (set1 set2 &key key test)) => set3
+(defgeneric difference (set1 set2 &key key test)) 
 
 (defmethod difference ((set1 null) set2 &key key test) 
   (declare (ignore set1))

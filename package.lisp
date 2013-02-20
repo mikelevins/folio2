@@ -58,8 +58,8 @@
    ;; streams
    :characters :lines :objects :octets
    ;; tables
-   :alist :alist->plist :associate :contains-key? :contains-value? :dissociate :get-key :keys :merge
-   :ordered-map :plist :plist->alist :put-key :table :table? :vals :zipmap
+   :alist :alist? :alist->plist :associate :contains-key? :contains-value? :dissociate :get-key :keys :merge
+   :ordered-map :ordered-map? :plist :plist? :plist->alist :put-key :table :table? :vals :zipmap
    ;; text
    :join-text :split-text :text?))
 

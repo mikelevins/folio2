@@ -18,9 +18,6 @@
                           :reduce :remove :rest :reverse :second :sequence :sort :union)
   (:import-from :net.bardcode.folio.common 
                 :$ :^ :-> :cascade :compose :conjoin :disjoin :flip :fn :function? :functional? :generic-function? :method?
-                :partial :rotate-left :rotate-right :rpartial) 
-  (:export
-   :$ :^ :-> :apply :cascade :compose :conjoin :disjoin :flip :fn :function? :functional? :generic-function? :method?
-   :partial :rotate-left :rotate-right :rpartial))
+                :partial :rotate-left :rotate-right :rpartial) )
 
 

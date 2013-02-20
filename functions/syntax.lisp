@@ -18,7 +18,7 @@
 ;;; folio's application operator.
 ;;; if f is a function or generic function then $ is a synonym for
 ;;; FUNCALL. If f is a sequence, table, series, or generator, then
-;;; it is a synonym for net.bardcode.folio.tables:GET-KEY
+;;; it is a synonym for net.bardcode.folio.common:GET-KEY
 
 (defmethod %funcall-applicable (f &rest args)
   (error "Not an applicable object: ~S" f))
@@ -30,16 +30,16 @@
   (apply f args))
 
 (defmethod %funcall-applicable ((f cl:sequence) &rest args)
-  (net.bardcode.folio.tables:get-key f (car args)))
+  (net.bardcode.folio.common:get-key f (car args)))
 
 (defmethod %funcall-applicable ((f fset:seq) &rest args)
-  (net.bardcode.folio.tables:get-key f (car args)))
+  (net.bardcode.folio.common:GET-KEY f (car args)))
 
 (defmethod %funcall-applicable ((f fset:map) &rest args)
-  (net.bardcode.folio.tables:get-key f (car args)))
+  (net.bardcode.folio.common:GET-KEY f (car args)))
 
 (defmethod %funcall-applicable ((f series::foundation-series) &rest args)
-  (net.bardcode.folio.tables:get-key f (car args)))
+  (net.bardcode.folio.common:GET-KEY f (car args)))
 
 (defmacro $ (f &rest args)
   `(%funcall-applicable ,f ,@args))

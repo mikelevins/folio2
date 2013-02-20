@@ -1122,65 +1122,6 @@
   (series:choose (series:mask indexes) s))
 
 
-
-;;; type sequence
-;;;
-;;; ---------------------------------------------------------------------
-;;; the type of sequences
-
-(deftype sequence ()
- '(satisfies sequence?))
-
-
-;;; function sequence?
-;;;
-;;; (sequence? p) => Boolean
-;;; ---------------------------------------------------------------------
-;;; returns a true value if p is a sequence
-
-(defgeneric sequence? (p))
-
-(defmethod sequence? (s)
-  (declare (ignore s))
-  nil)
-
-(defmethod sequence? ((s cl:sequence))
-  (declare (ignore s))
-  t)
-
-(defmethod sequence? ((s fset:seq))
-  (declare (ignore s))
-  t)
-
-(defmethod sequence? ((s series::foundation-series))
-  (declare (ignore s))
-  t)
-
-
-;;; function series?
-;;;
-;;; (series? p) => Boolean
-;;; ---------------------------------------------------------------------
-;;; returns a true value if p is a series
-
-(defgeneric series? (p))
-
-(defmethod series? (s)
-  (declare (ignore s))
-  nil)
-
-(defmethod series? ((s cl:sequence))
-  (declare (ignore s))
-  nil)
-
-(defmethod series? ((s fset:seq))
-  (declare (ignore s))
-  nil)
-
-(defmethod series? ((s series::foundation-series))
-  (declare (ignore s))
-  t)
-
 ;;; function shuffle
 ;;;
 ;;; (shuffle seq1) => seq2

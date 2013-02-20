@@ -13,10 +13,10 @@
 
 (defpackage :net.bardcode.folio.common
   (:shadow :adjoin :append :apply :find :first :get :intersection :last :length :map :merge :position :position-if :put 
-           :reduce :remove :rest :reverse :second :sequence :sort :union)
+           :reduce :remove :rest :reverse :second :sequence :set :sort :union)
   (:use :cl)
   (:export :$ :^ :-> :> :>= :< :<=
-           :adjoin :add-first :add-last :alist :alist->plist :any :append :append2 :apply :as :associate
+           :adjoin :add-first :add-last :alist :alist? :alist->plist :any :append :append2 :apply :as :associate
            :box :box? :by
            :cascade :characters :coalesce :combined-type :compose :concat :conjoin :contains-key? :contains-value?
            :difference :disjoin :dissociate :drop :drop-while 
@@ -29,8 +29,8 @@
            :last :left :length :lines
            :make :map :merge :method?
            :next-last
-           :objects :octets :ordered-map
-           :pair :pair? :partial :partition :plist :plist->alist :position :position-if :put-key
+           :objects :octets :ordered-map :ordered-map?
+           :pair :pair? :partial :partition :plist :plist? :plist->alist :position :position-if :put-key
            :range :range-from :reduce :remove :repeat :rest :reverse :right :rotate-left :rotate-right :rpartial
            :scan :scan-map :second :select :series? :sequence :sequence? :set-box! :set? :shuffle :some?
            :sort :split :split-text :stream? :subsequence :subset?

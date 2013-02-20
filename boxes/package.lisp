@@ -19,12 +19,7 @@
                 :box
                 :box?
                 :set-box!
-                :unbox)
-  (:export
-   :box
-   :box?
-   :set-box!
-   :unbox))
+                :unbox))
 
 
 
