@@ -12,6 +12,26 @@
 (in-package :net.bardcode.folio.pairs)
 
 
+;;; function as
+;;;
+;;; (as type x) => an instance of type
+;;; ---------------------------------------------------------------------
+
+(defmethod as ((type (eql 'pair))(val null))
+  val)
+
+(defmethod as ((type (eql 'pair))(val cons))
+  val)
+
+(defmethod as ((type (eql 'pair))(val cl:sequence))
+  (coerce val 'cl:list))
+
+(defmethod as ((type (eql 'pair))(val seq))
+  (fset:convert 'cl:list val))
+
+(defmethod as ((type (eql 'pair))(val foundation-series))
+  (series:collect 'cl:list val))
+
 ;;; function left
 ;;;
 ;;; (left p) => anything
@@ -22,6 +42,15 @@
 
 (defmethod left ((p cons))
   (car p))
+
+;;; function make
+;;;
+;;; (make 'pair :left x :right y) => (x . y)
+;;; ---------------------------------------------------------------------
+;;; create a pair
+
+(defmethod make ((type (eql 'pair)) &key (left nil) (right nil) &allow-other-keys)
+  (cons left right))
 
 ;;; function pair
 ;;;

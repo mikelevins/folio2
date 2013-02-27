@@ -28,8 +28,7 @@
                (:module "sequences" :components ((:file "package")))
                (:module "sets" :components ((:file "package")))
                (:module "streams" :components ((:file "package")))
-               (:module "tables" :components ((:file "package")))
-               (:module "text" :components ((:file "package")))))
+               (:module "tables" :components ((:file "package")))))
 
 (asdf:defsystem :net.bardcode.folio.boxes
   :serial t
@@ -176,15 +175,16 @@
                         :components ((:file "package")
                                      (:file "syntax")))))
 
-(asdf:defsystem :net.bardcode.folio.text
+(asdf:defsystem :net.bardcode.folio.table-printer
   :serial t
-  :description "functional operations on text strings"
+  :description "prettier printing for fset-based tables"
   :author "mikel evins <mevins@me.com>"
   :license "Lisp Lesser GNU Public License"
-  :depends-on (:fset :series :net.bardcode.folio.packages)
-  :components ((:module "text"
+  :depends-on (:fset :series :net.bardcode.folio.tables :net.bardcode.folio.packages)
+  :components ((:module "tables"
                         :serial t
-                        :components ((:file "package")))))
+                        :components ((:file "package")
+                                     (:file "printer")))))
 
 (asdf:defsystem :net.bardcode.folio
   :serial t
@@ -205,8 +205,7 @@
                :net.bardcode.folio.streams
                :net.bardcode.folio.table-syntax
                :net.bardcode.folio.tables
-               :net.bardcode.folio.text
-               )
+               :net.bardcode.folio.table-printer)
   :components ((:file "package")))
 
 (defun load-folio ()

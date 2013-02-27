@@ -28,11 +28,11 @@
   (declare (ignore s))
   t)
 
-(defmethod sequence? ((s fset:seq))
+(defmethod sequence? ((s seq))
   (declare (ignore s))
   t)
 
-(defmethod sequence? ((s series::foundation-series))
+(defmethod sequence? ((s foundation-series))
   (declare (ignore s))
   t)
 
@@ -52,11 +52,11 @@
   (declare (ignore s))
   nil)
 
-(defmethod series? ((s fset:seq))
+(defmethod series? ((s seq))
   (declare (ignore s))
   nil)
 
-(defmethod series? ((s series::foundation-series))
+(defmethod series? ((s foundation-series))
   (declare (ignore s))
   t)
 

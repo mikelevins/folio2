@@ -3,7 +3,7 @@
 ;;;;
 ;;;; Name:          functions.lisp
 ;;;; Project:       folio - the Bard runtime
-;;;; Purpose:       tables functions
+;;;; Purpose:       table functions
 ;;;; Author:        mikel evins
 ;;;; Copyright:     2013 by mikel evins
 ;;;;
@@ -22,6 +22,13 @@
 ;;; API
 ;;; ---------------------------------------------------------------------
 
+;;; ---------------------------------------------------------------------
+;;; as
+;;; ---------------------------------------------------------------------
+
+(defmethod as ((type (eql 'cl:list))(tbl fset:map))
+  (fset:convert 'cl:list tbl))
+
 ;;; generic function alist->plist
 ;;;
 ;;; (alist->plist alist) => plist
@@ -39,7 +46,7 @@
   nil)
 
 (defmethod alist->plist ((x cons))
-  (loop for (a . b) in x appending (list a b)))
+  (loop for (a . b) in x appending (cl:list a b)))
 
 ;;; generic function associate
 ;;;
@@ -60,7 +67,7 @@
             (setf (cdr already) val)
             (setf (%table-entries outm)
                   (append (%table-entries outm)
-                          (list (cons key val)))))
+                          (cl:list (cons key val)))))
         outm)))
 
 (defmethod associate ((table alist) key val &key (test 'equal) &allow-other-keys)
@@ -82,7 +89,7 @@
         (progn
           (setf (value new-table)
                 (append (value new-table)
-                        (list key val)))
+                        (cl:list key val)))
           new-table))))
 
 (defmethod associate ((table fset:map) key val &key &allow-other-keys)
@@ -117,13 +124,13 @@
                     (return-from searching t))))
     nil))
 
-(defmethod contains-key? ((map fset:seq) key &key &allow-other-keys)
+(defmethod contains-key? ((map seq) key &key &allow-other-keys)
   (fset:domain-contains? map key))
 
 (defmethod contains-key? ((map fset:map) key &key &allow-other-keys)
   (fset:domain-contains? map key))
 
-(defmethod contains-key? ((map series::foundation-series) (key integer) &key &allow-other-keys)
+(defmethod contains-key? ((map foundation-series) (key integer) &key &allow-other-keys)
   (let ((absent (gensym)))
     (and (not (eq absent (series:collect-nth key map absent)))
          t)))
@@ -151,13 +158,13 @@
                     (return-from searching t))))
     nil))
 
-(defmethod contains-value? ((map fset:seq) val &key &allow-other-keys)
+(defmethod contains-value? ((map seq) val &key &allow-other-keys)
   (fset:range-contains? map val))
 
 (defmethod contains-value? ((map fset:map) key &key &allow-other-keys)
   (fset:range-contains? map key))
 
-(defmethod contains-value? ((map series::foundation-series) val &key (test #'equal) &allow-other-keys)
+(defmethod contains-value? ((map foundation-series) val &key (test #'equal) &allow-other-keys)
   (series:collect-first (series:choose-if (lambda (x)(funcall test val x)) map)))
 
 ;;; generic function get-key
@@ -186,7 +193,7 @@
                     (return-from searching (cadr x)))))
     default))
 
-(defmethod get-key ((map fset:seq)(key integer) &key (default nil) &allow-other-keys)
+(defmethod get-key ((map seq)(key integer) &key (default nil) &allow-other-keys)
   (multiple-value-bind (result found?)(fset:lookup map key)
     (if found? result default)))
 
@@ -194,7 +201,7 @@
   (multiple-value-bind (result found?)(fset:lookup map key)
     (if found? result default)))
 
-(defmethod get-key ((map series::foundation-series) (key integer) &key (default nil) &allow-other-keys)
+(defmethod get-key ((map foundation-series) (key integer) &key (default nil) &allow-other-keys)
   (series:collect-nth key map default))
 
 ;;; generic function keys
@@ -216,114 +223,69 @@
   (loop (for x on (value map) by 'cddr
              collecting (car x))))
 
-(defmethod keys ((map fset:seq))
+(defmethod keys ((map seq))
   (fset:domain map))
 
 (defmethod keys ((map fset:map))
   (fset:domain map))
 
-(defmethod keys ((map series::foundation-series))
+(defmethod keys ((map foundation-series))
   (series:positions (series:map-fn 'boolean (constantly t) map)))
 
-;;; generic function merge-tables
-;;; (merge-tables map1 map2 &key (test 'equal)) => map3
 ;;; ---------------------------------------------------------------------
-;;; returns a new map constructed by combining the key/value pairs
-;;; from both MAP1 and MAP2. If a key appears in both maps then the
-;;; value from MAP2 is used. Keys are compared using TEST. sequences
-;;; and sequence-like objects are treated as maps from indexes to
-;;; elements.
+;;; function make
+;;; ---------------------------------------------------------------------
+;;;
+;;; (make 'table &key ) => a table
+;;; ---------------------------------------------------------------------
+;;; create a table
 
-(defgeneric merge-tables (map1 map2 &key &allow-other-keys))
+(defmethod make ((type (eql 'alist))  &key &allow-other-keys)
+  )
 
-(defmethod merge-tables ((map1 cl:sequence)(map2 cl:sequence) &key &allow-other-keys)
-  (if (<= (length map1)(length map2))
-      map2
-      (concatenate 'list map2 (subseq map1 (length map2)))))
+(defmethod make ((type (eql 'ordered-map))  &key &allow-other-keys)
+  )
 
-(defmethod merge-tables ((map1 string)(map2 string) &key &allow-other-keys)
-  (if (<= (length map1)(length map2))
-      map2
-      (concatenate 'string map2 (subseq map1 (length map2)))))
+(defmethod make ((type (eql 'plist))  &key &allow-other-keys)
+  )
 
-(defmethod merge-tables ((map1 vector)(map2 vector) &key &allow-other-keys)
-  (if (<= (length map1)(length map2))
-      map2
-      (concatenate 'vector map2 (subseq map1 (length map2)))))
-
-(defmethod merge-tables ((map1 cl:sequence)(map2 fset:seq) &key &allow-other-keys)
-  (merge-tables map1 (fset:convert 'list map2)))
-
-(defmethod merge-tables ((map1 cl:sequence)(map2 fset:map) &key &allow-other-keys)
-  (merge-tables map1 (fset:convert 'list map2)))
-
-(defmethod merge-tables ((map1 cl:sequence)(map2 series::foundation-series) &key &allow-other-keys)
-  (merge-tables (series:scan map1) map2))
+(defmethod make ((type (eql 'table))  &key &allow-other-keys)
+  )
 
 
+;;; generic function merge
+;;; (merge table1 table2 &key (test 'equal)) => table3
+;;; ---------------------------------------------------------------------
+;;; returns a new table constructed by combining the key/value pairs
+;;; from both TABLE1 and TABLE2. If a key appears in both tables then
+;;; the value from TABLE2 is used. Keys are compared using
+;;; TEST. sequences and sequence-like objects are treated as maps from
+;;; indexes to elements.
 
-(defmethod merge-tables ((map1 fset:seq)(map2 cl:sequence) &key &allow-other-keys)
-  (merge-tables map1 (fset:convert 'fset:seq map2)))
+(defmethod %convert-to-merge ((table null))
+  nil)
 
-(defmethod merge-tables ((map1 fset:seq)(map2 fset:seq) &key &allow-other-keys)
-  (if (<= (fset:size map1)(fset:size map2))
-      map2
-      (fset:concat map2 (fset:subseq map1 (fset:size map2)))))
+(defmethod %convert-to-merge ((table cl:sequence))
+  (loop 
+     for i from 0 below (length table)
+     collecting (cons i (elt table i))))
 
-(defmethod merge-tables ((map1 fset:seq)(map2 fset:map) &key &allow-other-keys)
-  (merge-tables map1 (fset:convert 'fset:seq map2)))
+(defmethod %convert-to-merge ((table seq))
+  (loop 
+     for i from 0 below (fset:size table)
+     collecting (cons i (elt table i))))
 
-(defmethod merge-tables ((map1 fset:seq)(map2 series::foundation-series) &key &allow-other-keys)
-  (merge-tables (series:scan (fset:convert 'list map1)) map2))
+(defmethod %merge-converted-tables ((table1 null) (table2 null))
+  nil)
 
+(defmethod %convert-from-merge (out-type (table null))
+  nil)
 
-
-(defmethod merge-tables ((map1 fset:map)(map2 cl:sequence) &key &allow-other-keys)
-  (merge-tables map1 (fset:convert 'fset:seq map2)))
-
-(defmethod merge-tables ((map1 fset:map)(map2 fset:seq) &key &allow-other-keys)
-  (merge-tables map1
-                (fset:convert 'fset:map
-                              (fset:convert 'list
-                                            (fset:image (lambda (i)(cons i (fset:@ map2 i)))
-                                                        (fset:domain map2))))))
-
-(defmethod merge-tables ((map1 fset:map)(map2 fset:map) &key &allow-other-keys)
-  (fset:map-union map1 map2))
-
-(defmethod merge-tables ((map1 fset:map)(map2 series::foundation-series) &key &allow-other-keys)
-  (merge-tables (series:scan (fset:convert 'list map1)) 
-                (series:map-fn 't
-                               (lambda (k i)(cons k i))
-                               (keys map2)
-                               map2)))
-
-
-(defmethod merge-tables ((map1 series::foundation-series)(map2 cl:sequence) &key &allow-other-keys)
-  (merge-tables map1 (series:scan map2)))
-
-(defmethod merge-tables ((map1 series::foundation-series)(map2 fset:seq) &key &allow-other-keys)
-  (merge-tables map1 (series:scan (fset:convert 'list map2))))
-
-(defmethod merge-tables ((map1 series::foundation-series)(map2 fset:map) &key &allow-other-keys)
-  (merge-tables map1 (series:scan (fset:convert 'list map2))))
-
-(defmethod merge-tables ((map1 series::foundation-series)(map2 series::foundation-series) &key &allow-other-keys)
-  (labels ((nils () 
-             (series:scan-fn 't 
-                             (lambda () nil)
-                             (lambda (i)(declare (ignore i)) nil))))
-    (let* ((pos1 (series:mask (keys map1)))
-           (pos2 (series:mask (keys map2)))
-           (map1 (series:catenate map1 (nils)))
-           (map2 (series:catenate map2 (nils))))
-      (series:until-if #'null
-                       (series:map-fn 't (lambda (m2 p2 m1 p1)
-                                           (cond 
-                                             (p2 m2)
-                                             (p1 m1)
-                                             (t nil)))
-                                      map2 pos2 map1 pos1)))))
+(defun merge (table1 table2 &key &allow-other-keys)
+  (let ((out-type (type-for-copy table1)))
+    (%convert-from-merge out-type
+                         (%merge-converted-tables (%convert-to-merge table1)
+                                                  (%convert-to-merge table2)))))
 
 
 ;;; generic function put-key
@@ -351,7 +313,7 @@
       (error "key ~A is out of range" key)))
 
 
-(defmethod put-key ((map fset:seq) key val &key &allow-other-keys)
+(defmethod put-key ((map seq) key val &key &allow-other-keys)
   (if (< -1 key (fset:size map))
       (fset:with map key val)
       (error "key ~A is out of range" key)))
@@ -359,7 +321,7 @@
 (defmethod put-key ((map fset:map) key val &key &allow-other-keys)
   (fset:with map key val))
 
-(defmethod put-key ((map series::foundation-series) (key integer) val &key &allow-other-keys)
+(defmethod put-key ((map foundation-series) (key integer) val &key &allow-other-keys)
   (series:map-fn 't
                  (lambda (i v)(if (= i key) val v))
                  (keys map)
@@ -386,6 +348,6 @@
 (defgeneric vals (map))
 
 (defmethod vals ((map cl:sequence)) map)
-(defmethod vals ((map fset:seq)) map)
+(defmethod vals ((map seq)) map)
 (defmethod vals ((map fset:map)) (fset:range map))
-(defmethod vals ((map series::foundation-series)) map)
+(defmethod vals ((map foundation-series)) map)

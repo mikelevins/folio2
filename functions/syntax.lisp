@@ -32,13 +32,13 @@
 (defmethod %funcall-applicable ((f cl:sequence) &rest args)
   (net.bardcode.folio.common:get-key f (car args)))
 
-(defmethod %funcall-applicable ((f fset:seq) &rest args)
+(defmethod %funcall-applicable ((f seq) &rest args)
   (net.bardcode.folio.common:GET-KEY f (car args)))
 
 (defmethod %funcall-applicable ((f fset:map) &rest args)
   (net.bardcode.folio.common:GET-KEY f (car args)))
 
-(defmethod %funcall-applicable ((f series::foundation-series) &rest args)
+(defmethod %funcall-applicable ((f foundation-series) &rest args)
   (net.bardcode.folio.common:GET-KEY f (car args)))
 
 (defmacro $ (f &rest args)

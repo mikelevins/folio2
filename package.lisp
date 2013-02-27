@@ -12,12 +12,16 @@
 
 (in-package :cl-user)
 
+;;; folio1 APIs not covered:
+;;; functions: choose-any contains? get make-as put slice
+
 (defpackage :net.bardcode.folio
   (:nicknames :folio)
   (:shadowing-import-from :net.bardcode.folio.common
-                          :adjoin :append :apply :find :first :indexes :intersection :last :length
-                          :map :merge :position :position-if :reduce :remove :rest
+                          :adjoin :apply :find :first :indexes :intersection :last :length
+                          :merge :position :position-if :reduce :remove :rest
                           :reverse :second :sequence :sort :union) 
+  (:import-from :net.bardcode.folio.common :foundation-series :seq) 
   (:use :cl :net.bardcode.folio.common)
   (:export
    ;; boxes
@@ -34,23 +38,23 @@
    ;; pairs
    :left :pair :pair? :right
    ;; sequences
-   :add-first :add-last :any :append :append2
+   :add-first :add-last :any
    :by
    :coalesce :concat
    :drop :drop-while
    :element :empty? :every?
    :filter :find :first
    :generate
-   :indexes :interleave :interpose
+   :head
+   :image :indexes :interleave :interpose
    :join :join2
-   :last :length :lines
-   :map
+   :last :length
    :next-last
-   :objects :octets :ordered-map
+   :ordered-map
    :partition :position :position-if
    :range :range-from :reduce :remove :repeat :rest :reverse 
    :scan :scan-map :second :select :sequence :sequence? :series? :shuffle :some? :sort :split :subsequence
-   :tails :take :take-by :take-while
+   :tail :tails :take :take-by :take-while
    :unique :unzip
    :zip
    ;; sets
@@ -62,7 +66,6 @@
    :ordered-map :ordered-map? :plist :plist? :plist->alist :put-key :table :table? :vals :zipmap
    ;; text
    :join-text :split-text :text?))
-
 
 
 

@@ -11,6 +11,13 @@
 
 (in-package #:net.bardcode.folio.tables)
 
+(set-syntax-from-char #\{ #\()
+(set-syntax-from-char #\} #\))
+
+(set-macro-character #\{
+                (lambda (stream char)
+                  (let ((elts (read-delimited-list #\} stream t)))
+                    `(table ,@elts))))
 
 
 

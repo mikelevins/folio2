@@ -11,14 +11,6 @@
 
 (in-package :net.bardcode.folio.boxes)
 
-;;; type box
-;;;
-;;; ---------------------------------------------------------------------
-;;; the type of boxes
-
-(deftype box ()
- '(and cons (satisfies box?)))
-
 ;;; function box
 ;;;
 ;;; (box val) => a box
@@ -26,6 +18,15 @@
 ;;; create a box
 
 (defun box (val)(cons :box val))
+
+;;; function make
+;;;
+;;; (make 'box val) => (:box val)
+;;; ---------------------------------------------------------------------
+;;; create a box
+
+(defmethod make ((type (eql 'box)) &optional (val nil) &key &allow-other-keys)
+  (box val))
 
 ;;; function set-box!
 ;;;
