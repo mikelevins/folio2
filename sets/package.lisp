@@ -16,7 +16,7 @@
                           :adjoin :apply :find :first :get :intersection :last :length :merge :position :position-if :put 
                           :reduce :remove :rest :reverse :second :sequence :set :sort :union)
   (:import-from :net.bardcode.folio.common 
-                :difference :set? :subset?))
+                :as :difference :set? :subset?))
 
 
 

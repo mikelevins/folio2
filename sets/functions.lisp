@@ -26,8 +26,6 @@
 ;;; returns a new set that contains X prepended to the elements of
 ;;; SET
 
-(defgeneric adjoin (item set &key test key))
-
 (defmethod adjoin (item (set null) &key test key)
   (declare (ignore item set))
   (list item))
@@ -61,6 +59,15 @@
   (error "no applicable method for ADJOIN with arguments: (~S ~S)"
          (class-of item)(class-of set)))
 
+;;; function as
+;;;
+;;; (as 'set x) => an instance of type
+;;; ---------------------------------------------------------------------
+
+(defmethod as ((type (eql 'cl:set)) (val cl:sequence) &key &allow-other-keys)
+  (cl:remove-duplicates (coerce val 'cl:list)
+                        :test 'cl:equal))
+
 ;;; ---------------------------------------------------------------------
 ;;; function difference
 ;;; ---------------------------------------------------------------------
@@ -69,8 +76,6 @@
 ;;; ---------------------------------------------------------------------
 ;;; returns a new set that contains the elements of SET1 that are
 ;;; not in SET2
-
-(defgeneric difference (set1 set2 &key key test)) 
 
 (defmethod difference ((set1 null) set2 &key key test) 
   (declare (ignore set1))
@@ -135,8 +140,6 @@
 ;;; returns a sequence that contains those elements that appear in both 
 ;;; SET1 and SET2
 
-(defgeneric intersection (set1 set2 &key key test))
-
 (defmethod intersection ((set1 null) set2 &key key test) 
   (declare (ignore set1))
   nil)
@@ -199,27 +202,8 @@
 ;;; ---------------------------------------------------------------------
 ;;; create a set
 
-(defmethod make ((type (eql 'set)) &rest args &key &allow-other-keys)
-  )
-
-;;; ---------------------------------------------------------------------
-;;; function set?
-;;; ---------------------------------------------------------------------
-;;;
-;;; (set? s) => boolean
-;;; ---------------------------------------------------------------------
-
-(defgeneric set? ())
-
-;;; ---------------------------------------------------------------------
-;;; function subset?
-;;; ---------------------------------------------------------------------
-;;;
-;;; (subset? set1 set2) => boolean
-;;; ---------------------------------------------------------------------
-;;; returns true if every element of SET1 also appears in SET2
-
-(defgeneric subset? ())
+(defmethod make ((type (eql 'set)) &key (elements nil) &allow-other-keys)
+  (cl:remove-duplicates elements :test 'equal))
 
 ;;; ---------------------------------------------------------------------
 ;;; function union
@@ -229,8 +213,6 @@
 ;;; ---------------------------------------------------------------------
 ;;; returns a set that contains all elements that appear either in
 ;;; SET1 or in SET2
-
-(defgeneric union (set1 set2 &key key test))
 
 (defmethod union ((set1 null) set2 &key key test) 
   (declare (ignore set1))

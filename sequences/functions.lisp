@@ -99,8 +99,6 @@
 ;;; returns a new sequence that contains X prepended to the elements of
 ;;; SEQ
 
-(defgeneric add-first (x seq))
-
 (defmethod add-first (x (s null))(cons x s))
 (defmethod add-first (x (s list))(cons x s))
 (defmethod add-first (x (s vector))(concatenate 'vector (vector x) s))
@@ -117,8 +115,6 @@
 ;;; ---------------------------------------------------------------------
 ;;; returns a new sequence that contains X appended after the elements of
 ;;; SEQ
-
-(defgeneric add-last (seq x))
 
 (defmethod add-last ((s null) x)(cons x s))
 (defmethod add-last ((s list) x)(append s (list x)))
@@ -137,8 +133,6 @@
 ;;; returns an arbitrary element of seq. any chooses the element
 ;;; randomly
 
-(defgeneric any (seq))
-
 (defmethod any ((s null)) (declare (ignore s)) nil)
 (defmethod any ((s cl:sequence))(elt s (random (length s))))
 (defmethod any ((s seq))(fset:@ s (random (fset:size s))))
@@ -156,19 +150,94 @@
 ;;; (as type x) => an instance of type
 ;;; ---------------------------------------------------------------------
 
-(defmethod as ((type (eql 'cl:list)) (val cl:list) )
+(defmethod as ((type (eql 'cl:list)) (val null) &key &allow-other-keys)
   val)
 
-(defmethod as ((type (eql 'cl:vector))(val cl:vector))
+(defmethod as ((type (eql 'cl:list)) (val cl:sequence) &key &allow-other-keys)
+  (coerce val 'cl:list))
+
+(defmethod as ((type (eql 'cl:list)) (val seq) &key &allow-other-keys)
+  (fset:convert 'cl:list val))
+
+(defmethod as ((type (eql 'cl:list)) (val foundation-series) &key &allow-other-keys)
+  (series:collect 'cl:list val))
+
+
+(defmethod as ((type (eql 'cl:vector)) (val null) &key &allow-other-keys)
+  (vector))
+
+(defmethod as ((type (eql 'cl:vector))(val cl:sequence) &key &allow-other-keys)
+  (coerce val 'cl:vector))
+
+(defmethod as ((type (eql 'cl:vector)) (val seq) &key &allow-other-keys)
+  (fset:convert 'cl:vector val))
+
+(defmethod as ((type (eql 'cl:vector)) (val foundation-series) &key &allow-other-keys)
+  (series:collect 'cl:vector val))
+
+
+(defmethod as ((type (eql 'cl:string)) (val null) &key &allow-other-keys)
+  "")
+
+(defmethod as ((type (eql 'cl:string))(val cl:sequence) &key &allow-other-keys)
+  (coerce val 'cl:string))
+
+(defmethod as ((type (eql 'cl:string)) (val seq) &key &allow-other-keys)
+  (fset:convert 'cl:string val))
+
+(defmethod as ((type (eql 'cl:string)) (val foundation-series) &key &allow-other-keys)
+  (series:collect 'cl:string val))
+
+
+(defmethod as ((type (eql 'seq)) (val null) &key &allow-other-keys)
+  (fset:seq))
+
+(defmethod as ((type (eql 'seq))(val cl:sequence) &key &allow-other-keys)
+  (fset:convert 'seq val))
+
+(defmethod as ((type (eql 'seq))(val seq) &key &allow-other-keys)
   val)
 
-(defmethod as ((type (eql 'cl:string))(val cl:string))
+(defmethod as ((type (eql 'seq))(val foundation-series) &key &allow-other-keys)
+  (fset:convert 'seq (series:collect 'cl:list val)))
+
+
+(defmethod as ((type (eql 'series::foundation-series)) (val null) &key &allow-other-keys)
+  (series:scan nil))
+
+(defmethod as ((type (eql 'series::foundation-series))(val cl:sequence) &key &allow-other-keys)
+  (series:scan val))
+
+(defmethod as ((type (eql 'series::foundation-series))(val seq) &key &allow-other-keys)
+  (series:scan (fset:convert 'cl:list val)))
+
+(defmethod as ((type (eql 'series::foundation-series))(val foundation-series) &key &allow-other-keys)
   val)
 
-(defmethod as ((type (eql 'seq))(val seq))
+
+(defmethod as ((type (eql 'sequence)) (val null) &key &allow-other-keys)
   val)
 
-(defmethod as ((type (eql 'foundation-series))(val foundation-series))
+(defmethod as ((type (eql 'sequence))(val cl:sequence) &key &allow-other-keys)
+  val)
+
+(defmethod as ((type (eql 'sequence))(val seq) &key &allow-other-keys)
+  (fset:convert 'cl:list val))
+
+(defmethod as ((type (eql 'sequence))(val foundation-series) &key &allow-other-keys)
+  (series:collect 'list val))
+
+
+(defmethod as ((type (eql 'series)) (val null) &key &allow-other-keys)
+  (series:scan nil))
+
+(defmethod as ((type (eql 'series))(val cl:sequence) &key &allow-other-keys)
+  (series:scan val))
+
+(defmethod as ((type (eql 'series))(val seq) &key &allow-other-keys)
+  (series:scan (fset:convert 'cl:list val)))
+
+(defmethod as ((type (eql 'series))(val foundation-series) &key &allow-other-keys)
   val)
 
 ;;; ---------------------------------------------------------------------
@@ -179,8 +248,6 @@
 ;;; ---------------------------------------------------------------------
 ;;; returns a sequence of sequences constructed by taking the elements of
 ;;; SEQ N at a time
-
-(defgeneric by (n seq))
 
 (defmethod by (n (s null))
   (declare (ignore n))
@@ -272,8 +339,6 @@
 ;;; returns a sequence containing all the elements of SEQ1 followed by
 ;;; all the elements of SEQ2.
 
-(defgeneric concat2 (seq1 seq2))
-
 (defmethod concat2 ((seq1 null)(seq2 null))(declare (ignore seq1 seq2)) nil)
 (defmethod concat2 ((seq1 null)(seq2 cl:sequence))(declare (ignore seq1)) seq2)
 (defmethod concat2 ((seq1 null)(seq2 seq))(declare (ignore seq1)) seq2)
@@ -295,8 +360,6 @@
 ;;; returns a new sequence containing the elements of SEQ after the first
 ;;; N elements have been removed
 
-(defgeneric drop (n seq))
-
 (defmethod drop ((n integer) (seq null))
   (error "index out of range: ~A" n))
 
@@ -315,8 +378,6 @@
 ;;;
 ;;; (drop-while test seq) => seq'
 ;;; ---------------------------------------------------------------------
-
-(defgeneric drop-while (test seq))
 
 (defmethod drop-while (fn (seq null))
   (error "index out of range: ~A" n))
@@ -346,8 +407,6 @@
 ;;; ---------------------------------------------------------------------
 ;;; returns the element of SEQ at index N
 
-(defgeneric element (seq n))
-
 (defmethod element ((s null) (n integer))
   (error "index out of range: ~A" n))
 
@@ -367,8 +426,6 @@
 ;;; (empty? seq) => a boolean
 ;;; ---------------------------------------------------------------------
 ;;; returns true if SEQ contains no elements, and false otherwise
-
-(defgeneric empty? (seq))
 
 (defmethod empty? ((s null))
   (declare (ignore s))
@@ -395,8 +452,6 @@
 ;;; ---------------------------------------------------------------------
 ;;; returns true if SEQ contains no elements, and false otherwise
 
-(defgeneric every? (test seq))
-
 (defmethod every? (fn (s null))
   (declare (ignore fn s))
   t)
@@ -417,8 +472,6 @@
 ;;; (filter test seq) => seq'
 ;;; ---------------------------------------------------------------------
 ;;; returns those elements of SEQ for which TEST returns true
-
-(defgeneric filter (test seq))
 
 (defmethod filter (fn (s null))
   (declare (ignore fn s))
@@ -441,8 +494,6 @@
 ;;; ---------------------------------------------------------------------
 ;;; shadows cl:find, providing an extensible generic version
 
-(defgeneric find (item seq &key from-end test test-not start end key &allow-other-keys))
-
 (defmethod find (item (s cl:sequence) &key from-end test test-not start end key &allow-other-keys)
   (cl:find item s :from-end from-end :test test :test-not test-not
            :start start :end end :key key))
@@ -461,8 +512,6 @@
 ;;; (first seq) => anything
 ;;; ---------------------------------------------------------------------
 ;;; returns the first element of SEQ
-
-(defgeneric first (seq))
 
 (defmethod first ((s null))
   nil)
@@ -484,8 +533,6 @@
 ;;; ---------------------------------------------------------------------
 ;;; returns a generator that returns one element at a time from the
 ;;; input SEQ
-
-(defgeneric generate (seq))
 
 (defmethod generate ((s cl:sequence))
   (series:generator (series:scan s)))
@@ -533,8 +580,6 @@
 ;;; length of the shorter are appended after the last element of the
 ;;; shorter.
 
-(defgeneric interleave (seq1 seq2))
-
 (defmethod interleave ((s1 null)(s2 null))
   (declare (ignore s1 s2))
   nil)
@@ -550,7 +595,6 @@
 (defmethod interleave ((s1 null)(s2 foundation-series))
   (declare (ignore s1 s2))
   s2)
-
 
 
 (defmethod interleave ((s1 cl:sequence)(s2 null))
@@ -571,7 +615,6 @@
 (defmethod interleave ((s1 cl:sequence)(s2 foundation-series))
   (series:collect (combined-type s1 s2) 
     (interleave (series:scan s1) s2)))
-
 
 
 (defmethod interleave ((s1 seq)(s2 null))
@@ -616,8 +659,6 @@
 ;;; returns a new sequence SEQ2 that contains the elements of SEQ1, but
 ;;; with CUPOLA inserted between them
 
-(defgeneric interpose (cupola seq))
-
 (defmethod interpose (x (s null))
   (declare (ignore x s))
   nil)
@@ -658,8 +699,6 @@
 ;;; joins SEQS in the manner of join2, below. to add support for joining 
 ;;; new sequence types, add methods to join2
 
-(defgeneric join (cupola seq))
-
 (defmethod join (x (s null))
   (declare (ignore x s))
   nil)
@@ -684,8 +723,6 @@
 ;;; ---------------------------------------------------------------------
 ;;; concatenates SEQ1 and SEQ2 to form the new sequence SEQ3, with CUPOLA
 ;;; inserted between the elements of SEQ1 and SEQ2
-
-(defgeneric join2 (cupola seq1 seq2))
 
 (defmethod join2 (x (s1 cl:sequence)(s2 cl:sequence))
   (let* ((out-type (combined-type s1 s2))
@@ -737,8 +774,6 @@
 ;;; ---------------------------------------------------------------------
 ;;; returns the last element of SEQ
 
-(defgeneric last (seq))
-
 (defmethod last ((s null)) (declare (ignore s)) nil)
 (defmethod last ((s cl:cons)) (cl:first (cl:last s)))
 (defmethod last ((s cl:sequence))(cl:elt s (1- (cl:length s))))
@@ -752,9 +787,6 @@
 ;;; (length seq) => an integer
 ;;; ---------------------------------------------------------------------
 ;;; returns a count of the elements in SEQ
-
-(defgeneric length (seq))
-
 
 (defmethod length ((s null)) (declare (ignore s)) 0)
 (defmethod length ((s cl:sequence))(cl:length s))
@@ -770,8 +802,6 @@
 ;;; returns a sequence containing the values produced by applying
 ;;; FN to each element of SEQ
 
-(defgeneric image (fn seq))
-
 (defmethod image  (fn (s null)) (declare (ignore s)) nil)
 (defmethod image  (fn (s cl:sequence))(cl:map 'list fn s))
 (defmethod image  (fn (s seq))(fset:image fn s))
@@ -785,26 +815,76 @@
 ;;; ---------------------------------------------------------------------
 ;;; create a list
 
-(defmethod make ((type (eql 'cl:list)) &rest args &key &allow-other-keys)
-  args)
+(defmethod make ((type (eql 'cl:list)) &key elements &allow-other-keys)
+  elements)
 
-(defmethod make ((type (eql 'cl:vector)) &key &allow-other-keys)
-  )
+(defmethod make ((type (eql 'cl:vector)) &key elements &allow-other-keys)
+  (coerce elements 'cl:vector))
 
-(defmethod make ((type (eql 'cl:string)) &key &allow-other-keys)
-  )
+(defmethod make ((type (eql 'cl:string)) &key elements &allow-other-keys)
+  (coerce elements 'cl:string))
 
-(defmethod make ((type (eql 'seq)) &key &allow-other-keys)
-  )
+(defmethod make ((type (eql 'seq)) &key elements &allow-other-keys)
+  (fset:convert 'fset:seq elements))
 
-(defmethod make ((type (eql 'foundation-series)) &key &allow-other-keys)
-  )
+(defmethod make ((type (eql 'foundation-series)) &key elements &allow-other-keys)
+  (series:scan elements))
 
-(defmethod make ((type (eql 'sequence)) &key &allow-other-keys)
-  )
+(defmethod make ((type (eql 'series)) &key elements &allow-other-keys)
+  (series:scan elements))
 
-(defmethod make ((type (eql 'series)) &key &allow-other-keys)
-  )
+(defmethod make ((type (eql 'sequence)) &key elements &allow-other-keys)
+  elements)
+
+
+;;; ---------------------------------------------------------------------
+;;; function match-prefix?
+;;; ---------------------------------------------------------------------
+;;;
+;;; (match-prefix? pref seq &key (test 'equal)) => boolean
+;;; ---------------------------------------------------------------------
+;;; returns true if the elements of PREF match element-wise the first
+;;; several elements of SEQ, using TEST as the matching criterion;
+;;; otherwise, returns false. The number of elements tested is equal
+;;; to the count of elements in PREF. PREF and SEQ need not be of the
+;;; same type.
+
+(defmethod match-prefix? ((pref null)(seq null) &key test) t)
+(defmethod match-prefix? ((pref null) seq &key test) t)
+(defmethod match-prefix? (pref (seq null) &key test) nil)
+
+(defmethod match-prefix? ((pref cl:sequence)(seq cl:sequence) &key (test 'equal))
+  (and (<= (cl:length pref)(cl:length seq))
+       (every (lambda (x y)(funcall test x y))
+              pref seq)))
+
+(defmethod match-prefix? ((pref cl:sequence)(seq seq) &key (test 'equal))
+  (match-prefix? pref (as 'sequence seq)))
+
+(defmethod match-prefix? ((pref cl:sequence)(seq foundation-series) &key (test 'equal))
+  (match-prefix? pref (as 'sequence seq)))
+
+(defmethod match-prefix? ((pref seq)(seq seq) &key (test 'equal))
+  (and (<= (fset:size pref)(fset:size seq))
+       (fset::every (lambda (x y)(funcall test x y))
+                    pref seq)))
+
+(defmethod match-prefix? ((pref foundation-series)(seq foundation-series) &key (test 'equal))
+  (series:collect-and (series:map-fn 'boolean
+                                     (lambda (x y)(funcall test x y))
+                                     pref seq)))
+
+;;; ---------------------------------------------------------------------
+;;; function match-suffix?
+;;; ---------------------------------------------------------------------
+;;;
+;;; (match-suffix? seq suff &key (test 'equal)) => boolean
+;;; ---------------------------------------------------------------------
+;;; returns true if the elements of SUFF match element-wise the last
+;;; several elements of SEQ, using TEST as the matching criterion;
+;;; otherwise, returns false. The number of elements tested is equal
+;;; to the count of elements in SUFF. SUFF and SEQ need not be of the
+;;; same type.
 
 ;;; ---------------------------------------------------------------------
 ;;; function next-last
@@ -813,8 +893,6 @@
 ;;; (next-last seq) => anything
 ;;; ---------------------------------------------------------------------
 ;;; returns the last-but-one element of seq
-
-(defgeneric next-last (seq))
 
 (defmethod next-last ((s null)) (declare (ignore s)) nil)
 
@@ -839,8 +917,6 @@
 ;;; the elements of SEQ1 are produced by applying FN1 to each element of
 ;;; SEQ; the elements of SEQ2 are produced by applying FN2 to each 
 ;;; element of SEQ; and so on
-
-(defgeneric partition (seq &rest fns))
 
 (defmethod partition ((seq null) &rest fns)
   (declare (ignore seq fns))
@@ -869,8 +945,6 @@
 ;;; (position item seq &key from-end test test-not start end key) => integer | nil
 ;;; ---------------------------------------------------------------------
 ;;; returns the index of ITEM in SEQ, or nil if it's not found
-
-(defgeneric position (item sequence &key from-end test test-not start end key &allow-other-keys))
 
 (defmethod position (item (seq null) &key from-end test test-not start end key &allow-other-keys)
   (declare (ignore item seq from-end test test-not start end key))
@@ -904,8 +978,6 @@
 ;;; the elements of SEQ1 are produced by applying FN1 to each element of
 ;;; SEQ; the elements of SEQ2 are produced by applying FN2 to each 
 ;;; element of SEQ; and so on
-
-(defgeneric position-if (test sequence &key from-end start end key &allow-other-keys))
 
 (defmethod position-if (test (seq null) &key from-end start end key &allow-other-keys)
   (declare (ignore test seq from-end test test-not start end key))
@@ -976,8 +1048,6 @@
 ;;; ---------------------------------------------------------------------
 ;;; returns an infinitely-repeating sequence of VAL.
 
-(defgeneric remove (test seq &key from-end test test-not start end count key &allow-other-keys))
-
 (defmethod remove (item (s null) &key from-end test test-not start end count key &allow-other-keys)
   (declare (ignore item s))
   nil)
@@ -1022,8 +1092,6 @@
 ;;; ---------------------------------------------------------------------
 ;;; returns all but the firt element of SEQ
 
-(defgeneric rest (seq))
-
 (defmethod rest ((s null))
   (declare (ignore s))
   nil)
@@ -1042,8 +1110,6 @@
 ;;; (reverse SEQ) => seq'
 ;;; ---------------------------------------------------------------------
 ;;; returns the elements of SEQ in reverse order
-
-(defgeneric reverse (seq))
 
 (defmethod reverse ((s null))
   (declare (ignore s))
@@ -1064,34 +1130,28 @@
 ;;; ---------------------------------------------------------------------
 ;;; returns a series equivalent to SEQ
 
-(defgeneric scan (seq))
-
 (defmethod scan ((s null)) (series:scan s))
 (defmethod scan ((s cons)) (series:scan s))
 (defmethod scan ((s vector)) (series:scan s))
 (defmethod scan ((s seq)) (series:scan (fset:convert 'vector s)))
 (defmethod scan ((s foundation-series)) s)
 
-;;; function scan-map
+;;; function scan-image
 ;;;
-;;; (scan-map fn seq) => a series
+;;; (scan-image fn seq) => a series
 ;;; ---------------------------------------------------------------------
 ;;; returns a series equivalent to (map FN SEQ)
 
-(defgeneric scan-map (fn seq))
-
-(defmethod scan-map (fn (s null)) (declare (ignore fn s)) nil)
-(defmethod scan-map (fn (s cl:sequence)) (scan-map fn (scan s)))
-(defmethod scan-map (fn (s seq)) (scan-map fn (scan s)))
-(defmethod scan-map (fn (s foundation-series)) (series:map-fn t fn s))
+(defmethod scan-image (fn (s null)) (declare (ignore fn s)) nil)
+(defmethod scan-image (fn (s cl:sequence)) (scan-image fn (scan s)))
+(defmethod scan-image (fn (s seq)) (scan-image fn (scan s)))
+(defmethod scan-image (fn (s foundation-series)) (series:map-fn t fn s))
 
 ;;; function second
 ;;;
 ;;; (second seq) => anything
 ;;; ---------------------------------------------------------------------
 ;;; returns the second element of SEQ
-
-(defgeneric second (seq))
 
 (defmethod second ((s null))
   nil)
@@ -1113,8 +1173,6 @@
 ;;; ---------------------------------------------------------------------
 ;;; returns the elements of SEQ1 at the indexes given by the sequence
 ;;; INDEXES
-
-(defgeneric select (seq indexes))
 
 (defmethod select ((s null) indexes)
   (error "indexes out of range: ~A" indexes))
@@ -1169,8 +1227,6 @@
 ;;; returns a new sequence with the same elements as SEQ1, but
 ;;; in random order
 
-(defgeneric shuffle (p))
-
 (defmethod shuffle (s)
   (declare (ignore s))
   nil)
@@ -1190,8 +1246,6 @@
 ;;; ---------------------------------------------------------------------
 ;;; returns the first element of SEQ for which TEST returns true, or
 ;;; nil otherwise
-
-(defgeneric some? (test seq))
 
 (defmethod some? (test (s null)) (declare (ignore fn s)) nil)
 (defmethod some? (test (s cl:sequence)) (cl:some test s))
@@ -1218,8 +1272,6 @@
 ;;; of SUBSEQ. SUBSEQ does not appear in the output sequences. TEST,
 ;;; whose default value is equal, is used to match occurrences of
 ;;; SUBSEQ.
-
-(defgeneric split (seq subseq &key test))
 
 (defmethod split ((seq null) subseq &key test)
   (declare (ignore seq subseq test))
@@ -1297,8 +1349,6 @@
 ;;; the element just before index END; otherwise, it is the last element
 ;;; of SEQ.
 
-(defgeneric subsequence (seq start &optional end))
-
 (defmethod subsequence ((s null) (start integer) &optional end)
   (error "Index out of range on NIL:" start))
 
@@ -1318,8 +1368,6 @@
 ;;; returns a sequence of sequences beginning with SEQ, followed by
 ;;; the tail of SEQ, then the tail of the tail of SEQ, and so on,
 ;;; ending with the last non-empty tail
-
-(defgeneric tails (seq))
 
 (defmethod tails ((seq null))
   (declare (ignore fn s))
@@ -1345,8 +1393,6 @@
 ;;; ---------------------------------------------------------------------
 ;;; returns a sequence containing the first N elements of SEQ
 
-(defgeneric take (n seq))
-
 (defmethod take ((n (eql 0))(s null))
   (declare (ignore n))
   nil)
@@ -1369,8 +1415,6 @@
 ;;; ---------------------------------------------------------------------
 ;;; returns the elements of SEQ N at a time. each chunk beings ADVANCE
 ;;; places after the start of the previous chunk
-
-(defgeneric take-by (n advance seq))
 
 (defmethod take-by ((n (eql 0))(advance (eql 0))(s null))
   (declare (ignore n))
@@ -1408,8 +1452,6 @@
 ;;; ---------------------------------------------------------------------
 ;;; returns elements of SEQ one after the other until TEST returns true
 
-(defgeneric take-while (test seq))
-
 (defmethod take-while (test (s cl:sequence))
   (cl:subseq s 0 (cl:position-if test s)))
 
@@ -1430,8 +1472,6 @@
 ;;; ---------------------------------------------------------------------
 ;;; returns the elements of SEQ with duplicates removed. TEST is used
 ;;; to test whether two elements SEQ are the same.
-
-(defgeneric unique (seq &key test))
 
 (defmethod unique ((s cl:sequence) &key (test #'equal))
   (cl:remove-duplicates s :test test))
@@ -1459,8 +1499,6 @@
 ;;; contains the heads of the pairs in SEQ, and the second contains
 ;;; the tails
 
-(defgeneric unzip (seq))
-
 (defmethod unzip ((seq null))
   (declare (ignore seq))
   (values nil nil))
@@ -1483,8 +1521,6 @@
 ;;; ---------------------------------------------------------------------
 ;;; returns a sequence of pairs in which each left element is from SEQ1
 ;;; and each right element is the corresponding one from SEQ2.
-
-(defgeneric zip (seq1 seq2))
 
 (defmethod zip ((seq1 null) seq2)
   (declare (ignore seq1 seq2))

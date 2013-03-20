@@ -17,19 +17,19 @@
 ;;; (as type x) => an instance of type
 ;;; ---------------------------------------------------------------------
 
-(defmethod as ((type (eql 'pair))(val null))
+(defmethod as ((type (eql 'pair))(val null) &key &allow-other-keys)
   val)
 
-(defmethod as ((type (eql 'pair))(val cons))
+(defmethod as ((type (eql 'pair))(val cons) &key &allow-other-keys)
   val)
 
-(defmethod as ((type (eql 'pair))(val cl:sequence))
+(defmethod as ((type (eql 'pair))(val cl:sequence) &key &allow-other-keys)
   (coerce val 'cl:list))
 
-(defmethod as ((type (eql 'pair))(val seq))
+(defmethod as ((type (eql 'pair))(val seq) &key &allow-other-keys)
   (fset:convert 'cl:list val))
 
-(defmethod as ((type (eql 'pair))(val foundation-series))
+(defmethod as ((type (eql 'pair))(val foundation-series) &key &allow-other-keys)
   (series:collect 'cl:list val))
 
 ;;; function left
@@ -37,8 +37,6 @@
 ;;; (left p) => anything
 ;;; ---------------------------------------------------------------------
 ;;; returns the left element (i.e. the CAR) of the pair
-
-(defgeneric left (pair))
 
 (defmethod left ((p cons))
   (car p))
@@ -58,8 +56,6 @@
 ;;; ---------------------------------------------------------------------
 ;;; returns a pair whose left element is a and whose right element is b
 
-(defgeneric pair (a b))
-
 (defmethod pair (a b)
   (cons a b))
 
@@ -68,8 +64,6 @@
 ;;; (right p) => anything
 ;;; ---------------------------------------------------------------------
 ;;; returns the right element (i.e. the CDR) of the pair
-
-(defgeneric right (pair))
 
 (defmethod right ((p cons))
   (cdr p))

@@ -16,7 +16,7 @@
                           :adjoin :apply :find :first :get :last :length :merge :position :position-if :put 
                           :reduce :remove :rest :reverse :second :sequence :sort :union)
   (:import-from :net.bardcode.folio.common 
-                :add-first :add-last :any
+                :add-first :add-last :any :as
                 :by
                 :coalesce :combined-type
                 :drop :drop-while
@@ -28,7 +28,7 @@
                 :next-last
                 :partition
                 :range :range-from :repeat
-                :scan :scan-map :select :sequence? :shuffle :some? 
+                :scan :scan-image :select :sequence? :shuffle :some? 
                 :split :subsequence 
                 :tails :take :take-by :take-while :type-for-copy
                 :unique :unzip

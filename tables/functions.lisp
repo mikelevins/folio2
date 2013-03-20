@@ -26,7 +26,7 @@
 ;;; as
 ;;; ---------------------------------------------------------------------
 
-(defmethod as ((type (eql 'cl:list))(tbl fset:map))
+(defmethod as ((type (eql 'cl:list))(tbl fset:map) &key &allow-other-keys)
   (fset:convert 'cl:list tbl))
 
 ;;; generic function alist->plist
@@ -35,8 +35,6 @@
 ;;; ---------------------------------------------------------------------
 ;;; returns a plist--a list of alternating key/value elements
 ;;; constructed from the keys and values of the alist
-
-(defgeneric alist->plist (thing))
 
 (defmethod alist->plist (x)
   (error "Not an alist:" thing))
@@ -55,8 +53,6 @@
 ;;; returns a table TABLE2 that contains the elements of TABLE1, plus the
 ;;; key/value pair of KEY and VAL. If TABLE1 contains KEY then its value is
 ;;; replaced by VAL in TABLE2.
-
-(defgeneric associate (table key val &key test &allow-other-keys))
 
 (defmethod associate ((m ordered-map) key val &key (test 'equal) &allow-other-keys)
   (if (%find-entry m key :test test)
@@ -105,8 +101,6 @@
 ;;; false value otherwise. support for the TEST keyword depends on the
 ;;; representation of MAP.
 
-(defgeneric contains-key? (map key &key &allow-other-keys))
-
 (defmethod contains-key? ((map cl:sequence) key &key &allow-other-keys)
   (declare (ignore key))
   nil)
@@ -143,8 +137,6 @@
 ;;; that is equivalent to VAL in the sense of TEST, and returns a
 ;;; false value otherwise
 
-(defgeneric contains-value? (map key &key &allow-other-keys))
-
 (defmethod contains-value? ((map cl:sequence) val &key (test #'equal) &allow-other-keys)
   (cl:some (lambda (i)(funcall test val i)) map))
 
@@ -172,8 +164,6 @@
 ;;; ---------------------------------------------------------------------
 ;;; returns the value stored on KEY in MAP if KEY is present; returns
 ;;; DEFAULT otherwise. Matches KEY using TEST
-
-(defgeneric get-key (map key &key &allow-other-keys))
 
 (defmethod get-key ((map cl:sequence)(key integer) &key (default nil) &allow-other-keys)
   (if (< -1 key (length map))
@@ -210,8 +200,6 @@
 ;;; returns a sequence of all the keys appearing in MAP. If MAP is a
 ;;; sequence then KEYS returns a sequence of indexes. If MAP is a
 ;;; series then KEYS returns a series of indexes.
-
-(defgeneric keys (map))
 
 (defmethod keys ((map cl:sequence))
   (loop for i from 0 below (length map) collect i))
@@ -295,8 +283,6 @@
 ;;; with the pair (KEY . VAL) added. If KEY appears in MAP1 then
 ;;; its associated value is replaced by VAL in MAP2. Keys are compared
 ;;; using TEST.
-
-(defgeneric put-key (map key val &key &allow-other-keys))
 
 (defmethod put-key ((map cl:sequence) (key integer) val &key &allow-other-keys)
   (if (< -1 key (length map))

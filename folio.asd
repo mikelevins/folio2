@@ -20,7 +20,6 @@
   :depends-on (:fset :series)
   :components ((:file "package-common")
                (:module "boxes" :components ((:file "package")))
-               (:module "constructing" :components ((:file "package")))
                (:module "converting" :components ((:file "package")))
                (:module "functions" :components ((:file "package")))
                (:module "ordering" :components ((:file "package")))
@@ -30,33 +29,39 @@
                (:module "streams" :components ((:file "package")))
                (:module "tables" :components ((:file "package")))))
 
+(asdf:defsystem :net.bardcode.folio.generic-functions
+  :serial t
+  :description "all folio generic functions"
+  :license "Lisp Lesser GNU Public License"
+  :depends-on (:net.bardcode.folio.packages)
+  :components ((:file "generic-functions")))
+
 (asdf:defsystem :net.bardcode.folio.boxes
   :serial t
   :description "wrapping values in mutable containers"
   :license "Lisp Lesser GNU Public License"
-  :depends-on (:net.bardcode.folio.packages)
+  :depends-on (:net.bardcode.folio.packages :net.bardcode.folio.generic-functions)
   :components ((:module "boxes"
                         :serial t
                         :components ((:file "functions")
                                      (:file "types")))))
 
-(asdf:defsystem :net.bardcode.folio.constructing
+(asdf:defsystem :net.bardcode.folio.boxes.tests
   :serial t
-  :description "uniform tools for constructing values"
-  :author "mikel evins <mevins@me.com>"
+  :description "box tests"
   :license "Lisp Lesser GNU Public License"
-  :depends-on (:fset :series :net.bardcode.folio.packages)
-  :components ((:module "constructing"
+  :depends-on (:net.bardcode.folio.packages :net.bardcode.folio.generic-functions
+               :net.bardcode.folio.boxes :lift)
+  :components ((:module "tests"
                         :serial t
-                        :components ((:file "package")
-                                     (:file "functions")))))
+                        :components ((:file "box-tests")))))
 
 (asdf:defsystem :net.bardcode.folio.converting
   :serial t
   :description "uniform tools for converting values from one type to another"
   :author "mikel evins <mevins@me.com>"
   :license "Lisp Lesser GNU Public License"
-  :depends-on (:fset :series :net.bardcode.folio.packages)
+  :depends-on (:fset :series :net.bardcode.folio.packages :net.bardcode.folio.generic-functions)
   :components ((:module "converting"
                         :serial t
                         :components ((:file "package")
@@ -67,7 +72,7 @@
   :description "combinators and other conveniences for working with functions"
   :author "mikel evins <mevins@me.com>"
   :license "Lisp Lesser GNU Public License"
-  :depends-on (:net.bardcode.folio.packages)
+  :depends-on (:net.bardcode.folio.packages :net.bardcode.folio.generic-functions)
   :components ((:module "functions"
                         :serial t
                         :components ((:file "package")
@@ -79,7 +84,7 @@
   :description "sorting values into stable orders"
   :author "mikel evins <mevins@me.com>"
   :license "Lisp Lesser GNU Public License"
-  :depends-on (:fset :series :net.bardcode.folio.packages)
+  :depends-on (:fset :series :net.bardcode.folio.packages :net.bardcode.folio.generic-functions)
   :components ((:module "ordering"
                         :serial t
                         :components ((:file "package")))))
@@ -89,7 +94,7 @@
   :description "associating one value with another"
   :author "mikel evins <mevins@me.com>"
   :license "Lisp Lesser GNU Public License"
-  :depends-on (:net.bardcode.folio.packages)
+  :depends-on (:net.bardcode.folio.packages :net.bardcode.folio.generic-functions)
   :components ((:module "pairs"
                         :serial t
                         :components ((:file "package")
@@ -101,7 +106,7 @@
   :description "tools for manipulating sequences, series, and generators"
   :author "mikel evins <mevins@me.com>"
   :license "Lisp Lesser GNU Public License"
-  :depends-on (:fset :series :net.bardcode.folio.packages)
+  :depends-on (:fset :series :net.bardcode.folio.packages :net.bardcode.folio.generic-functions)
   :components ((:module "sequences"
                         :serial t
                         :components ((:file "package")
@@ -113,7 +118,8 @@
   :description "syntactic sugar for sequences"
   :author "mikel evins <mevins@me.com>"
   :license "Lisp Lesser GNU Public License"
-  :depends-on (:fset :series :net.bardcode.folio.sequences :net.bardcode.folio.packages)
+  :depends-on (:fset :series :net.bardcode.folio.sequences :net.bardcode.folio.packages
+               :net.bardcode.folio.generic-functions)
   :components ((:module "sequences"
                         :serial t
                         :components ((:file "package")
@@ -124,7 +130,7 @@
   :description "treating sequences as sets"
   :author "mikel evins <mevins@me.com>"
   :license "Lisp Lesser GNU Public License"
-  :depends-on (:fset :series :net.bardcode.folio.packages)
+  :depends-on (:fset :series :net.bardcode.folio.packages :net.bardcode.folio.generic-functions)
   :components ((:module "sets"
                         :serial t
                         :components ((:file "package")
@@ -136,7 +142,8 @@
   :description "syntactic sugar for sets"
   :author "mikel evins <mevins@me.com>"
   :license "Lisp Lesser GNU Public License"
-  :depends-on (:fset :series :net.bardcode.folio.sets :net.bardcode.folio.packages)
+  :depends-on (:fset :series :net.bardcode.folio.sets :net.bardcode.folio.packages
+               :net.bardcode.folio.generic-functions)
   :components ((:module "sets"
                         :serial t
                         :components ((:file "package")))))
@@ -146,7 +153,8 @@
   :description "input streams as series"
   :author "mikel evins <mevins@me.com>"
   :license "Lisp Lesser GNU Public License"
-  :depends-on (:series :net.bardcode.folio.packages)
+  :depends-on (:series :net.bardcode.folio.packages
+               :net.bardcode.folio.generic-functions)
   :components ((:module "streams"
                         :serial t
                         :components ((:file "package")
@@ -157,7 +165,8 @@
   :description "tools for manipulating finite maps"
   :author "mikel evins <mevins@me.com>"
   :license "Lisp Lesser GNU Public License"
-  :depends-on (:fset :series :net.bardcode.folio.packages)
+  :depends-on (:fset :series :net.bardcode.folio.packages
+               :net.bardcode.folio.generic-functions)
   :components ((:module "tables"
                         :serial t
                         :components ((:file "package")
@@ -169,7 +178,8 @@
   :description "syntactic sugar for finite maps"
   :author "mikel evins <mevins@me.com>"
   :license "Lisp Lesser GNU Public License"
-  :depends-on (:fset :series :net.bardcode.folio.tables :net.bardcode.folio.packages)
+  :depends-on (:fset :series :net.bardcode.folio.tables :net.bardcode.folio.packages
+               :net.bardcode.folio.generic-functions)
   :components ((:module "tables"
                         :serial t
                         :components ((:file "package")
@@ -180,7 +190,8 @@
   :description "prettier printing for fset-based tables"
   :author "mikel evins <mevins@me.com>"
   :license "Lisp Lesser GNU Public License"
-  :depends-on (:fset :series :net.bardcode.folio.tables :net.bardcode.folio.packages)
+  :depends-on (:fset :series :net.bardcode.folio.tables :net.bardcode.folio.packages
+               :net.bardcode.folio.generic-functions)
   :components ((:module "tables"
                         :serial t
                         :components ((:file "package")
@@ -192,8 +203,8 @@
   :author "mikel evins <mevins@me.com>"
   :license "Lisp Lesser GNU Public License"
   :depends-on (:net.bardcode.folio.packages
+               :net.bardcode.folio.generic-functions
                :net.bardcode.folio.boxes 
-               :net.bardcode.folio.constructing
                :net.bardcode.folio.converting
                :net.bardcode.folio.functions
                :net.bardcode.folio.ordering
@@ -208,9 +219,27 @@
                :net.bardcode.folio.table-printer)
   :components ((:file "package")))
 
+
+(asdf:defsystem :net.bardcode.folio.tests
+  :serial t
+  :description "folio system tests"
+  :author "mikel evins <mevins@me.com>"
+  :license "Lisp Lesser GNU Public License"
+  :depends-on (:lift :net.bardcode.folio)
+  :components ((:file "package")
+               (:module "tests"
+                        :serial t
+                        :components
+                        ((:file "box-tests")))))
+
+
 (defun load-folio ()
   (let ((asdf:*compile-file-warnings-behaviour* #+sbcl :ignore #-sbcl :warn)
         (asdf:*compile-file-failure-behaviour* #+sbcl :ignore #-sbcl :warn))
     (asdf:oos 'asdf:load-op :net.bardcode.folio)))
 
+(defun load-folio-tests ()
+  (asdf:oos 'asdf:load-op :net.bardcode.folio.tests))
+
 ;;; (load-folio)
+;;; (load-folio-tests)

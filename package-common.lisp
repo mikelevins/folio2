@@ -12,7 +12,7 @@
 (in-package :cl-user)
 
 (defpackage :net.bardcode.folio.common
-  (:shadow :adjoin :apply :find :first :get :intersection :last :length :merge :position :position-if :put 
+  (:shadow :> :>= :< :<= :adjoin :apply :find :first :get :intersection :last :length :merge :position :position-if :put 
            :reduce :remove :rest :reverse :second :sequence :set :sort :union)
   (:use :cl)
   (:import-from :fset :seq)
@@ -26,18 +26,20 @@
            :filter :find :first :flip :fn :foundation-series :function? :functional?
            :generate :generic-function? :get-key
            :head
-           :image :indexes :interleave :interpose  :intersection
+           :image :indexes :input-stream :input-stream? :interleave :interpose :intersection
            :join :join2 :join-text
            :keys
            :last :left :length :lines
-           :make :merge :method?
+           :make :make-output-stream :match-prefix? :match-suffix? :merge :method?
            :next-last
-           :objects :octets :ordered-map :ordered-map?
+           :objects :octets :ordered-map :ordered-map? :output-stream :output-stream?
            :pair :pair? :partial :partition :plist :plist? :plist->alist :position :position-if :put-key
-           :range :range-from :reduce :remove :repeat :rest :reverse :right :rotate-left :rotate-right :rpartial
-           :scan :scan-map :second :select :seq :series? :sequence :sequence? :set-box! :set? :shuffle :some?
-           :sort :split :split-text :stream? :subsequence :subset?
+           :range :range-from :readable :readable? :reduce :remove :repeat :repeatedly :rest :reverse :right 
+           :rotate-left :rotate-right :rpartial
+           :scan :scan-image :second :select :seq :series :series? :sequence :sequence? :set-box! :set? :shuffle :some?
+           :sort :split :split-text :stream? :streamable :streamable? :subsequence :subset?
            :table :table? :tail :tails :take :take-by :take-while :text? :type-for-copy
            :unbox :union :unique :unzip
            :vals
+           :writable :writable?
            :zip :zipmap))

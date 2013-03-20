@@ -18,10 +18,11 @@
 (defpackage :net.bardcode.folio
   (:nicknames :folio)
   (:shadowing-import-from :net.bardcode.folio.common
+                          :> :>= :< :<=
                           :adjoin :apply :find :first :indexes :intersection :last :length
-                          :merge :position :position-if :reduce :remove :rest
+                          :merge :position :position-if :reduce :remove :repeatedly :rest
                           :reverse :second :sequence :sort :union) 
-  (:import-from :net.bardcode.folio.common :foundation-series :seq) 
+  (:import-from :net.bardcode.folio.common :foundation-series :make-output-stream :seq) 
   (:use :cl :net.bardcode.folio.common)
   (:export
    ;; boxes
@@ -46,21 +47,24 @@
    :filter :find :first
    :generate
    :head
-   :image :indexes :interleave :interpose
+   :image :indexes :input-stream? :interleave :interpose
    :join :join2
    :last :length
+   :match-prefix? :match-suffix? :make-output-stream
    :next-last
-   :ordered-map
+   :output-stream :output-stream? :ordered-map
    :partition :position :position-if
-   :range :range-from :reduce :remove :repeat :rest :reverse 
-   :scan :scan-map :second :select :sequence :sequence? :series? :shuffle :some? :sort :split :subsequence
+   :range :range-from :readable :readable? :reduce :remove :repeat :repeatedly :rest :reverse 
+   :scan :scan-image :second :select :seq :sequence :sequence? :series :series? :shuffle :some? :sort :split
+   :streamable :streamable? :subsequence
    :tail :tails :take :take-by :take-while
    :unique :unzip
+   :writable :writable?
    :zip
    ;; sets
    :adjoin :difference :intersection :set? :subset? :union
    ;; streams
-   :characters :lines :objects :octets
+   :characters :lines :objects :octets :output-stream :output-stream?
    ;; tables
    :alist :alist? :alist->plist :associate :contains-key? :contains-value? :dissociate :get-key :keys :merge
    :ordered-map :ordered-map? :plist :plist? :plist->alist :put-key :table :table? :vals :zipmap

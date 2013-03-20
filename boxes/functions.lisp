@@ -11,6 +11,16 @@
 
 (in-package :net.bardcode.folio.boxes)
 
+;;; function as
+;;;
+;;; (as type x) => an instance of type
+;;; ---------------------------------------------------------------------
+
+(defmethod as ((type (eql 'box)) val &key &allow-other-keys)
+  (if (box? val)
+      val
+      (box val)))
+
 ;;; function box
 ;;;
 ;;; (box val) => a box
@@ -25,8 +35,8 @@
 ;;; ---------------------------------------------------------------------
 ;;; create a box
 
-(defmethod make ((type (eql 'box)) &optional (val nil) &key &allow-other-keys)
-  (box val))
+(defmethod make ((type (eql 'NET.BARDCODE.FOLIO.COMMON:box)) &key (value nil) &allow-other-keys)
+  (box value))
 
 ;;; function set-box!
 ;;;

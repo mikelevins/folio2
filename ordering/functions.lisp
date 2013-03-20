@@ -17,8 +17,6 @@
 ;;; ---------------------------------------------------------------------
 ;;; shadows cl:>, providing an extensible generic version
 
-(defgeneric > (thing1 thing2 &rest more-things))
-
 ;;; the default version
 (defmethod > (x y &rest more)
   (if (cl:> x y)
@@ -30,8 +28,6 @@
 ;;; (>= thing1 thing2 &rest more-things) => anything
 ;;; ---------------------------------------------------------------------
 ;;; shadows cl:>=, providing an extensible generic version
-
-(defgeneric >= (thing1 thing2 &rest more-things))
 
 ;;; the default version
 (defmethod >= (x y &rest more)
@@ -45,8 +41,6 @@
 ;;; ---------------------------------------------------------------------
 ;;; shadows cl:<, providing an extensible generic version
 
-(defgeneric < (thing1 thing2 &rest more-things))
-
 ;;; the default version
 (defmethod < (x y &rest more)
   (if (cl:< x y)
@@ -59,8 +53,6 @@
 ;;; ---------------------------------------------------------------------
 ;;; shadows cl:<=, providing an extensible generic version
 
-(defgeneric <= (thing1 thing2 &rest more-things))
-
 ;;; the default version
 (defmethod <= (x y &rest more)
   (if (cl:<= x y)
@@ -72,8 +64,6 @@
 ;;; (sort sequence &key (test '<)) => sequence'
 ;;; ---------------------------------------------------------------------
 ;;; shadows cl:sort, providing a non-destructive extensible generic version
-
-(defgeneric sort (sequence &key test))
 
 ;;; the default version
 (defmethod sort (seq pred &key (key nil))

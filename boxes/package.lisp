@@ -16,8 +16,10 @@
                           :adjoin :apply :find :first :get :last :length :merge :position :position-if :put 
                           :reduce :remove :rest :reverse :second :sequence :sort :union)
   (:import-from :net.bardcode.folio.common 
+                :as
                 :box
                 :box?
+                :make
                 :set-box!
                 :unbox))
 

@@ -16,6 +16,6 @@
                           :adjoin :apply :find :first :get :last :length :merge :position :position-if :put 
                           :reduce :remove :rest :reverse :second :sequence :sort :union)
   (:import-from :net.bardcode.folio.common 
-                :foundation-series :left :pair :pair? :right :seq))
+                :as :foundation-series :left :pair :pair? :right :seq))
 
 

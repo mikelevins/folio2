@@ -55,6 +55,26 @@
 (defmacro ^ (args &body body)
   `(lambda ,args ,@body))
 
+
+;;; macro ->
+;;;
+;;; (-> f1..fk) => fx
+;;; ---------------------------------------------------------------------
+;;; returns a function FX that accepts k arguments. When applied to k
+;;; values, the function yields k values, applying F1 to the first argument,
+;;; F2 to the second, and so on. Combines usefully with cascade, e.g:
+;;; (cascade (a b c) (-> f1 f2 f3)(-> g1 g2 g3)(-> h1 h2 h3)) => v1 v2 v3
+;;; where v1 is (h1 (g1 (f1 a))), and so on for the other values.
+
+
+(defmacro -> (&rest fns)
+  (let ((args (loop for fn in fns collecting (gensym))))
+    `(lambda (,@args)
+       (apply 'values
+              (mapcar (lambda (fn arg)(funcall fn arg))
+                      (list ,@fns)
+                      (list ,@args))))))
+
 ;;; macro fn
 ;;; 
 ;;; (fn (arg1..argk) expr1..exprk) => a function
@@ -76,22 +96,24 @@
 ;;; output values become the inputs to F2. F2's outputs are the inputs
 ;;; to F3, and so on. The outputs of FN are VAL1..VALK
 
-(defmacro -> (args &body body)
-  (if (null body)
+(defmacro cascade (args &rest fns)
+  (if (null fns)
       `(values ,@args)
-      (let ((vars (loop for arg in args collect (gensym)))
-            (f (car body))
-            (more (cdr body)))
-        `(multiple-value-bind ,vars (funcall ,f ,@args)
-           (-> ,vars ,@more)))))
+      (let ((params (loop for arg in args collecting (gensym)))
+            (fn (car fns))
+            (more-fns (cdr fns)))
+        `(multiple-value-bind (,@params)(funcall ,fn ,@args)
+           (cascade (,@params) ,@more-fns)))))
 
 
-;;; function ->
+;;; macro repeatedly
 ;;;
-;;; (-> f1..fk) => fx
+;;; (repeatedly fn arg1...argn)
 ;;; ---------------------------------------------------------------------
-;;; returns a function FX that accepts k arguments. When applied to k
-;;; values, the function yields k values, applying F1 to the first argument,
-;;; F2 to the second, and so on. Combines usefully with cascade, e.g:
-;;; (cascade (a b c) (-> f1 f2 f3)(-> g1 g2 g3)(-> h1 h2 h3)) => v1 v2 v3
-;;; where v1 is (h1 (g1 (f1 a))), and so on for the other values.
+;;; Returns an unbounded series of the results of repeatedly applying
+;;; the function FN to the arguments ARG1...ARGN.
+
+(defmacro repeatedly (fn &rest args)
+  `(series::scan-fn t 
+                    (lambda ()(funcall ,fn ,@args))
+                    (lambda (ignored)(funcall ,fn ,@args))))

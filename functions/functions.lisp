@@ -17,8 +17,6 @@
 ;;; ---------------------------------------------------------------------
 ;;; shadows cl:apply, providing an extensible generic version.
 
-(defgeneric apply (fn seq))
-
 ;;; the default version
 (defmethod apply (applicable (seq cl:cons))
   (cl:apply applicable seq))
@@ -87,8 +85,6 @@
 ;;; returns a true value if THING is a function (that is, it's a function,
 ;;; but not s generic function or method)
 
-(defgeneric function? (thing))
-
 (defmethod function? (thing)
   (declare (ignore thing))
   nil)
@@ -112,8 +108,6 @@
 ;;; returns a true value if THING is a function, a generic function,
 ;;; or a method
 
-(defgeneric functional? (thing))
-
 (defmethod functional? (thing)
   (declare (ignore thing))
   nil)
@@ -136,8 +130,6 @@
 ;;; ---------------------------------------------------------------------
 ;;; returns a true value if THING is a generic function
 
-(defgeneric generic-function? (thing))
-
 (defmethod generic-function? (thing)
   (declare (ignore thing))
   nil)
@@ -151,8 +143,6 @@
 ;;; (method? thing) => Boolean
 ;;; ---------------------------------------------------------------------
 ;;; returns a true value if THING is a method
-
-(defgeneric method? (thing))
 
 (defmethod method? (thing)
   (declare (ignore thing))
@@ -194,7 +184,7 @@
 ;;; f2 accepts the same arguments as b c a
 
 (defun rotate-left (f)
-  (fn (&rest args)
+  (lambda (&rest args)
     (apply f `(,@(last args) ,@(subseq args 0 (1- (length args)))))))
 
 ;;; function rotate-right
@@ -207,7 +197,7 @@
 ;;; f2 accepts the same arguments as c a b
 
 (defun rotate-right (f)
-  (fn (&rest args)
+  (lambda (&rest args)
     (apply f `(,@(cdr args) ,(car args)))))
 
 ;;; function rpartial
