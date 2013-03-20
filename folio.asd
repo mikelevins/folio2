@@ -230,7 +230,8 @@
                (:module "tests"
                         :serial t
                         :components
-                        ((:file "box-tests")))))
+                        ((:file "box-tests")
+                         (:file "converting-tests")))))
 
 
 (defun load-folio ()
