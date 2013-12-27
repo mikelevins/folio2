@@ -16,7 +16,7 @@
   (:use :cl :net.bardcode.folio.common :net.bardcode.folio.boxes :lift)
   (:shadowing-import-from :net.bardcode.folio.common
                           :> :>= :< :<=
-                          :adjoin :apply :find :first :intersection :last :length
+                          :adjoin :append :apply :find :first :intersection :last :length
                           :merge :position :position-if :reduce :remove :rest
                           :reverse :second :sequence :sort :union))
 

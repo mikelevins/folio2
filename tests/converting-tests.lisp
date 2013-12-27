@@ -15,7 +15,7 @@
   (:use :cl :net.bardcode.folio.common :net.bardcode.folio.converting :lift)
   (:shadowing-import-from :net.bardcode.folio.common
                           :> :>= :< :<=
-                          :adjoin :apply :find :first :intersection :last :length
+                          :adjoin :append :apply :find :first :intersection :last :length
                           :merge :position :position-if :reduce :remove :rest
                           :reverse :second :sequence :sort :union))
 
@@ -63,6 +63,10 @@
 (addtest (converting-tests)
   test-hash-table-type-for-copy
   (ensure (subtypep (type-for-copy (make-hash-table)) 'hash-table)))
+
+#+lispworks
+(setf (logical-pathname-translations "home")
+      `(("*" ,(user-homedir-pathname))))
 
 (addtest (converting-tests)
   test-logical-pathname-type-for-copy
@@ -147,4 +151,4 @@
   (let ((*TEST-DESCRIBE-IF-NOT-SUCCESSFUL?* t))
     (lift:run-tests :suite 'converting-tests)))
 
-;;; (net.bardcode.folio.boxes.tests::run-converting-tests)
+;;; (net.bardcode.folio.converting.tests::run-converting-tests)

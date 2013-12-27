@@ -150,7 +150,7 @@
 
 (defmethod method? ((thing function))
   (declare (ignore thing))
-  t)
+  nil)
 
 (defmethod method? ((thing method))
   (declare (ignore thing))
@@ -185,7 +185,7 @@
 
 (defun rotate-left (f)
   (lambda (&rest args)
-    (apply f `(,@(last args) ,@(subseq args 0 (1- (length args)))))))
+    (apply f `(,@(cl:last args) ,@(subseq args 0 (1- (length args)))))))
 
 ;;; function rotate-right
 ;;;

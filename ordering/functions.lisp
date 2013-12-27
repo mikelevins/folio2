@@ -66,8 +66,8 @@
 ;;; shadows cl:sort, providing a non-destructive extensible generic version
 
 ;;; the default version
-(defmethod sort (seq pred &key (key nil))
-  (cl:sort (cl:copy-seq seq) pred :key key))
+(defmethod sort (seq &key (test '<)(key nil))
+  (cl:sort (cl:copy-seq seq) test :key key))
 
 
 

@@ -25,8 +25,7 @@
                 :generate 
                 :interleave :interpose
                 :join
-                :next-last
-                :partition
+                :partition :penult
                 :range :range-from :repeat
                 :scan :scan-image :select :sequence? :shuffle :some? 
                 :split :subsequence 

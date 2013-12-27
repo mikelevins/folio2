@@ -173,7 +173,7 @@ use. Here's what that looks like:
        :$ :^
        ;; sequences
        :add-first :add-last :any :by :drop :element :empty? :filter 
-       :first :generate :last :length :map :next-last :partition
+       :first :generate :last :length :map :partition :penult
        :reduce :rest :reverse :scan :second :some? :take :take-by))
 
 now, by using or importing your `fn` package, you can get access to

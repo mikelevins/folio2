@@ -12,14 +12,14 @@
 (in-package :cl-user)
 
 (defpackage :net.bardcode.folio.common
-  (:shadow :> :>= :< :<= :adjoin :apply :find :first :get :intersection :last :length :merge :position :position-if :put 
+  (:shadow :> :>= :< :<= :adjoin :append :apply :find :first :get :intersection :last :length :merge :position :position-if :put 
            :reduce :remove :rest :reverse :second :sequence :set :sort :union)
   (:use :cl)
   (:import-from :fset :seq)
   (:import-from :series series::foundation-series)
   (:export :$ :^ :-> :> :>= :< :<=
-           :adjoin :add-first :add-last :alist :alist? :alist->plist :any :apply :as :associate
-           :box :box? :by
+           :adjoin :add-first :add-last :alist :alist? :alist->plist :any :append :apply :as :associate
+           :binary-append :box :box? :by
            :cascade :characters :coalesce :combined-type :compose :concat :conjoin :contains-key? :contains-value?
            :difference :disjoin :dissociate :drop :drop-while 
            :element :empty? :every? 
@@ -27,13 +27,12 @@
            :generate :generic-function? :get-key
            :head
            :image :indexes :input-stream :input-stream? :interleave :interpose :intersection
-           :join :join2 :join-text
+           :join :binary-join :join-text
            :keys
            :last :left :length :lines
            :make :make-output-stream :match-prefix? :match-suffix? :merge :method?
-           :next-last
            :objects :octets :ordered-map :ordered-map? :output-stream :output-stream?
-           :pair :pair? :partial :partition :plist :plist? :plist->alist :position :position-if :put-key
+           :pair :pair? :partial :partition :penult :plist :plist? :plist->alist :position :position-if :put-key
            :range :range-from :readable :readable? :reduce :remove :repeat :repeatedly :rest :reverse :right 
            :rotate-left :rotate-right :rpartial
            :scan :scan-image :second :select :seq :series :series? :sequence :sequence? :set-box! :set? :shuffle :some?

@@ -52,6 +52,10 @@
   (declare (ignore s1 s2))
   'vector)
 
+(defmethod combined-type ((s1 vector) (s2 cons))
+  (declare (ignore s1 s2))
+  'vector)
+
 (defmethod combined-type ((s1 string) s2)
   (declare (ignore s1 s2))
   'vector)
@@ -136,7 +140,8 @@
 (defmethod any ((s null)) (declare (ignore s)) nil)
 (defmethod any ((s cl:sequence))(elt s (random (length s))))
 (defmethod any ((s seq))(fset:@ s (random (fset:size s))))
-(defmethod any ((s fset:map))(fset:@ s ()))
+(defmethod any ((s fset:set))(elt (as 'list s)(random (fset:size s))))
+(defmethod any ((s fset:map))(fset:@ s (any (keys s))))
 
 (defmethod any ((s foundation-series))
   (block searching
@@ -144,6 +149,59 @@
         (when (zerop (random 2))
           (return-from searching x)))))
 
+
+;;; ---------------------------------------------------------------------
+;;; function append
+;;; ---------------------------------------------------------------------
+;;;
+;;; (append &rest seqs) => seq'
+;;; ---------------------------------------------------------------------
+;;; shadows cl:find, providing an extensible generic version
+;;; returns a new sequence. if SEQS is nil, then nil is returned. If
+;;; seqs contains a single value then that value is returned. Otherwise,
+;;; append returns (reduce 'binary-append seqs)
+;;; if you want to extend append with cases for additional sequence types,
+;;; add methods to binary-append
+
+(defun append (&rest seqs)
+  (if (null seqs)
+      nil
+      (if (null (cdr seqs))
+          (cadr seqs)
+          (reduce #'binary-append seqs))))
+
+;;; ---------------------------------------------------------------------
+;;; function binary-append
+;;; ---------------------------------------------------------------------
+;;;
+;;; (binary-append seq1 seq2) => seq3
+;;; ---------------------------------------------------------------------
+;;; returns a sequence containing all the elements of SEQ1 followed by
+;;; all the elements of SEQ2.
+
+(defmethod binary-append ((seq1 null)(seq2 null))(declare (ignore seq1 seq2)) nil)
+(defmethod binary-append ((seq1 null)(seq2 cl:sequence))(declare (ignore seq1)) seq2)
+(defmethod binary-append ((seq1 null)(seq2 seq))(declare (ignore seq1)) seq2)
+(defmethod binary-append ((seq1 null)(seq2 foundation-series))(declare (ignore seq1)) seq2)
+
+(defmethod binary-append ((seq1 cl:sequence)(seq2 null))(declare (ignore seq2)) seq1)
+(defmethod binary-append ((seq1 cl:sequence)(seq2 cl:sequence)) (concatenate (combined-type seq1 seq2) seq1 seq2))
+(defmethod binary-append ((seq1 cl:sequence)(seq2 seq))
+  (concatenate (combined-type seq1 seq2) seq1 (fset:convert (combined-type seq1 seq2) seq2)))
+(defmethod binary-append ((seq1 cl:sequence)(seq2 foundation-series))
+  (series:catenate (series:scan seq1) seq2))
+
+(defmethod binary-append ((seq1 seq)(seq2 null))(declare (ignore seq2)) seq1)
+(defmethod binary-append ((seq1 seq)(seq2 cl:sequence)) (as (combined-type seq1 seq2)(fset:concat seq1 seq2)))
+(defmethod binary-append ((seq1 seq)(seq2 seq))(fset:concat seq1 seq2))
+(defmethod binary-append ((seq1 seq)(seq2 foundation-series))
+  (series:catenate (series:scan (as 'list seq1)) seq2))
+
+(defmethod binary-append ((seq1 foundation-series)(seq2 null))(declare (ignore seq2)) seq1)
+(defmethod binary-append ((seq1 foundation-series)(seq2 cl:sequence))(series:catenate seq1 (scan seq2)))
+(defmethod binary-append ((seq1 foundation-series)(seq2 seq))(as 'series (series:catenate seq1 (scan (as 'list seq2)))))
+(defmethod binary-append ((seq1 foundation-series)(seq2 foundation-series))
+  (series:catenate seq1 seq2))
 
 ;;; function as
 ;;;
@@ -157,6 +215,9 @@
   (coerce val 'cl:list))
 
 (defmethod as ((type (eql 'cl:list)) (val seq) &key &allow-other-keys)
+  (fset:convert 'cl:list val))
+
+(defmethod as ((type (eql 'cl:list)) (val fset:set) &key &allow-other-keys)
   (fset:convert 'cl:list val))
 
 (defmethod as ((type (eql 'cl:list)) (val foundation-series) &key &allow-other-keys)
@@ -310,47 +371,6 @@
   (let ((seqs (mapcar 'scan seqs)))
     (series:collect (apply 'series:map-fn t fn seqs))))
 
-
-;;; ---------------------------------------------------------------------
-;;; function concat
-;;; ---------------------------------------------------------------------
-;;;
-;;; (concat &rest seqs) => seq'
-;;; ---------------------------------------------------------------------
-;;; returns a new sequence. if SEQS is nil, then nil is returned. If
-;;; seqs contains a single value then that value is returned. Otherwise,
-;;; append returns (reduce 'append2 seqs)
-;;; if you want to extend append with cases for additional sequence types,
-;;; add methods to append2
-
-(defun concat (&rest seqs)
-  (if (null seqs)
-      nil
-      (if (null (cdr seqs))
-          (cadr seqs)
-          (reduce #'concat2 seqs))))
-
-;;; ---------------------------------------------------------------------
-;;; function concat2
-;;; ---------------------------------------------------------------------
-;;;
-;;; (concat2 seq1 seq2) => seq3
-;;; ---------------------------------------------------------------------
-;;; returns a sequence containing all the elements of SEQ1 followed by
-;;; all the elements of SEQ2.
-
-(defmethod concat2 ((seq1 null)(seq2 null))(declare (ignore seq1 seq2)) nil)
-(defmethod concat2 ((seq1 null)(seq2 cl:sequence))(declare (ignore seq1)) seq2)
-(defmethod concat2 ((seq1 null)(seq2 seq))(declare (ignore seq1)) seq2)
-(defmethod concat2 ((seq1 null)(seq2 foundation-series))(declare (ignore seq1)) seq2)
-
-(defmethod concat2 ((seq1 cl:sequence)(seq2 null))(declare (ignore seq2)) seq1)
-(defmethod concat2 ((seq1 cl:sequence)(seq2 cl:sequence)) (concatenate (combined-type seq1 seq2) seq1 seq2))
-(defmethod concat2 ((seq1 cl:sequence)(seq2 seq))
-  (concatenate (combined-type seq1 seq2) seq1 (fset:convert (combined-type seq1 seq2) seq2)))
-(defmethod concat2 ((seq1 cl:sequence)(seq2 foundation-series))
-  (series:catenate (series:scan seq1) seq2))
-
 ;;; ---------------------------------------------------------------------
 ;;; function drop
 ;;; ---------------------------------------------------------------------
@@ -359,6 +379,11 @@
 ;;; ---------------------------------------------------------------------
 ;;; returns a new sequence containing the elements of SEQ after the first
 ;;; N elements have been removed
+
+(defmethod drop ((n (eql 0)) (seq null)) seq)
+(defmethod drop ((n (eql 0)) (seq cl:sequence)) seq)
+(defmethod drop ((n (eql 0)) (seq seq)) seq)
+(defmethod drop ((n (eql 0)) (seq foundation-series)) seq)
 
 (defmethod drop ((n integer) (seq null))
   (error "index out of range: ~A" n))
@@ -378,9 +403,6 @@
 ;;;
 ;;; (drop-while test seq) => seq'
 ;;; ---------------------------------------------------------------------
-
-(defmethod drop-while (fn (seq null))
-  (error "index out of range: ~A" n))
 
 (defmethod drop-while (fn (seq cl:sequence))
   (let ((pos (cl:position-if-not fn seq)))
@@ -494,16 +516,16 @@
 ;;; ---------------------------------------------------------------------
 ;;; shadows cl:find, providing an extensible generic version
 
-(defmethod find (item (s cl:sequence) &key from-end test test-not start end key &allow-other-keys)
+(defmethod find (item (s cl:sequence) &key from-end (test 'eql) test-not (start 0) end (key 'identity) &allow-other-keys)
   (cl:find item s :from-end from-end :test test :test-not test-not
            :start start :end end :key key))
 
-(defmethod find (item (s seq) &key test key &allow-other-keys)
-  (fset::find s 0 :key key :test test))
+(defmethod find (item (s seq) &key (test 'eql) (key 'identity) (start 0) end &allow-other-keys)
+  (fset::find item (drop start s) :key key :test test))
 
-(defmethod find (item (s foundation-series) &key test key &allow-other-keys)
-  (series:collect-first (series:choose (series:map-fn t (or test 'equal) s)
-                                        s)))
+(defmethod find (item (s foundation-series) &key (test 'eql) (key 'identity) (start 0) end &allow-other-keys)
+  (series:collect-first (series:choose (series:map-fn t (lambda (x) (funcall test x item)) s)
+                                       (drop start s))))
 
 ;;; ---------------------------------------------------------------------
 ;;; function first
@@ -537,11 +559,26 @@
 (defmethod generate ((s cl:sequence))
   (series:generator (series:scan s)))
 
-(defmethod generate ((s seq))
-  (series:generator (fset:convert 'cl:vector s)))
+(defmethod generate ((s fset:seq))
+  (series:generator (scan (fset:convert 'cl:vector s))))
 
 (defmethod generate ((s foundation-series))
   (series:generator s))
+
+;;; ---------------------------------------------------------------------
+;;; function image
+;;; ---------------------------------------------------------------------
+;;;
+;;; (image fn seq) => seq'
+;;; ---------------------------------------------------------------------
+;;; returns a sequence containing the values produced by applying
+;;; FN to each element of SEQ
+
+(defmethod image  (fn (s null)) (declare (ignore s)) nil)
+(defmethod image  (fn (s cl:sequence))(cl:map 'list fn s))
+(defmethod image  (fn (s cl:vector))(cl:map 'vector fn s))
+(defmethod image  (fn (s seq))(fset:image fn s))
+(defmethod image  (fn (s foundation-series))(series:map-fn t fn s))
 
 ;;; ---------------------------------------------------------------------
 ;;; function indexes
@@ -556,15 +593,13 @@
   nil)
 
 (defmethod indexes ((s cl:sequence))
-  (series:collect 'cl:list
-                  (indexes (scan s))))
+  (indexes (scan s)))
 
 (defmethod indexes ((s seq))
-  (series:collect 'cl:list
-                  (indexes (scan (fset:convert 'cl:vector s)))))
+  (indexes (scan (fset:convert 'cl:vector s))))
 
 (defmethod indexes ((s foundation-series))
-  (series:choose (series:positions (series:map-fn 'boolean (constantly t) (scan s)))))
+  (series:collect 'list (series:choose (series:positions (series:map-fn 'boolean (constantly t) (scan s))))))
 
 ;;; ---------------------------------------------------------------------
 ;;; function interleave
@@ -686,7 +721,7 @@
   (interleave s (make-array (1- (fset:size s)) :initial-element x)))
 
 (defmethod interpose (x (s foundation-series))
-  (let* ((indexes (indexes s))
+  (let* ((indexes (scan (indexes s)))
          (xs (series:choose (series:subseries indexes 1)(repeat x))))
     (interleave s xs)))
 
@@ -696,27 +731,27 @@
 ;;;
 ;;; (join cupola seqs) => seq
 ;;; ---------------------------------------------------------------------
-;;; joins SEQS in the manner of join2, below. to add support for joining 
-;;; new sequence types, add methods to join2
+;;; joins SEQS in the manner of binary-join, below. to add support for joining 
+;;; new sequence types, add methods to binary-join
 
 (defmethod join (x (s null))
   (declare (ignore x s))
   nil)
 
 (defmethod join (x (s cl:sequence))
-  (cl:reduce (lambda (a b)(join2 x a b)) s))
+  (cl:reduce (lambda (a b)(binary-join x a b)) s))
 
 (defmethod join (x (s seq))
-  (fset:reduce (lambda (a b)(join2 x a b)) s))
+  (fset:reduce (lambda (a b)(binary-join x a b)) s))
 
 (defmethod join (x (s foundation-series))
   (series:collect-fn t
                      (lambda () (series:collect-first s))
-                     (lambda (a b) (join2 x a b))
+                     (lambda (a b) (binary-join x a b))
                      (series:subseries s 1)))
 
 ;;; ---------------------------------------------------------------------
-;;; function join2
+;;; function binary-join
 ;;; ---------------------------------------------------------------------
 ;;;
 ;;; (join cupola seq1 seq2) => seq3
@@ -724,45 +759,48 @@
 ;;; concatenates SEQ1 and SEQ2 to form the new sequence SEQ3, with CUPOLA
 ;;; inserted between the elements of SEQ1 and SEQ2
 
-(defmethod join2 (x (s1 cl:sequence)(s2 cl:sequence))
+(defmethod binary-join (x (s1 cl:sequence)(s2 cl:sequence))
   (let* ((out-type (combined-type s1 s2))
          (cupola (coerce (list x) out-type)))
     (concatenate out-type s1 cupola s2)))
 
-(defmethod join2 ((x character) (s1 cl:sequence)(s2 cl:sequence))
+(defmethod binary-join ((x character) (s1 cl:sequence)(s2 cl:sequence))
   (let* ((out-type (combined-type s1 s2))
          (cupola (string x)))
     (concatenate out-type s1 cupola s2)))
 
-(defmethod join2 (x (s1 cl:sequence)(s2 seq))
+(defmethod binary-join ((cupola string) (s1 cl:string)(s2 cl:string))
+  (concatenate 'string s1 cupola s2))
+
+(defmethod binary-join (x (s1 cl:sequence)(s2 seq))
   (let* ((out-type (combined-type s1 s2))
          (cupola (coerce (list x) out-type)))
     (concatenate out-type s1 cupola (fset:convert out-type s2))))
 
-(defmethod join2 (x (s1 cl:sequence)(s2 foundation-series))
-  (join2 x (series:scan s1) s2))
+(defmethod binary-join (x (s1 cl:sequence)(s2 foundation-series))
+  (binary-join x (series:scan s1) s2))
 
 
-(defmethod join2 (x (s1 seq)(s2 cl:sequence))
+(defmethod binary-join (x (s1 seq)(s2 cl:sequence))
   (let* ((out-type (combined-type s1 s2))
          (cupola (fset:convert out-type (list x))))
     (fset:concat out-type s1 cupola (fset:convert out-type s2))))
 
-(defmethod join2 (x (s1 seq)(s2 seq))
+(defmethod binary-join (x (s1 seq)(s2 seq))
   (let ((cupola (fset:convert 'seq (list x))))
     (fset:concat out-type s1 cupola s2)))
 
-(defmethod join2 (x (s1 seq)(s2 foundation-series))
-  (join2 x (series:scan (fset:convert 'cl:list s1)) s2))
+(defmethod binary-join (x (s1 seq)(s2 foundation-series))
+  (binary-join x (series:scan (fset:convert 'cl:list s1)) s2))
 
 
-(defmethod join2 (x (s1 foundation-series)(s2 cl:sequence))
-  (join2 x s1 (series:scan s2)))
+(defmethod binary-join (x (s1 foundation-series)(s2 cl:sequence))
+  (binary-join x s1 (series:scan s2)))
 
-(defmethod join2 (x (s1 foundation-series)(s2 seq))
-  (join2 x s1 (series:scan (fset:convert 'cl:list s2))))
+(defmethod binary-join (x (s1 foundation-series)(s2 seq))
+  (binary-join x s1 (series:scan (fset:convert 'cl:list s2))))
 
-(defmethod join2 (x (s1 foundation-series)(s2 foundation-series))
+(defmethod binary-join (x (s1 foundation-series)(s2 foundation-series))
   (let ((cupola (series:scan (list x))))
     (series:catenate s1 cupola s2)))
 
@@ -792,20 +830,6 @@
 (defmethod length ((s cl:sequence))(cl:length s))
 (defmethod length ((s seq))(fset:size s))
 (defmethod length ((s foundation-series))(series:collect-length s))
-
-;;; ---------------------------------------------------------------------
-;;; function image
-;;; ---------------------------------------------------------------------
-;;;
-;;; (image fn seq) => seq'
-;;; ---------------------------------------------------------------------
-;;; returns a sequence containing the values produced by applying
-;;; FN to each element of SEQ
-
-(defmethod image  (fn (s null)) (declare (ignore s)) nil)
-(defmethod image  (fn (s cl:sequence))(cl:map 'list fn s))
-(defmethod image  (fn (s seq))(fset:image fn s))
-(defmethod image  (fn (s foundation-series))(series:map-fn t fn s))
 
 ;;; ---------------------------------------------------------------------
 ;;; function make
@@ -859,15 +883,27 @@
               pref seq)))
 
 (defmethod match-prefix? ((pref cl:sequence)(seq seq) &key (test 'equal))
-  (match-prefix? pref (as 'sequence seq)))
+  (match-prefix? pref (as 'sequence seq) :test test))
 
 (defmethod match-prefix? ((pref cl:sequence)(seq foundation-series) &key (test 'equal))
-  (match-prefix? pref (as 'sequence seq)))
+  (match-prefix? pref (as 'sequence seq) :test test))
+
+(defmethod match-prefix? ((pref seq)(seq cl:sequence) &key (test 'equal))
+  (match-prefix? (as 'list pref) seq :test test))
 
 (defmethod match-prefix? ((pref seq)(seq seq) &key (test 'equal))
   (and (<= (fset:size pref)(fset:size seq))
        (fset::every (lambda (x y)(funcall test x y))
                     pref seq)))
+
+(defmethod match-prefix? ((pref seq)(seq foundation-series) &key (test 'equal))
+  (match-prefix? (scan (as 'list pref)) seq :test test))
+
+(defmethod match-prefix? ((pref foundation-series)(seq cl:sequence) &key (test 'equal))
+  (match-prefix? pref (scan (as 'list seq)) :test test))
+
+(defmethod match-prefix? ((pref foundation-series)(seq seq) &key (test 'equal))
+  (match-prefix? pref (scan (as 'list seq)) :test test))
 
 (defmethod match-prefix? ((pref foundation-series)(seq foundation-series) &key (test 'equal))
   (series:collect-and (series:map-fn 'boolean
@@ -886,26 +922,46 @@
 ;;; to the count of elements in SUFF. SUFF and SEQ need not be of the
 ;;; same type.
 
-;;; ---------------------------------------------------------------------
-;;; function next-last
-;;; ---------------------------------------------------------------------
-;;;
-;;; (next-last seq) => anything
-;;; ---------------------------------------------------------------------
-;;; returns the last-but-one element of seq
+(defmethod match-suffix? ((seq null)(suff null) &key test) t)
+(defmethod match-suffix? (seq (suff null) &key test) t)
+(defmethod match-suffix? ((seq null) suff &key test) nil)
 
-(defmethod next-last ((s null)) (declare (ignore s)) nil)
+(defmethod match-suffix? ((seq cl:sequence)(suff cl:sequence) &key (test 'equal))
+  (and (<= (cl:length suff)(cl:length seq))
+       (equalp (subseq seq (- (length seq)
+                              (length suff)))
+               suff)))
 
-(defmethod next-last ((s cl:cons))
-  (if (null (cdr s))
-      nil
-      (if (null (cddr s))
-          (car s)
-          (next-last (cdr s)))))
+(defmethod match-suffix? ((seq seq)(suff cl:sequence) &key (test 'equal))
+  (match-suffix? (as 'sequence seq) suff :test test))
 
-(defmethod next-last ((s cl:sequence))(cl:elt s (- (cl:length s) 2)))
-(defmethod next-last ((s seq))(fset:@ s (- (fset:size s) 2)))
-(defmethod next-last ((s foundation-series))(series:collect-nth (- (series:collect-length s) 2) s))
+(defmethod match-suffix? ((seq foundation-series)(suff cl:sequence) &key (test 'equal))
+  (match-suffix? (as 'sequence seq) suff :test test))
+
+(defmethod match-suffix? ((seq cl:sequence)(suff seq) &key (test 'equal))
+  (match-suffix? seq (as 'list suff) :test test))
+
+(defmethod match-suffix? ((seq seq)(suff seq) &key (test 'equal))
+  (and (<= (fset:size suff)(fset:size seq))
+       (fset::every test
+                    (drop (- (length seq)
+                             (length suff))
+                          seq)
+                    suff)))
+
+(defmethod match-suffix? ((seq foundation-series)(suff seq) &key (test 'equal))
+  (match-suffix? seq (scan (as 'list suff)) :test test))
+
+(defmethod match-suffix? ((seq cl:sequence)(suff foundation-series) &key (test 'equal))
+  (match-suffix? (scan (as 'list seq)) suff :test test))
+
+(defmethod match-suffix? ((seq seq)(suff foundation-series) &key (test 'equal))
+  (match-suffix? (scan (as 'list seq)) suff))
+
+(defmethod match-suffix? ((seq foundation-series)(suff foundation-series) &key (test 'equal))
+  (match-suffix? (as 'list seq)
+                 (as 'list suff)
+                 :test test))
 
 ;;; ---------------------------------------------------------------------
 ;;; function partition
@@ -937,6 +993,27 @@
   (apply #'values (cl:map 'cl:list
                           (lambda (fn)(series:map-fn t fn seq))
                           fns)))
+
+;;; ---------------------------------------------------------------------
+;;; function penult
+;;; ---------------------------------------------------------------------
+;;;
+;;; (penult seq) => anything
+;;; ---------------------------------------------------------------------
+;;; returns the last-but-one element of seq
+
+(defmethod penult ((s null)) (declare (ignore s)) nil)
+
+(defmethod penult ((s cl:cons))
+  (if (null (cdr s))
+      nil
+      (if (null (cddr s))
+          (car s)
+          (penult (cdr s)))))
+
+(defmethod penult ((s cl:sequence))(cl:elt s (- (cl:length s) 2)))
+(defmethod penult ((s seq))(fset:@ s (- (fset:size s) 2)))
+(defmethod penult ((s foundation-series))(series:collect-nth (- (series:collect-length s) 2) s))
 
 ;;; ---------------------------------------------------------------------
 ;;; function position
@@ -1219,6 +1296,26 @@
 (defmethod select ((s foundation-series) (indexes foundation-series))
   (series:choose (series:mask indexes) s))
 
+;;; ---------------------------------------------------------------------
+;;; function seq
+;;; ---------------------------------------------------------------------
+;;;
+;;; (seq a b c ...) => seq
+;;; ---------------------------------------------------------------------
+;;; returns a simple fset:seq containing the elements a b c ...
+;;; imported from fset
+
+;;; ---------------------------------------------------------------------
+;;; function series
+;;; ---------------------------------------------------------------------
+;;;
+;;; (series a b c ...) => series
+;;; ---------------------------------------------------------------------
+;;; returns a simple series:series containing the elements a b c ... 
+;;; as if from series:scan
+
+(defun series (&rest args)
+  (series:scan args))
 
 ;;; function shuffle
 ;;;

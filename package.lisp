@@ -19,10 +19,10 @@
   (:nicknames :folio)
   (:shadowing-import-from :net.bardcode.folio.common
                           :> :>= :< :<=
-                          :adjoin :apply :find :first :indexes :intersection :last :length
+                          :adjoin :append :apply :find :first :indexes :intersection :last :length
                           :merge :position :position-if :reduce :remove :repeatedly :rest
                           :reverse :second :sequence :sort :union) 
-  (:import-from :net.bardcode.folio.common :foundation-series :make-output-stream :seq) 
+  (:import-from :net.bardcode.folio.common :binary-append :foundation-series :make-output-stream :seq) 
   (:use :cl :net.bardcode.folio.common)
   (:export
    ;; boxes
@@ -40,7 +40,7 @@
    :left :pair :pair? :right
    ;; sequences
    :add-first :add-last :any
-   :by
+   :binary-append :by
    :coalesce :concat
    :drop :drop-while
    :element :empty? :every?
@@ -48,12 +48,11 @@
    :generate
    :head
    :image :indexes :input-stream? :interleave :interpose
-   :join :join2
+   :join :binary-join
    :last :length
    :match-prefix? :match-suffix? :make-output-stream
-   :next-last
    :output-stream :output-stream? :ordered-map
-   :partition :position :position-if
+   :partition :penult :position :position-if
    :range :range-from :readable :readable? :reduce :remove :repeat :repeatedly :rest :reverse 
    :scan :scan-image :second :select :seq :sequence :sequence? :series :series? :shuffle :some? :sort :split
    :streamable :streamable? :subsequence

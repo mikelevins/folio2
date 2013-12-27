@@ -286,7 +286,7 @@
 (defgeneric function? (thing))
 
 
-;;; function functional?
+;;; functional?
 ;;;
 ;;; (functional? thing) => Boolean
 ;;; ---------------------------------------------------------------------
@@ -383,20 +383,20 @@
 ;;;
 ;;; (join cupola seqs) => seq
 ;;; ---------------------------------------------------------------------
-;;; joins SEQS in the manner of join2, below. to add support for joining 
-;;; new sequence types, add methods to join2
+;;; joins SEQS in the manner of binary-join, below. to add support for joining 
+;;; new sequence types, add methods to binary-join
 
 (defgeneric join (cupola seq))
 
 
-;;; join2
+;;; binary-join
 ;;;
 ;;; (join cupola seq1 seq2) => seq3
 ;;; ---------------------------------------------------------------------
 ;;; concatenates SEQ1 and SEQ2 to form the new sequence SEQ3, with CUPOLA
 ;;; inserted between the elements of SEQ1 and SEQ2
 
-(defgeneric join2 (cupola seq1 seq2))
+(defgeneric binary-join (cupola seq1 seq2))
 
 
 ;;; keys
@@ -479,7 +479,7 @@
 ;;; to the count of elements in SUFF. SUFF and SEQ need not be of the
 ;;; same type.
 
-(defgeneric match-suffix? (seq suff))
+(defgeneric match-suffix? (seq suff &key test))
 
 
 ;;; method?
@@ -490,14 +490,6 @@
 
 (defgeneric method? (thing))
 
-
-;;; next-last
-;;;
-;;; (next-last seq) => anything
-;;; ---------------------------------------------------------------------
-;;; returns the last-but-one element of seq
-
-(defgeneric next-last (seq))
 
 
 ;;; objects 
@@ -534,7 +526,6 @@
 (defgeneric pair (a b))
 
 
-
 ;;; partition
 ;;;
 ;;; (partition seq &rest fn1 fn2 fn3...) => seq1 seq2 seq3...
@@ -545,6 +536,14 @@
 ;;; element of SEQ; and so on
 
 (defgeneric partition (seq &rest fns))
+
+;;; penult
+;;;
+;;; (penult seq) => anything
+;;; ---------------------------------------------------------------------
+;;; returns the last-but-one element of seq
+
+(defgeneric penult (seq))
 
 
 ;;; position

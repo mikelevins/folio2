@@ -67,6 +67,17 @@
                         :components ((:file "package")
                                      (:file "functions")))))
 
+(asdf:defsystem :net.bardcode.folio.converting.tests
+  :serial t
+  :description "converting tests"
+  :author "mikel evins <mevins@me.com>"
+  :license "Lisp Lesser GNU Public License"
+  :depends-on (:fset :series :net.bardcode.folio.packages :net.bardcode.folio.generic-functions 
+                     :net.bardcode.folio.converting :lift)
+  :components ((:module "tests"
+                        :serial t
+                        :components ((:file "converting-tests")))))
+
 (asdf:defsystem :net.bardcode.folio.functions
   :serial t
   :description "combinators and other conveniences for working with functions"
@@ -79,6 +90,17 @@
                                      (:file "functions")
                                      (:file "syntax")))))
 
+(asdf:defsystem :net.bardcode.folio.function.tests
+  :serial t
+  :description "function tests"
+  :author "mikel evins <mevins@me.com>"
+  :license "Lisp Lesser GNU Public License"
+  :depends-on (:net.bardcode.folio.packages :net.bardcode.folio.generic-functions 
+                                            :net.bardcode.folio.functions :lift)
+  :components ((:module "tests"
+                        :serial t
+                        :components ((:file "function-tests")))))
+
 (asdf:defsystem :net.bardcode.folio.ordering
   :serial t
   :description "sorting values into stable orders"
@@ -87,7 +109,19 @@
   :depends-on (:fset :series :net.bardcode.folio.packages :net.bardcode.folio.generic-functions)
   :components ((:module "ordering"
                         :serial t
-                        :components ((:file "package")))))
+                        :components ((:file "package")
+                                     (:file "functions")))))
+
+(asdf:defsystem :net.bardcode.folio.ordering.tests
+  :serial t
+  :description "ordereing test"
+  :author "mikel evins <mevins@me.com>"
+  :license "Lisp Lesser GNU Public License"
+  :depends-on (:fset :series :net.bardcode.folio.packages :net.bardcode.folio.generic-functions 
+                     :net.bardcode.folio.ordering :lift)
+  :components ((:module "tests"
+                        :serial t
+                        :components ((:file "ordering-tests")))))
 
 (asdf:defsystem :net.bardcode.folio.pairs
   :serial t
@@ -101,6 +135,17 @@
                                      (:file "types")
                                      (:file "functions")))))
 
+(asdf:defsystem :net.bardcode.folio.pair.tests
+  :serial t
+  :description "pair tests"
+  :author "mikel evins <mevins@me.com>"
+  :license "Lisp Lesser GNU Public License"
+  :depends-on (:net.bardcode.folio.packages :net.bardcode.folio.generic-functions
+                                            :net.bardcode.folio.pairs :lift)
+  :components ((:module "tests"
+                        :serial t
+                        :components ((:file "pair-tests")))))
+
 (asdf:defsystem :net.bardcode.folio.sequences
   :serial t
   :description "tools for manipulating sequences, series, and generators"
@@ -112,6 +157,17 @@
                         :components ((:file "package")
                                      (:file "types")
                                      (:file "functions")))))
+
+(asdf:defsystem :net.bardcode.folio.sequence.tests
+  :serial t
+  :description "sequence tests"
+  :author "mikel evins <mevins@me.com>"
+  :license "Lisp Lesser GNU Public License"
+  :depends-on (:fset :series :net.bardcode.folio.packages :net.bardcode.folio.generic-functions
+                     :net.bardcode.folio.sequences :lift)
+  :components ((:module "tests"
+                        :serial t
+                        :components ((:file "sequence-tests")))))
 
 (asdf:defsystem :net.bardcode.folio.sequences-syntax
   :serial t
@@ -231,7 +287,11 @@
                         :serial t
                         :components
                         ((:file "box-tests")
-                         (:file "converting-tests")))))
+                         (:file "converting-tests")
+                         (:file "function-tests")
+                         (:file "ordering-tests")
+                         (:file "pair-tests")
+                         (:file "sequence-tests")))))
 
 
 (defun load-folio ()
