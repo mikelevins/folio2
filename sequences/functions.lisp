@@ -970,9 +970,9 @@
 ;;; (partition seq &rest fn1 fn2 fn3...) => seq1 seq2 seq3...
 ;;; ---------------------------------------------------------------------
 ;;; returns a number of sequences equal to the number of FUNCTIONS.
-;;; the elements of SEQ1 are produced by applying FN1 to each element of
-;;; SEQ; the elements of SEQ2 are produced by applying FN2 to each 
-;;; element of SEQ; and so on
+;;; the elements of SEQ1 are those elements of seq for which FN1
+;;; returns true; the elements of SEQ2 are those elements of seq for
+;;; which FN2 returns true; and so on
 
 (defmethod partition ((seq null) &rest fns)
   (declare (ignore seq fns))
@@ -980,18 +980,18 @@
 
 (defmethod partition ((seq cl:sequence) &rest fns)
   (apply #'values (cl:map 'cl:list
-                          (lambda (fn)(cl:map (combined-type seq seq)
-                                              fn seq))
+                          (lambda (fn)(cl:remove-if-not fn seq))
                           fns)))
 
 (defmethod partition ((seq seq) &rest fns)
   (apply #'values (cl:map 'cl:list
-                          (lambda (fn)(fset:image fn seq))
+                          (lambda (fn)(fset:remove-if-not fn seq))
                           fns)))
 
 (defmethod partition ((seq foundation-series) &rest fns)
   (apply #'values (cl:map 'cl:list
-                          (lambda (fn)(series:map-fn t fn seq))
+                          (lambda (fn)(series:choose (series:map-fn t fn seq)
+                                                     seq))
                           fns)))
 
 ;;; ---------------------------------------------------------------------
@@ -1023,26 +1023,24 @@
 ;;; ---------------------------------------------------------------------
 ;;; returns the index of ITEM in SEQ, or nil if it's not found
 
-(defmethod position (item (seq null) &key from-end test test-not start end key &allow-other-keys)
-  (declare (ignore item seq from-end test test-not start end key))
+(defmethod position (item (seq null) &key (test 'eql) (start 0) end (key 'cl:identity) &allow-other-keys)
+  (declare (ignore item seq test test-not start end key))
   nil)
 
-(defmethod position (item (seq cl:sequence) &key from-end (test 'equal) test-not (start 0) end key &allow-other-keys)
-  (cl:position item seq :from-end from-end :test test :test-not test-not :start start :end end :key key))
+(defmethod position (item (seq cl:sequence) &key (test 'eql) (start 0) end (key 'cl:identity) &allow-other-keys)
+  (cl:position item seq :test test :start start :end end :key key))
 
-(defmethod position (item (seq seq) &key from-end test test-not start end key &allow-other-keys)
-  (fset:position item seq :from-end from-end :test test :start start :end end :key key))
+(defmethod position (item (seq seq) &key (test 'eql) (start 0) end (key 'cl:identity) &allow-other-keys)
+  (fset:position item seq :test test :start start :end end :key key))
 
-(defmethod position (item (seq foundation-series) &key test (start 0) end key &allow-other-keys)
-  (let* ((key-fn (or key #'identity))
-         (test-fn (or test 'equal))
-         (test (lambda (x)(funcall test-fn (funcall key-fn item)(funcall key-fn x)))))
+(defmethod position (item (seq foundation-series) &key (test 'eql) (start 0) end (key 'cl:identity) &allow-other-keys)
+  (let* ((test (lambda (x)(funcall test (funcall key item)(funcall key x)))))
     (if end
         (let* ((s (series:subseries seq start end))
-               (indexes (series:subseries (indexes seq) start end)))
+               (indexes (series:subseries (scan (indexes seq)) start end)))
           (series:collect-first (series:choose (series:map-fn t test s) indexes)))
         (let* ((s (series:subseries seq start))
-               (indexes (series:subseries (indexes seq) start)))
+               (indexes (series:subseries (scan (indexes seq)) start)))
           (series:collect-first (series:choose (series:map-fn t test s) indexes))))))
 
 ;;; ---------------------------------------------------------------------
@@ -1056,25 +1054,24 @@
 ;;; SEQ; the elements of SEQ2 are produced by applying FN2 to each 
 ;;; element of SEQ; and so on
 
-(defmethod position-if (test (seq null) &key from-end start end key &allow-other-keys)
-  (declare (ignore test seq from-end test test-not start end key))
+(defmethod position-if (test (seq null) &key (start 0) end (key 'cl:identity) &allow-other-keys)
+  (declare (ignore test seq test start end key))
   nil)
 
-(defmethod position-if (test (seq cl:sequence) &key from-end (start 0) end key &allow-other-keys)
-  (cl:position-if test seq :from-end from-end :start start :end end :key key))
+(defmethod position-if (test (seq cl:sequence) &key (start 0) end (key 'cl:identity) &allow-other-keys)
+  (cl:position-if test seq :start start :end end :key key))
 
-(defmethod position-if (test (seq seq) &key from-end start end key &allow-other-keys)
-  (fset:position-if test seq :from-end from-end :start start :end end :key key))
+(defmethod position-if (test (seq seq) &key (start 0) end (key 'cl:identity) &allow-other-keys)
+  (fset:position-if test seq :start start :end end :key key))
 
-(defmethod position-if (test (seq foundation-series) &key (start 0) end key &allow-other-keys)
-  (let* ((key-fn (or key #'identity))
-         (test (lambda (x)(funcall test (funcall key-fn x)))))
+(defmethod position-if (test (seq foundation-series) &key (start 0) end (key 'cl:identity) &allow-other-keys)
+  (let* ((test (lambda (x)(funcall test (funcall key x)))))
     (if end
         (let* ((s (series:subseries seq start end))
-               (indexes (series:subseries (indexes seq) start end)))
+               (indexes (series:subseries (scan (indexes seq)) start end)))
           (series:collect-first (series:choose (series:map-fn t test s) indexes)))
         (let* ((s (series:subseries seq start))
-               (indexes (series:subseries (indexes seq) start)))
+               (indexes (series:subseries (scan (indexes seq)) start)))
           (series:collect-first (series:choose (series:map-fn t test s) indexes))))))
 
 ;;; function range
@@ -1121,24 +1118,23 @@
 
 ;;; function remove
 ;;;
-;;; (remove item seq ) => cycling series
+;;; (remove item seq &key test start end key) => seq'
 ;;; ---------------------------------------------------------------------
-;;; returns an infinitely-repeating sequence of VAL.
+;;; returns a sequence that contains the elements of SEQ, but with 
+;;; ITEM removed
 
-(defmethod remove (item (s null) &key from-end test test-not start end count key &allow-other-keys)
+(defmethod remove (item (s null) &key (test 'eql) (start 0) end (key 'cl:identity) &allow-other-keys)
   (declare (ignore item s))
   nil)
 
-(defmethod remove (item (s cl:sequence) &key from-end (test 'equal) test-not (start 0) end count key &allow-other-keys)
-  (cl:remove item s :from-end from-end :test test :test-not test-not :start start :end end :count count :key key))
+(defmethod remove (item (s cl:sequence) &key (test 'eql) (start 0) end (key 'cl:identity)  &allow-other-keys)
+  (cl:remove item s :test test :start start :end end :key key))
 
-(defmethod remove (item (s seq) &key test key &allow-other-keys)
+(defmethod remove (item (s seq) &key (test 'eql) (key 'cl:identity) &allow-other-keys)
   (fset:remove item s :test test :key key))
 
-(defmethod remove (item (seq foundation-series) &key from-end test (start 0) end count key &allow-other-keys)
-  (let* ((key-fn (or key 'identity))
-         (test-fn (or test 'equal))
-         (test (lambda (x)(funcall test-fn (funcall key-fn item)(funcall key-fn x)))))
+(defmethod remove (item (seq foundation-series) &key (test 'eql) (start 0) end (key 'cl:identity) &allow-other-keys)
+  (let* ((test (lambda (x)(funcall test (funcall key item)(funcall key x)))))
     (if end
         (let* ((pre (series:subseries seq 0 start))
                (body (series:subseries seq start end))

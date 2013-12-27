@@ -442,8 +442,169 @@
 (addtest (sequence-tests)
   test-partition
   (multiple-value-bind (odds evens)(partition '(0 1 2 3 4 5) 'oddp 'evenp)
-    (ensure-same '(nil t nil t nil t) odds)
-    (ensure-same '(t nil t nil t nil) evens)))
+    (ensure-same '(1 3 5) odds)
+    (ensure-same '(0 2 4) evens))
+  (multiple-value-bind (numbers strings symbols)(partition '(0 goose "apple" 1 "banana" hippo 2 "cherry" 3 4 ibex 5)
+                                                           'numberp
+                                                           'stringp
+                                                           'symbolp)
+    (ensure-same '(0 1 2 3 4 5) numbers)
+    (ensure-same '("apple" "banana" "cherry") strings)
+    (ensure-same '(goose hippo ibex) symbols))
+  (multiple-value-bind (nums chars)(partition (seq 0 #\1 2 #\3 4 #\5) 'numberp 'characterp)
+    (ensure-same (seq 0 2 4) nums :test 'equalp)
+    (ensure-same (seq #\1 #\3 #\5) chars :test 'equalp)))
+
+;;; penult
+;;; ---------------------------------------------------------------------
+
+(addtest (sequence-tests)
+  test-penult
+  (ensure (null (penult nil)))
+  (ensure-same 'b (penult '(a b c)))
+  (ensure-same 'b (penult (vector 'a 'b 'c)))
+  (ensure-same #\b (penult "abc"))
+  (ensure-same 'b (penult (seq 'a 'b 'c)))
+  (ensure-same 'b (penult (series 'a 'b 'c))))
+
+;;; position
+;;; ---------------------------------------------------------------------
+
+(addtest (sequence-tests)
+  test-position
+  (ensure (null (position 1 nil)))
+  (ensure-same 2 (position 2 '(0 1 2 3 4)))
+  (ensure-same 2 (position 2 (vector 0 1 2 3 4)))
+  (ensure-same 2 (position #\2 "01234"))
+  (ensure-same 2 (position 2 (seq 0 1 2 3 4)))
+  (ensure-same 2 (position 2 (series 0 1 2 3 4)))
+  (ensure-same 2 (position "Foo" (series "bar" "BAZ" "foo" "grault") :test 'equalp)))
+
+;;; position-if
+;;; ---------------------------------------------------------------------
+
+(addtest (sequence-tests)
+  test-position-if
+  (ensure (null (position-if 'stringp nil)))
+  (ensure-same 2 (position-if 'stringp '(0 1 "2" 3 4)))
+  (ensure-same 2 (position-if 'stringp (vector 0 1 "2" 3 4)))
+  (ensure-same 2 (position-if 'stringp (seq 0 1 "2" 3 4)))
+  (ensure-same 2 (position-if 'stringp (series 0 1 "2" 3 4))))
+
+;;; range
+;;; ---------------------------------------------------------------------
+
+(addtest (sequence-tests)
+  test-range
+  (ensure (null (range 0 0)))
+  (ensure-same '(1 2 3) (range 1 4))
+  (ensure-same '(2 4 6 8) (range 2 10 :by 2)))
+
+;;; range-from
+;;; ---------------------------------------------------------------------
+
+(addtest (sequence-tests)
+  test-range-from
+  (ensure-same (series 1 2 3) (take 3 (range-from 1)) :test 'equivalent-series?)
+  (ensure-same (series 5 10 15) (take 3 (range-from 5 :by 5)) :test 'equivalent-series?))
+
+;;; reduce
+;;; ---------------------------------------------------------------------
+
+(addtest (sequence-tests)
+  test-reduce
+  (ensure-same 9 (reduce 'cl:+ '(2 3 4)))
+  (ensure-same 9 (reduce 'cl:+ (vector 2 3 4)))
+  (ensure-same 9 (reduce 'cl:+ (seq 2 3 4)))
+  (ensure-same 9 (reduce 'cl:+ (series 2 3 4))))
+
+;;; remove
+;;; ---------------------------------------------------------------------
+
+(addtest (sequence-tests)
+  test-remove
+  (ensure (null (remove 1 nil)))
+  (ensure-same '("carol" "ted" "alice") (remove "bob" '("bob" "carol" "bob" "ted" "bob" "alice") :test 'string=) :test 'equalp)
+  (ensure-same (vector "carol" "ted" "alice")
+               (remove "bob" (vector "bob" "carol" "bob" "ted" "bob" "alice") :test 'string=)
+               :test 'equalp)
+  (ensure-same (seq "carol" "ted" "alice")
+               (remove "bob" (seq "bob" "carol" "bob" "ted" "bob" "alice") :test 'string=)
+               :test 'equalp)
+  (ensure-same (series "carol" "ted" "alice")
+               (remove "bob" (series "bob" "carol" "bob" "ted" "bob" "alice") :test 'string=)
+               :test 'equivalent-series?))
+
+;;; repeat
+;;; ---------------------------------------------------------------------
+
+(addtest (sequence-tests)
+  test-repeat
+  (ensure-same (series 1) (take 1 (repeat 1)) :test 'equivalent-series?)
+  (ensure-same (series 1 1 1 1 1 1 1 1 1 1) (take 10 (repeat 1)) :test 'equivalent-series?))
+
+;;; rest
+;;; ---------------------------------------------------------------------
+
+(addtest (sequence-tests)
+  test-rest
+  (ensure (null (rest nil)))
+  (ensure (null (rest (list 0))))
+  (ensure-same 2 (first (rest '(1 2 3 4 5))))
+  (ensure-same 2 (first (rest (vector 1 2 3 4 5))))
+  (ensure-same #\2 (first (rest "123456")))
+  (ensure-same 2 (first (rest (seq 1 2 3 4 5))))
+  (ensure-same 2 (first (rest (series 1 2 3 4 5))))
+  (ensure-same 2 (first (rest (range-from 1)))))
+
+;;; reverse
+;;; ---------------------------------------------------------------------
+
+(addtest (sequence-tests)
+  test-reverse
+  (ensure-same nil (reverse nil))
+  (ensure-same '(3 2 1) (reverse '(1 2 3)))
+  (ensure-same (vector 3 2 1)(reverse (vector 1 2 3)) :test 'equalp)
+  (ensure-same "321" (reverse "123") :test 'equalp)
+  (ensure-same (seq 3 2 1)(reverse (seq 1 2 3)) :test 'equalp)
+  (ensure-same (series 3 2 1) (reverse (series 1 2 3)) :test 'equivalent-series?))
+
+;;; scan
+;;; ---------------------------------------------------------------------
+
+(addtest (sequence-tests)
+  test-scan
+  (ensure (series::foundation-series-p (scan nil)))
+  (ensure (series::foundation-series-p (scan '(1 2 3))))
+  (ensure (series::foundation-series-p (scan (vector 1 2 3))))
+  (ensure (series::foundation-series-p (scan (seq 1 2 3))))
+  (ensure (series::foundation-series-p (scan (series 1 2 3)))))
+
+;;; scan-image
+;;; ---------------------------------------------------------------------
+
+(addtest (sequence-tests)
+  test-scan-image
+  (ensure-same (series 4 9 16)
+               (scan-image (lambda (x)(* x x))
+                           '(2 3 4))
+               :test 'equivalent-series?)
+  (ensure-same (series 1 4 9 16)
+               (take 4 (scan-image (lambda (x)(* x x))
+                                   (range-from 1)))
+               :test 'equivalent-series?))
+
+;;; second
+;;; ---------------------------------------------------------------------
+
+(addtest (sequence-tests)
+  test-second
+  (ensure (null (second nil)))
+  (ensure-same 2 (second '(1 2 3)))
+  (ensure-same 2 (second (vector 1 2 3)))
+  (ensure-same #\2 (second "123"))
+  (ensure-same 2 (second (seq 1 2 3)))
+  (ensure-same 2 (second (series 1 2 3))))
 
 ;;; ---------------------------------------------------------------------
 ;;; run tests
