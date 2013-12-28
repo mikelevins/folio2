@@ -13,5 +13,6 @@
 
 (defpackage :net.bardcode.folio.comparisons
   (:use :cl :net.bardcode.folio.as :net.bardcode.folio.comparisons)
-  (:export ))
+  (:shadow :> :>= :< :<=)
+  (:export :> :>= :< :<= :equivalent?))
 

@@ -13,5 +13,5 @@
 
 (defpackage :net.bardcode.folio.generators
   (:use :cl :net.bardcode.folio.as :net.bardcode.folio.make)
-  (:export ))
+  (:export :generate :next))
 

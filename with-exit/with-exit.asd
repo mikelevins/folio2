@@ -1,9 +1,9 @@
 ;;;; ***********************************************************************
 ;;;; FILE IDENTIFICATION
 ;;;;
-;;;; Name:          folio.series.asd
+;;;; Name:          folio.with-exit.asd
 ;;;; Project:       folio - Bard features for Common Lisp
-;;;; Purpose:       system definition for folio.series
+;;;; Purpose:       system definition for folio.with-exit
 ;;;; Author:        mikel evins
 ;;;; Copyright:     2013 by mikel evins
 ;;;;
@@ -13,7 +13,7 @@
 
 (require :asdf)
 
-(asdf:defsystem :net.bardcode.folio.series
+(asdf:defsystem :net.bardcode.folio.with-exit
   :serial t
   :description "associating paris of values"
   :license "Lisp Lesser GNU Public License"
@@ -23,20 +23,20 @@
                         :components ((:file "package")
                                      (:file "functions")))))
 
-(asdf:defsystem :net.bardcode.folio.series.tests
+(asdf:defsystem :net.bardcode.folio.with-exit.tests
   :serial t
-  :description "series tests"
+  :description "with-exit tests"
   :license "Lisp Lesser GNU Public License"
-  :depends-on (:net.bardcode.folio.series :lift)
+  :depends-on (:net.bardcode.folio.with-exit :lift)
   :components ((:module "tests"
                         :serial t
-                        :components ((:file "series")))))
+                        :components ((:file "with-exit")))))
 
-(defun load-series ()
-  (asdf:oos 'asdf:load-op :net.bardcode.folio.series))
+(defun load-with-exit ()
+  (asdf:oos 'asdf:load-op :net.bardcode.folio.with-exit))
 
-(defun load-series-tests ()
-  (asdf:oos 'asdf:load-op :net.bardcode.folio.series.tests))
+(defun load-with-exit-tests ()
+  (asdf:oos 'asdf:load-op :net.bardcode.folio.with-exit.tests))
 
-;;; (load-series)
-;;; (load-series-tests)
+;;; (load-with-exit)
+;;; (load-with-exit-tests)
