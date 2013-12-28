@@ -34,39 +34,50 @@
    ;; functions
    :$ :^ :-> :apply :cascade :compose :conjoin :disjoin :flip :fn :function? :functional? :generic-function? :method?
    :partial :rotate-left :rotate-right :rpartial
-   ;; ordering
-   :> :>= :< :<= :sort
+   ;; comparing
+   :> :>= :< :<= :equivalent?
    ;; pairs
    :left :pair :pair? :right
    ;; sequences
    :add-first :add-last :any
-   :binary-append :by
-   :coalesce :concat
-   :drop :drop-while
-   :element :empty? :every?
-   :filter :find :first
-   :generate
-   :head
-   :image :indexes :input-stream? :interleave :interpose
+   :binary-append
+   :every?
+   :find
    :join :binary-join
    :last :length
-   :match-prefix? :match-suffix? :make-output-stream
-   :output-stream :output-stream? :ordered-map
-   :partition :penult :position :position-if
-   :range :range-from :readable :readable? :reduce :remove :repeat :repeatedly :rest :reverse 
-   :scan :scan-image :search :second :select :seq :sequence :sequence? :series :series? :shuffle
-   :some? :sort :split :streamable :streamable? :subsequence
+   :match-suffix?
+   :position
+   :range 
+   :reduce :reverse
+   :search :select
+   :seq :sequence :sequence? :shuffle
+   :some? :sort :split :subsequence
+   :unique 
+   ;; series
+   :by
+   :coalesce
+   :drop :drop-while
+   :element :empty?
+   :filter :first
+   :generate
+   :head
+   :image :indexes :interleave :interpose
+   :match-prefix?
+   :partition :penult
+   :range-from :remove :repeat :repeatedly :rest 
+   :scan :scan-image :second :series :series?
    :tail :tails :take :take-by :take-while
-   :unique :unzip
-   :writable :writable?
+   :unzip
    :zip
    ;; sets
    :adjoin :difference :intersection :set? :subset? :union
    ;; streams
-   :characters :lines :objects :octets :output-stream :output-stream?
-   ;; tables
-   :alist :alist? :alist->plist :associate :contains-key? :contains-value? :dissociate :get-key :keys :merge
-   :ordered-map :ordered-map? :plist :plist? :plist->alist :put-key :table :table? :vals :zipmap
+   :characters :input-stream :input-stream? :lines :objects :octets :output-stream :output-stream? 
+   :readable :readable? :streamable :streamable? :writable :writable?
+   ;; mappings
+   :alist :alist? :alist->plist :associate :contains-key? :contains-value? :dissociate :get-key :keys 
+   :mapping :mapping? :merge
+   :ordered-map :ordered-map? :plist :plist? :plist->alist :put-key :vals :zipmap
    ;; text
    :join-text :split-text :text?))
 
