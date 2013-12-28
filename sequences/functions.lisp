@@ -56,6 +56,14 @@
   (declare (ignore s1 s2))
   'vector)
 
+(defmethod combined-type ((s1 vector) (s2 fset:seq))
+  (declare (ignore s1 s2))
+  'vector)
+
+(defmethod combined-type ((s1 vector) (s2 foundation-series))
+  (declare (ignore s1 s2))
+  'vector)
+
 (defmethod combined-type ((s1 string) s2)
   (declare (ignore s1 s2))
   'vector)
@@ -76,24 +84,6 @@
   (declare (ignore s1 s2))
   'list)
 
-(defmethod %split-at ((n integer)(ls null))
-  (declare (ignore n ls))
-  (values nil nil))
-
-(defmethod %split-at ((n integer)(ls cons))
-  (do ((i n)
-       (collected nil)
-       (remaining ls))
-      ((or (null remaining)
-           (<= i 0))
-       (values (cl:reverse collected)
-               remaining))
-    (setf i (1- i)
-          collected (cons (car remaining)
-                          collected)
-          remaining (cdr remaining))))
-
-
 ;;; ---------------------------------------------------------------------
 ;;; function add-first
 ;;; ---------------------------------------------------------------------
@@ -109,7 +99,7 @@
 (defmethod add-first (x (s string))(concatenate 'vector (vector x) s))
 (defmethod add-first ((x character) (s string))(concatenate 'string (string x) s))
 (defmethod add-first (x (s seq))(fset:with-first s x))
-(defmethod add-first (x (s foundation-series))(series:catenate (series:scan (list x)) s))
+(defmethod add-first (x (s foundation-series))(series:catenate (series x) s))
 
 ;;; ---------------------------------------------------------------------
 ;;; function add-last
@@ -126,7 +116,7 @@
 (defmethod add-last ((s string) x)(concatenate 'vector s (vector x)))
 (defmethod add-last ((s string) (x character))(concatenate 'string s (string x)))
 (defmethod add-last ((s seq) x)(fset:with-last s x))
-(defmethod add-last ((s foundation-series) x)(series:catenate s (series:scan (list x))))
+(defmethod add-last ((s foundation-series) x)(series:catenate s (series x)))
 
 ;;; ---------------------------------------------------------------------
 ;;; function any
@@ -143,11 +133,9 @@
 (defmethod any ((s fset:set))(elt (as 'list s)(random (fset:size s))))
 (defmethod any ((s fset:map))(fset:@ s (any (keys s))))
 
+;;; WARNING: nonterminating if s is unbounded
 (defmethod any ((s foundation-series))
-  (block searching
-    (series:iterate ((x s))
-        (when (zerop (random 2))
-          (return-from searching x)))))
+  (element s (random (length s))))
 
 
 ;;; ---------------------------------------------------------------------
@@ -189,7 +177,7 @@
 (defmethod binary-append ((seq1 cl:sequence)(seq2 seq))
   (concatenate (combined-type seq1 seq2) seq1 (fset:convert (combined-type seq1 seq2) seq2)))
 (defmethod binary-append ((seq1 cl:sequence)(seq2 foundation-series))
-  (series:catenate (series:scan seq1) seq2))
+  (append seq1 (series:collect seq2)))
 
 (defmethod binary-append ((seq1 seq)(seq2 null))(declare (ignore seq2)) seq1)
 (defmethod binary-append ((seq1 seq)(seq2 cl:sequence)) (as (combined-type seq1 seq2)(fset:concat seq1 seq2)))
@@ -310,41 +298,52 @@
 ;;; returns a sequence of sequences constructed by taking the elements of
 ;;; SEQ N at a time
 
-(defmethod by (n (s null))
-  (declare (ignore n))
-  nil)
-
 (defmethod by ((n integer)(s list))
   (assert (> n 0)() "count argument to BY must be greater than zero")
   (if (null s)
       nil
-      (multiple-value-bind (collected remaining)(%split-at n s)
-        (cons collected
-              (by n remaining)))))
+      (let ((tl (nthcdr n s)))
+        (if tl
+            (cons (take n s)
+                  (by n tl))
+            (list s)))))
 
-(defmethod by ((n integer)(s vector))
+(defmethod by ((n integer)(vec vector))
   (assert (> n 0)() "count argument to BY must be greater than zero")
-  (multiple-value-bind (vcount leftover)(truncate (cl:length s) n)
-    (let* ((last-seg (subseq s (* vcount n)))
-           (tail (if (> (cl:length last-seg) 0)
-                     (list last-seg)
-                     nil))
-           (segs (loop for i from vcount above 0 
-                    do (push (subseq s (* (1- i) n)(* i n))
-                             tail))))
-      tail)))
+  (if (<= (length vec) n)
+      (vector vec)
+      (let* ((s (scan vec))
+             (starts (series:scan-range :by n :below (length vec)))
+             (tails (series:map-fn t (lambda (x)(series:subseries s x)) starts))
+             (chunks (series:map-fn t (lambda (y)(series:subseries y 0 n)) tails)))
+        (map 'vector 
+             (lambda (chunk)(series:collect 'vector chunk))
+             (series:collect 'vector chunks)))))
+
+(defmethod by ((n integer)(str string))
+  (assert (> n 0)() "count argument to BY must be greater than zero")
+  (if (<= (length str) n)
+      (vector str)
+      (let* ((s (scan str))
+             (starts (series:scan-range :by n :below (length str)))
+             (tails (series:map-fn t (lambda (x)(series:subseries s x)) starts))
+             (chunks (series:map-fn t (lambda (y)(series:subseries y 0 n)) tails)))
+        (map 'vector 
+             (lambda (chunk)(series:collect 'string chunk))
+             (series:collect 'vector chunks)))))
 
 (defmethod by ((n integer)(s seq))
   (assert (> n 0)() "count argument to BY must be greater than zero")
-  (multiple-value-bind (vcount leftover)(truncate (fset:size s) n)
-    (let* ((last-seg (fset:subseq s (* vcount n)))
-           (tail (if (> (fset:size last-seg) 0)
-                     (list last-seg)
-                     nil))
-           (segs (loop for i from vcount above 0 
-                    do (push (fset:subseq s (* (1- i) n)(* i n))
-                             tail))))
-      tail)))
+  (if (<= (length s) n)
+      (seq s)
+      (let* ((s* (scan (fset:convert 'vector s)))
+             (starts (series:scan-range :by n :below (length s)))
+             (tails (series:map-fn t (lambda (x)(series:subseries s* x)) starts))
+             (chunks (series:map-fn t (lambda (y)(series:subseries y 0 n)) tails)))
+        (fset:convert 'fset:seq
+                      (map 'vector 
+                           (lambda (chunk)(fset:convert 'fset:seq (series:collect 'vector chunk)))
+                           (series:collect 'vector chunks))))))
 
 (defmethod by ((n integer)(s foundation-series))
   (assert (> n 0)() "count argument to BY must be greater than zero")
@@ -369,7 +368,7 @@
 
 (defun coalesce (fn &rest seqs)
   (let ((seqs (mapcar 'scan seqs)))
-    (series:collect (apply 'series:map-fn t fn seqs))))
+    (apply 'series:map-fn t fn seqs)))
 
 ;;; ---------------------------------------------------------------------
 ;;; function drop
@@ -464,7 +463,7 @@
   (= 0 (fset:size s)))
 
 (defmethod empty? ((s foundation-series))
-  (= 0 (series:collect-length s)))
+  (null (first (indexes s))))
 
 ;;; ---------------------------------------------------------------------
 ;;; function every?
@@ -484,6 +483,7 @@
 (defmethod every? (fn (s seq))
   (fset::every fn s))
 
+;;; WARNING: nonterminating if s is unbounded
 (defmethod every? (fn (s foundation-series))
   (series:collect-and (series:map-fn t fn s)))
 
@@ -599,7 +599,7 @@
   (indexes (scan (fset:convert 'cl:vector s))))
 
 (defmethod indexes ((s foundation-series))
-  (series:collect 'list (series:choose (series:positions (series:map-fn 'boolean (constantly t) (scan s))))))
+  (series:choose (series:positions (series:map-fn 'boolean (constantly t) (scan s)))))
 
 ;;; ---------------------------------------------------------------------
 ;;; function interleave
@@ -661,12 +661,10 @@
 
 (defmethod interleave ((s1 seq)(s2 seq))
   (fset:convert 'seq (interleave (fset:convert 'cl:list s1)
-                                      (fset:convert 'cl:list s2))))
+                                 (fset:convert 'cl:list s2))))
 
 (defmethod interleave ((s1 seq)(s2 foundation-series))
   (fset:convert 'seq (interleave (fset:convert 'cl:list s1) s2)))
-
-
 
 (defmethod interleave ((s1 foundation-series)(s2 null))
   (declare (ignore s1 s2))
@@ -816,6 +814,7 @@
 (defmethod last ((s cl:cons)) (cl:first (cl:last s)))
 (defmethod last ((s cl:sequence))(cl:elt s (1- (cl:length s))))
 (defmethod last ((s seq))(fset:last s))
+;;; WARNING: nonterminating if s is unbounded
 (defmethod last ((s foundation-series))(series:collect-last s))
 
 ;;; ---------------------------------------------------------------------
@@ -829,6 +828,7 @@
 (defmethod length ((s null)) (declare (ignore s)) 0)
 (defmethod length ((s cl:sequence))(cl:length s))
 (defmethod length ((s seq))(fset:size s))
+;;; WARNING: nonterminating if s is unbounded
 (defmethod length ((s foundation-series))(series:collect-length s))
 
 ;;; ---------------------------------------------------------------------
@@ -873,42 +873,55 @@
 ;;; to the count of elements in PREF. PREF and SEQ need not be of the
 ;;; same type.
 
-(defmethod match-prefix? ((pref null)(seq null) &key test) t)
-(defmethod match-prefix? ((pref null) seq &key test) t)
-(defmethod match-prefix? (pref (seq null) &key test) nil)
+(defmethod match-prefix? ((pref null)(seq null) &key test start) t)
+(defmethod match-prefix? ((pref null) seq &key test start) t)
+(defmethod match-prefix? (pref (seq null) &key test start) nil)
 
-(defmethod match-prefix? ((pref cl:sequence)(seq cl:sequence) &key (test 'equal))
-  (and (<= (cl:length pref)(cl:length seq))
-       (every (lambda (x y)(funcall test x y))
-              pref seq)))
+(defmethod match-prefix? ((pref cl:list) (sequence cl:list) &key (test 'equal)(start 0))
+  (let ((sequence (nthcdr start sequence)))
+    (block searching
+      (loop for p on pref
+         and s on sequence
+         do (if (null (cdr s))
+                (if (cdr p)
+                    ;; ran out of sequence before we ran out of prefix
+                    (return-from searching nil)
+                    ;; ran out of both, so they must match
+                    (return-from searching t))
+                (if (null (cdr p))
+                    ;; ran out of prefix, so they match so far
+                    (return-from searching (funcall test (car p)(car s)))
+                    (unless (funcall test (car p)(car s))
+                      (return-from searching nil))))))))
 
-(defmethod match-prefix? ((pref cl:sequence)(seq seq) &key (test 'equal))
-  (match-prefix? pref (as 'sequence seq) :test test))
+(defmethod match-prefix? ((pref cl:sequence) (sequence cl:sequence) &key (test 'equal)(start 0))
+  (let ((plen (length pref))
+        (slen (length sequence)))
+    (if (< slen (+ start plen))
+        nil
+        (block searching
+          (loop for i from 0 below plen 
+             do (unless (funcall test (elt pref i)(elt sequence (+ start i)))
+                  (return-from searching nil)))
+          (return-from searching t)))))
 
-(defmethod match-prefix? ((pref cl:sequence)(seq foundation-series) &key (test 'equal))
-  (match-prefix? pref (as 'sequence seq) :test test))
+(defmethod match-prefix? ((pref fset:seq) (sequence fset:seq) &key (test 'equal)(start 0))
+  (let ((plen (length pref))
+        (slen (length sequence)))
+    (if (< slen (+ start plen))
+        nil
+        (block searching
+          (loop for i from 0 below plen 
+             do (unless (funcall test (fset:@ pref i)(fset:@ sequence (+ start i)))
+                  (return-from searching nil)))
+          (return-from searching t)))))
 
-(defmethod match-prefix? ((pref seq)(seq cl:sequence) &key (test 'equal))
-  (match-prefix? (as 'list pref) seq :test test))
-
-(defmethod match-prefix? ((pref seq)(seq seq) &key (test 'equal))
-  (and (<= (fset:size pref)(fset:size seq))
-       (fset::every (lambda (x y)(funcall test x y))
-                    pref seq)))
-
-(defmethod match-prefix? ((pref seq)(seq foundation-series) &key (test 'equal))
-  (match-prefix? (scan (as 'list pref)) seq :test test))
-
-(defmethod match-prefix? ((pref foundation-series)(seq cl:sequence) &key (test 'equal))
-  (match-prefix? pref (scan (as 'list seq)) :test test))
-
-(defmethod match-prefix? ((pref foundation-series)(seq seq) &key (test 'equal))
-  (match-prefix? pref (scan (as 'list seq)) :test test))
-
-(defmethod match-prefix? ((pref foundation-series)(seq foundation-series) &key (test 'equal))
-  (series:collect-and (series:map-fn 'boolean
-                                     (lambda (x y)(funcall test x y))
-                                     pref seq)))
+(defmethod match-prefix? ((pref foundation-series) (sequence foundation-series) &key (test 'equal)(start 0))
+  (let* ((sequence (series:subseries sequence start))
+         (len (series:collect-length pref))
+         (matches (series:subseries (series:map-fn 'boolean (lambda (p s)(funcall test p s)) pref sequence)
+                                    0 len)))
+    (series:collect-and matches)))
 
 ;;; ---------------------------------------------------------------------
 ;;; function match-suffix?
@@ -935,9 +948,6 @@
 (defmethod match-suffix? ((seq seq)(suff cl:sequence) &key (test 'equal))
   (match-suffix? (as 'sequence seq) suff :test test))
 
-(defmethod match-suffix? ((seq foundation-series)(suff cl:sequence) &key (test 'equal))
-  (match-suffix? (as 'sequence seq) suff :test test))
-
 (defmethod match-suffix? ((seq cl:sequence)(suff seq) &key (test 'equal))
   (match-suffix? seq (as 'list suff) :test test))
 
@@ -949,8 +959,8 @@
                           seq)
                     suff)))
 
-(defmethod match-suffix? ((seq foundation-series)(suff seq) &key (test 'equal))
-  (match-suffix? seq (scan (as 'list suff)) :test test))
+
+;;; WARNING: following are nonterminating if the series are unbounded
 
 (defmethod match-suffix? ((seq cl:sequence)(suff foundation-series) &key (test 'equal))
   (match-suffix? (scan (as 'list seq)) suff :test test))
@@ -962,6 +972,13 @@
   (match-suffix? (as 'list seq)
                  (as 'list suff)
                  :test test))
+
+(defmethod match-suffix? ((seq foundation-series)(suff cl:sequence) &key (test 'equal))
+  (match-suffix? (as 'sequence seq) suff :test test))
+
+(defmethod match-suffix? ((seq foundation-series)(suff seq) &key (test 'equal))
+  (match-suffix? seq (scan (as 'list suff)) :test test))
+
 
 ;;; ---------------------------------------------------------------------
 ;;; function partition
@@ -1013,6 +1030,8 @@
 
 (defmethod penult ((s cl:sequence))(cl:elt s (- (cl:length s) 2)))
 (defmethod penult ((s seq))(fset:@ s (- (fset:size s) 2)))
+
+;;; WARNING: nonterminating if s is unbounded
 (defmethod penult ((s foundation-series))(series:collect-nth (- (series:collect-length s) 2) s))
 
 ;;; ---------------------------------------------------------------------
@@ -1033,6 +1052,7 @@
 (defmethod position (item (seq seq) &key (test 'eql) (start 0) end (key 'cl:identity) &allow-other-keys)
   (fset:position item seq :test test :start start :end end :key key))
 
+;;; WARNING: nonterminating if seq is unbounded
 (defmethod position (item (seq foundation-series) &key (test 'eql) (start 0) end (key 'cl:identity) &allow-other-keys)
   (let* ((test (lambda (x)(funcall test (funcall key item)(funcall key x)))))
     (if end
@@ -1064,6 +1084,7 @@
 (defmethod position-if (test (seq seq) &key (start 0) end (key 'cl:identity) &allow-other-keys)
   (fset:position-if test seq :start start :end end :key key))
 
+;;; WARNING: nonterminating if seq is unbounded
 (defmethod position-if (test (seq foundation-series) &key (start 0) end (key 'cl:identity) &allow-other-keys)
   (let* ((test (lambda (x)(funcall test (funcall key x)))))
     (if end
@@ -1112,6 +1133,7 @@
 (defmethod reduce (fn (seq seq))
   (fset:reduce fn seq))
 
+;;; WARNING: nonterminating if s is unbounded
 (defmethod reduce (fn (seq foundation-series))
   (reduce fn (series:collect 'list seq)))
 
@@ -1194,6 +1216,7 @@
 (defmethod reverse ((s seq))
   (fset::reverse s))
 
+;;; WARNING: nonterminating if s is unbounded
 (defmethod reverse ((s foundation-series))
   (series:scan (reverse (series:collect 'list s))))
 
@@ -1237,6 +1260,21 @@
 
 (defmethod search ((subsequence cl:sequence) (sequence cl:sequence) &key (start 0) (test 'equalp))
   (cl:search subsequence sequence :start2 start :test test))
+
+(defmethod search ((subsequence fset:seq) (sequence fset:seq) &key (start 0) (test 'equalp))
+  (block searching
+    (let ((sublen (length subsequence))
+          (seqlen (length sequence))
+          (pos start))
+      (loop
+         (if (< seqlen (+ pos sublen))
+             (return-from searching nil)
+             (if (match-prefix? subsequence sequence :start pos :test test)
+                 (return-from searching pos)
+                 (incf pos)))))))
+
+(defmethod search ((subsequence foundation-series) (sequence foundation-series) &key (start 0) (test 'equalp))
+  )
 
 ;;; function second
 ;;;
@@ -1422,7 +1460,7 @@
 
 ;;; cons, cons
 (defmethod split ((seq cl:cons) (subseq cl:cons) &key (test 'equal))
-  (let ((pos (search subseq seq :test test)))
+  (let ((pos (cl:search subseq seq :test test)))
     (if pos
         (let ((head (subseq seq 0 pos))
               (tail (subseq (subseq seq pos)
@@ -1433,7 +1471,7 @@
 
 ;;; vector, vector
 (defmethod %bite ((seq cl:vector) (subseq cl:vector) &key (test 'equal)(start 0))
-  (let ((pos (search subseq seq :test test :start2 start))
+  (let ((pos (cl:search subseq seq :test test :start2 start))
         (seqlen (length seq))
         (sublen (length subseq)))
     (if pos

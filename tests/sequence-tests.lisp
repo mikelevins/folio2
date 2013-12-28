@@ -171,18 +171,17 @@
   test-by
   (ensure (null (by 1 nil)))
   (ensure-same '((1 2 3)(4 5 6)(7 8 9)) (by 3 '(1 2 3 4 5 6 7 8 9)))
-  (ensure-same `(,(vector 1 2 3) ,(vector 4 5 6) ,(vector 7 8 9)) (by 3 (vector 1 2 3 4 5 6 7 8 9)) :test 'equalp)
-  (ensure-same `(,(seq 1 2 3) ,(seq 4 5 6) ,(seq 7 8 9)) (by 3 (seq 1 2 3 4 5 6 7 8 9)) :test 'equalp)
-  (ensure-same '((1)(2)(3)) (mapcar (lambda (x)(as 'list x)) (as 'list (take 3(by 1 (scan '(1 2 3))))))))
+  (ensure-same (vector (vector 1 2 3) (vector 4 5 6) (vector 7 8 9)) (by 3 (vector 1 2 3 4 5 6 7 8 9)) :test 'equalp)
+  (ensure-same (seq (seq 1 2 3) (seq 4 5 6) (seq 7 8 9)) (by 3 (seq 1 2 3 4 5 6 7 8 9)) :test 'equalp))
 
 ;;; coalesce
 ;;; ---------------------------------------------------------------------
 
 (addtest (sequence-tests)
   test-coalesce
-  (ensure (null (coalesce 'cl:+ nil)))
-  (ensure-same '(3 6 9) (coalesce 'cl:+ '(1 2 3) '(1 2 3) '(1 2 3)))
-  (ensure-same '(3 6 9) (coalesce 'cl:+ '(1 2 3) (vector 1 2 3) (seq 1 2 3))))
+  (ensure (empty? (coalesce 'cl:+ nil)))
+  (ensure-same (series 3 6 9) (coalesce 'cl:+ '(1 2 3) '(1 2 3) '(1 2 3)) :test 'equivalent-series?)
+  (ensure-same (series 3 6 9) (coalesce 'cl:+ '(1 2 3) (vector 1 2 3) (seq 1 2 3)) :test 'equivalent-series?))
 
 ;;; drop
 ;;; ---------------------------------------------------------------------
@@ -314,11 +313,11 @@
 (addtest (sequence-tests)
   test-indexes
   (ensure (null (indexes nil)))
-  (ensure-same '(0 1 2 3) (indexes '(0 1 2 3)))
-  (ensure-same '(0 1 2 3) (indexes (vector 0 1 2 3)))
-  (ensure-same '(0 1 2 3) (indexes "0123"))
-  (ensure-same '(0 1 2 3) (indexes (seq 0 1 2 3)))
-  (ensure-same '(0 1 2 3) (indexes (series 0 1 2 3))))
+  (ensure-same (series 0 1 2 3) (indexes '(0 1 2 3)) :test 'equivalent-series?)
+  (ensure-same (series 0 1 2 3) (indexes (vector 0 1 2 3)) :test 'equivalent-series?)
+  (ensure-same (series 0 1 2 3) (indexes "0123") :test 'equivalent-series?)
+  (ensure-same (series 0 1 2 3) (indexes (seq 0 1 2 3)) :test 'equivalent-series?)
+  (ensure-same (series 0 1 2 3) (indexes (series 0 1 2 3)) :test 'equivalent-series?))
 
 ;;; interleave
 ;;; ---------------------------------------------------------------------
@@ -410,12 +409,7 @@
   (ensure (not (match-prefix? '(1 2 3 4) nil)))
   (ensure (match-prefix? '(1 2) '(1 2 3 4)))
   (ensure (not (match-prefix? '(2) '(1 2 3 4))))
-  (ensure (match-prefix? '(1 2) (seq 1 2 3 4)))
-  (ensure (match-prefix? '(1 2) (series 1 2 3 4)))
-  (ensure (match-prefix? (seq 1 2) '(1 2 3 4)))
-  (ensure (match-prefix? (seq 1 2) (series 1 2 3 4)))
-  (ensure (match-prefix? (series 1 2) (list 1 2 3 4)))
-  (ensure (match-prefix? (series 1 2) (seq 1 2 3 4)))
+  (ensure (match-prefix? (seq 1 2) (seq 1 2 3 4)))
   (ensure (match-prefix? (series 1 2) (series 1 2 3 4))))
 
 ;;; match-suffix?
@@ -655,13 +649,8 @@
   test-split
   (ensure (null (split nil "foo")))
   (ensure-same '((a b c)(f g h i j)) (split '(a b c d e f g h i j) '(d e)))
-  (ensure-same '("foo" "bar") (split "fooBAZbar" "BAZ"))
-  (ensure-same (list (vector :a :b :c)(vector :f :g :h :i :j))
-               (split (vector :a :b :c :d :e :f :g :h :i :j) '(:d :e))
-               :test 'equalp)
-  (ensure-same (list (seq :a :b :c)(seq :f :g :h :i :j))
-               (split (seq :a :b :c :d :e :f :g :h :i :j) '(:d :e))
-               :test 'equalp))
+  (ensure-same (vector "foo" "bar") (split "fooBAZbar" "BAZ") :test 'equalp)
+  )
 
 ;;; ---------------------------------------------------------------------
 ;;; run tests
