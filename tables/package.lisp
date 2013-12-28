@@ -14,7 +14,7 @@
   (:shadowing-import-from :net.bardcode.folio.common
                           :> :>= :< :<=
                           :adjoin :append :apply :find :first :get :intersection :last :length :merge :position :position-if :put 
-                          :reduce :remove :rest :reverse :second :sequence :sort :union)
+                          :reduce :remove :rest :reverse :search :second :sequence :sort :union)
   (:import-from :net.bardcode.folio.common
                 :as))
 

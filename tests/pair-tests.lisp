@@ -17,7 +17,7 @@
                           :> :>= :< :<=
                           :adjoin :append :apply :find :first :intersection :last :length :make
                           :merge :pair :position :position-if :reduce :remove :rest
-                          :reverse :second :sequence :sort :union))
+                          :reverse :search :second :sequence :sort :union))
 
 (in-package :net.bardcode.folio.pair.tests)
 

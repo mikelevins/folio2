@@ -13,7 +13,7 @@
 
 (defpackage :net.bardcode.folio.common
   (:shadow :> :>= :< :<= :adjoin :append :apply :find :first :get :intersection :last :length :merge :position :position-if :put 
-           :reduce :remove :rest :reverse :second :sequence :set :sort :union)
+           :reduce :remove :rest :reverse :search :second :sequence :set :sort :union)
   (:use :cl)
   (:import-from :fset :seq)
   (:import-from :series series::foundation-series)
@@ -35,7 +35,7 @@
            :pair :pair? :partial :partition :penult :plist :plist? :plist->alist :position :position-if :put-key
            :range :range-from :readable :readable? :reduce :remove :repeat :repeatedly :rest :reverse :right 
            :rotate-left :rotate-right :rpartial
-           :scan :scan-image :second :select :seq :series :series? :sequence :sequence? :set-box! :set? :shuffle :some?
+           :scan :scan-image :search :second :select :seq :series :series? :sequence :sequence? :set-box! :set? :shuffle :some?
            :sort :split :split-text :stream? :streamable :streamable? :subsequence :subset?
            :table :table? :tail :tails :take :take-by :take-while :text? :type-for-copy
            :unbox :union :unique :unzip

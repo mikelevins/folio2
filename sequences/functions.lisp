@@ -1220,6 +1220,24 @@
 (defmethod scan-image (fn (s seq)) (scan-image fn (scan s)))
 (defmethod scan-image (fn (s foundation-series)) (series:map-fn t fn s))
 
+;;; function search
+;;;
+;;; (search subsequence sequence &key (start 0)(test 'equalp)) => integer
+;;; ---------------------------------------------------------------------
+;;; returns the position, if any, in SEQUENCE where SUBSEQUENCE appears
+
+(defmethod search ((subsequence null) (sequence cl:sequence) &key (start 0) (test 'equalp))
+  start)
+
+(defmethod search ((subsequence null) (sequence seq) &key (start 0) (test 'equalp))
+  start)
+
+(defmethod search ((subsequence null) (sequence foundation-series) &key (start 0) (test 'equalp))
+  start)
+
+(defmethod search ((subsequence cl:sequence) (sequence cl:sequence) &key (start 0) (test 'equalp))
+  (cl:search subsequence sequence :start2 start :test test))
+
 ;;; function second
 ;;;
 ;;; (second seq) => anything
@@ -1269,7 +1287,7 @@
 (defmethod select ((s seq) (indexes cl:sequence))
   (fset:convert 'seq
                 (map 'cl:vector
-                     (lambda (i)(cl:elt s i))
+                     (lambda (i)(fset:@ s i))
                      indexes)))
 
 (defmethod select ((s seq) (indexes seq))
@@ -1365,70 +1383,81 @@
 ;;; of SUBSEQ. SUBSEQ does not appear in the output sequences. TEST,
 ;;; whose default value is equal, is used to match occurrences of
 ;;; SUBSEQ.
+;;; The structure of the output value depends on the types of the
+;;; inputs. The container is of the same or compatiable type as
+;;; SEQ1. The subesquences within the result sequence are of the same
+;;; or compatible types as SUBSEQ. Thus, for example,
+;;;  (split "foo" nil)
+;;; returns #((#\f)(#\o)(#\o))
+;;; the result is a vector because SEQ1 is a string. the individual
+;;; elements are not characters, so the result cannot be a string, so
+;;; instead it is the next more general type of which string is a 
+;;; subtype. The individual elements of the result are lists because
+;;; nil is a list.
 
+;;; null, any
 (defmethod split ((seq null) subseq &key test)
   (declare (ignore seq subseq test))
   nil)
 
+;;; cons, null
+(defmethod split ((seq cl:cons) (subseq null) &key test)
+  (declare (ignore subseq test))
+  (mapcar 'list seq))
 
-(defmethod split ((seq cl:sequence) (subseq null) &key test)
-  (declare (ignore seq subseq test))
-  (cl:map 'cl:list
-          (lambda (e)(coerce (list e) (combined-type seq seq)))
-          seq))
+;;; vector, null
+(defmethod split ((seq cl:vector) (subseq null) &key test)
+  (declare (ignore subseq test))
+  (map 'cl:vector 'cl:list seq))
 
-(defmethod split ((seq cl:sequence) (subseq cl:sequence) &key (test 'equal))
-  (let* ((pivot 0)
-         (result '())
-         (sublen (cl:length subseq))
-         (ends (block scanning
-                 (loop
-                    (let* ((pos (search subseq seq :start2 pivot :test test)))
-                      (if pos
-                          (setf result (cons pos result)
-                                pivot (+ pos sublen))
-                          (return-from scanning result))))))
-         (starts (cons 0 (mapcar (lambda (e)(+ e sublen))
-                                 (reverse ends))))
-         (ends (reverse (cons nil ends))))
-    (cl:mapcar (lambda (s e)(cl:subseq seq s e)) starts ends)))
+;;; seq, null
+(defmethod split ((seq fset:seq) (subseq null) &key test)
+  (declare (ignore subseq test))
+  (fset:image 'list seq))
 
-(defmethod split ((seq cl:sequence) (subseq seq) &key (test 'equal))
-  (split seq (fset:convert 'cl:vector subseq) :test test))
+;;; series, null
+(defmethod split ((seq foundation-series) (subseq null) &key test)
+  (declare (ignore subseq test))
+  (series:map-fn 'list 'list seq))
 
-(defmethod split ((seq cl:sequence) (subseq foundation-series) &key (test 'equal))
-  (split seq (series:collect 'vector subseq) :test test))
+;;; cons, cons
+(defmethod split ((seq cl:cons) (subseq cl:cons) &key (test 'equal))
+  (let ((pos (search subseq seq :test test)))
+    (if pos
+        (let ((head (subseq seq 0 pos))
+              (tail (subseq (subseq seq pos)
+                            (length subseq))))
+          (cons head
+                (split tail subseq :test test)))
+        (list seq))))
 
+;;; vector, vector
+(defmethod %bite ((seq cl:vector) (subseq cl:vector) &key (test 'equal)(start 0))
+  (let ((pos (search subseq seq :test test :start2 start))
+        (seqlen (length seq))
+        (sublen (length subseq)))
+    (if pos
+        (values (subseq seq start pos)
+                (+ pos sublen))
+        (values (subseq seq start seqlen)
+                seqlen))))
 
-(defmethod split ((seq seq) (subseq cl:sequence) &key (test 'equal))
-  (fset:convert 'seq
-                (split (fset:convert 'cl:vector seq)
-                       subseq :test test)))
-
-(defmethod split ((seq seq) (subseq seq) &key (test 'equal))
-  (fset:convert 'seq
-                (split (fset:convert 'cl:vector seq)
-                       (fset:convert 'cl:vector subseq)
-                       :test test)))
-
-(defmethod split ((seq seq) (subseq foundation-series) &key (test 'equal))
-  (fset:convert 'seq
-                (split (fset:convert 'cl:vector seq)
-                       (series:collect 'cl:vector subseq)
-                       :test test)))
-
-
-(defmethod split ((seq foundation-series) (subseq cl:sequence) &key (test 'equal))
-  (series:scan (split (series:collect 'cl:vector seq)
-                      subseq :test test)))
-
-(defmethod split ((seq foundation-series) (subseq seq) &key (test 'equal))
-  (series:scan (split (series:collect 'cl:vector seq)
-                      (fset:convert 'cl:vector subseq) :test test)))
-
-(defmethod split ((seq foundation-series) (subseq foundation-series) &key (test 'equal))
-  (series:scan (split (series:collect 'cl:vector seq)
-                      (series:collect 'cl:vector subseq) :test test)))
+(defmethod split ((seq cl:vector) (subseq cl:vector) &key (test 'equal))
+  (if (empty? subseq)
+      (map 'cl:vector 'cl:vector seq)
+      (let ((seqlen (length seq))
+            (sublen (length subseq))
+            (start 0)
+            (chunks nil))
+        (block searching
+          (loop
+             (if (>= start seqlen)
+                 (return-from searching)
+                 (multiple-value-bind (chunk pos) (%bite seq subseq :test test :start start)
+                   (push chunk chunks)
+                   (setf start pos)))))
+        (coerce (reverse chunks)
+                'cl:vector))))
 
 
 ;;; ---------------------------------------------------------------------

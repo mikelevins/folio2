@@ -633,6 +633,14 @@
 (defgeneric scan-image (fn seq))
 
 
+;;; search
+;;;
+;;; (search subsequence sequence &key (start 0)(test 'equalp)) => integer
+;;; ---------------------------------------------------------------------
+;;; returns the position, if any, in sequence where subsequence appears
+
+(defgeneric search (subsequence sequence &key start test))
+
 ;;; second
 ;;;
 ;;; (second seq) => anything

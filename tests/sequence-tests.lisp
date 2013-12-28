@@ -17,7 +17,7 @@
                           :> :>= :< :<=
                           :adjoin :append :apply :find :first :intersection :last :length :make
                           :merge :pair :position :position-if :reduce :remove :rest
-                          :reverse :second :sequence :sort :union)
+                          :reverse :search :second :sequence :sort :union)
   (:import-from :net.bardcode.folio.common
                 :seq :series))
 
@@ -605,6 +605,63 @@
   (ensure-same #\2 (second "123"))
   (ensure-same 2 (second (seq 1 2 3)))
   (ensure-same 2 (second (series 1 2 3))))
+
+;;; select
+;;; ---------------------------------------------------------------------
+
+(addtest (sequence-tests)
+  test-select
+  (ensure-error (select nil (list 1 2 3)))
+  (ensure-same '(b d f) (select '(a b c d e f) '(1 3 5)))
+  (ensure-same (vector 'b 'd 'f) (select (vector 'a 'b 'c 'd 'e 'f) '(1 3 5)) :test 'equalp)
+  (ensure-same (seq 'b 'd 'f) (select (seq 'a 'b 'c 'd 'e 'f) '(1 3 5)) :test 'equalp)
+  (ensure-same (seq 'b 'd 'f) (select (seq 'a 'b 'c 'd 'e 'f) (seq 1 3 5)) :test 'equalp)
+  (ensure-same (seq 'b 'd 'f) (select (seq 'a 'b 'c 'd 'e 'f) (series 1 3 5)) :test 'equalp)
+  (ensure-same (series 'b 'd 'f) (select (series 'a 'b 'c 'd 'e 'f) (series 1 3 5)) :test 'equivalent-series?))
+
+;;; shuffle
+;;; ---------------------------------------------------------------------
+
+(addtest (sequence-tests)
+  test-shuffle
+  (let* ((ls (list 1 2 3 4 5 6 7 8))
+         (ls* (shuffle ls)))
+    (ensure (and (not (equalp ls ls*))
+                 (every (lambda (x)(member x ls))
+                        ls*))))
+  (let* ((vec (vector 1 2 3 4 5 6 7 8))
+         (vec* (shuffle vec)))
+    (ensure (and (not (equalp vec vec*))
+                 (every (lambda (x)(cl:some (lambda (e)(equalp x e)) vec))
+                        vec*)))))
+
+;;; some?
+;;; ---------------------------------------------------------------------
+
+(addtest (sequence-tests)
+  test-some?
+  (ensure (some? 'integerp '(a b 3 d)))
+  (ensure (not (some? 'integerp '(a b c d))))
+  (ensure (some? 'integerp (vector :a :b 3 :d)))
+  (ensure (some? 'alpha-char-p "123A56"))
+  (ensure (not (some? 'alpha-char-p "123456")))
+  (ensure (some? 'integerp (seq :a :b 3 :d)))
+  (ensure (some? 'integerp (series :a :b 3 :d))))
+
+;;; split
+;;; ---------------------------------------------------------------------
+
+(addtest (sequence-tests)
+  test-split
+  (ensure (null (split nil "foo")))
+  (ensure-same '((a b c)(f g h i j)) (split '(a b c d e f g h i j) '(d e)))
+  (ensure-same '("foo" "bar") (split "fooBAZbar" "BAZ"))
+  (ensure-same (list (vector :a :b :c)(vector :f :g :h :i :j))
+               (split (vector :a :b :c :d :e :f :g :h :i :j) '(:d :e))
+               :test 'equalp)
+  (ensure-same (list (seq :a :b :c)(seq :f :g :h :i :j))
+               (split (seq :a :b :c :d :e :f :g :h :i :j) '(:d :e))
+               :test 'equalp))
 
 ;;; ---------------------------------------------------------------------
 ;;; run tests

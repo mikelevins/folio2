@@ -21,7 +21,7 @@
                           :> :>= :< :<=
                           :adjoin :append :apply :find :first :indexes :intersection :last :length
                           :merge :position :position-if :reduce :remove :repeatedly :rest
-                          :reverse :second :sequence :sort :union) 
+                          :reverse :search :second :sequence :sort :union) 
   (:import-from :net.bardcode.folio.common :binary-append :foundation-series :make-output-stream :seq) 
   (:use :cl :net.bardcode.folio.common)
   (:export
@@ -54,8 +54,8 @@
    :output-stream :output-stream? :ordered-map
    :partition :penult :position :position-if
    :range :range-from :readable :readable? :reduce :remove :repeat :repeatedly :rest :reverse 
-   :scan :scan-image :second :select :seq :sequence :sequence? :series :series? :shuffle :some? :sort :split
-   :streamable :streamable? :subsequence
+   :scan :scan-image :search :second :select :seq :sequence :sequence? :series :series? :shuffle
+   :some? :sort :split :streamable :streamable? :subsequence
    :tail :tails :take :take-by :take-while
    :unique :unzip
    :writable :writable?

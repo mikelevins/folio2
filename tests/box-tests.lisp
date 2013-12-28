@@ -18,7 +18,7 @@
                           :> :>= :< :<=
                           :adjoin :append :apply :find :first :intersection :last :length
                           :merge :position :position-if :reduce :remove :rest
-                          :reverse :second :sequence :sort :union))
+                          :reverse :search :second :sequence :sort :union))
 
 (in-package :net.bardcode.folio.boxes.tests)
 
