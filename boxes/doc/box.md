@@ -1,49 +1,47 @@
 # box
-A mutable container
+A mutable container for values.
 
-A **box** is a mutable container that can be used to bridge the
-advantages of mutable data with those of immutable data and pure
-functions.
+**Package:** `net.bardcode.folio.boxes`<br>
+**Exports:** `box box? set-box! unbox`
 
-Pure-functional data structures and immutable data offers certain
-strong advantages, but can also sometimes impose awkward
-restrictions. By selectively including boxes as elements in immutable
-structures, you can introduce just as much mutability as you need, and
-no more.
+The `box` type is a mutable container for arbitrary values. The functions `unbox` and `set-box!` can be used to retrieve and replace the value stored in a `box`.
 
-**`as`** *Generic function* 
+Boxes provide a way to introduce mutability piecemeal into immutable and pure-functional data structures. As an example, we can use a pure-functional implementation of finite maps, but store the value elements in boxes so that they can be destructively updated. All operations on the finite map as a whole and on its keys remain purely functional, but we can destructively modify the values stored on the keys.
 
-`as` `'box` *`value`* => `box`<br>
+A type definition establishes the `box` type as a synonym for a `cons` cell whose `car` element is the keyword `:BOX`.
 
-**`box`** *Type* 
+## Reference
 
-A `box` is a container for a value. folio represents a `box` as a
-`cons` whose `car` is the keyword `:box`. A type definition
-establishes such values as members of the type `box`.
+**`as`** *Generic function* <br>
+`as 'box value => box`<br>
 
-**`box`** *Function* 
+**`box`** *Type* <br>
+A `box` is a mutable container for a value. folio represents a `box` as a
+`cons` whose `car` is the keyword `:box`.
 
-`box` *`value`* => `box`<br>
+**`box`** *Function* <br>
+`box value => box`<br>
+Returns a new box containing `value`.
 
-**`box?`** *Generic function* 
-
-`box?` *`value`*  => *`Generalized boolean`*<br>
+**`box?`** *Generic function* <br>
+`box? value => Generalized Boolean`<br>
 Returns a true value if *`value`* is a `box`, and a false value otherwise.
 
-**`make`** *Generic function* 
+**`make`** *Generic function* <br>
+`make 'box &key (value nil) => Anything`<br>
+Returns a new `box` whose initial value is `value`.
 
-`make` `'box` `&key` *`value`* => `box`<br>
+**`set-box!`** *Generic function* <br>
+`set-box! box value => Anything`<br>
+Replaces the value of `box` with `value`, returning `value`.
 
-**`set-box!`** *Generic function* 
+**`unbox`** *Generic function* <br>
+`unbox box => Anything`<br>
+Returns the value stored in `box`.
 
-`set-box!` *`box`* *`value`* => `Anything`<br>
-
-**`unbox`** *Generic function* 
-
-`unbox` *`box`*  => `Anything`<br>
-Returns the value stored in *`box`*.
-
-`setf (unbox ` *`b`* `)` *`value`*  => `Anything`<br>
+**`setf unbox`** *Generic function* <br>
+`setf (unbox b) val => val`<br>
+Replaces the value of `b` with `value`, returning `value`.
 
 
 
