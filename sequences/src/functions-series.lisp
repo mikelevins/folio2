@@ -1,13 +1,13 @@
 ;;;; ***********************************************************************
 ;;;; FILE IDENTIFICATION
 ;;;;
-;;;; Name:          functions.lisp
-;;;; Project:       folio - the Bard runtime
-;;;; Purpose:       with-exit functions
+;;;; Name:          functions-series.lisp
+;;;; Project:       folio - Bard features in Common Lisp
+;;;; Purpose:       operations on (unbounded) series
 ;;;; Author:        mikel evins
 ;;;; Copyright:     2013 by mikel evins
 ;;;;
 ;;;; ***********************************************************************
 
-(in-package :net.bardcode.folio.with-exit)
+(in-package :net.bardcode.folio.sequences)
 

@@ -17,10 +17,11 @@
   :serial t
   :description "associating paris of values"
   :license "Lisp Lesser GNU Public License"
-  :depends-on (:net.bardcode.folio.as :net.bardcode.folio.make)
+  :depends-on (:fset :net.bardcode.folio.as :net.bardcode.folio.make)
   :components ((:module "src"
                         :serial t
                         :components ((:file "package")
+                                     (:file "types")
                                      (:file "functions")))))
 
 (asdf:defsystem :net.bardcode.folio.maps.tests

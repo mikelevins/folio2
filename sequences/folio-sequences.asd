@@ -1,7 +1,7 @@
 ;;;; ***********************************************************************
 ;;;; FILE IDENTIFICATION
 ;;;;
-;;;; Name:          folio.sequences.asd
+;;;; Name:          folio-sequences.asd
 ;;;; Project:       folio - Bard features for Common Lisp
 ;;;; Purpose:       system definition for folio.sequences
 ;;;; Author:        mikel evins
@@ -15,22 +15,26 @@
 
 (asdf:defsystem :net.bardcode.folio.sequences
   :serial t
-  :description "associating paris of values"
+  :description "operations on sequences of values"
   :license "Lisp Lesser GNU Public License"
-  :depends-on (:net.bardcode.folio.as :net.bardcode.folio.make)
+  :depends-on (:net.bardcode.folio.as
+               :net.bardcode.folio.make
+               :fset :series)
   :components ((:module "src"
                         :serial t
                         :components ((:file "package")
-                                     (:file "functions")))))
+                                     (:file "functions-sequences")
+                                     (:file "functions-series")))))
 
 (asdf:defsystem :net.bardcode.folio.sequences.tests
   :serial t
-  :description "sequence tests"
+  :description "sequence and series tests"
   :license "Lisp Lesser GNU Public License"
   :depends-on (:net.bardcode.folio.sequences :lift)
   :components ((:module "tests"
                         :serial t
-                        :components ((:file "sequences")))))
+                        :components ((:file "sequences")
+                                     (:file "series")))))
 
 (defun load-sequences ()
   (asdf:oos 'asdf:load-op :net.bardcode.folio.sequences))

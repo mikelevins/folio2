@@ -14,5 +14,17 @@
 (defpackage :net.bardcode.folio.maps
   (:use :cl :net.bardcode.folio.as :net.bardcode.folio.make)
   (:shadow :map :merge :values)
-  (:export :alist->plist :contains-key? :contains-value? :get-key :keys :map :map? :merge :plist->alist :put-key :values))
+  (:import-from :fset :wb-map)
+  (:export 
+   :alist :alist?
+   :contains-key? :contains-value?
+   :get-key
+   :keys
+   :map :map? :merge
+   :plist :plist? :put-key
+   :values
+   :wb-map :wb-map?))
+
+
+
 
