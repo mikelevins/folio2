@@ -51,7 +51,11 @@
           (cons (car x)
                 (%put-alist-key (cdr x) key value :test test)))))
 
-;;; macro 
+;;; ---------------------------------------------------------------------
+;;; maps
+;;; ---------------------------------------------------------------------
+
+;;; macro alist
 ;;;
 ;;; (alist pair ...) => alist
 ;;; ---------------------------------------------------------------------
@@ -60,9 +64,9 @@
   (cons 'cl:list 
         (%expand-alist-pairs pairs)))
 
-;;; function 
+;;; function as
 ;;;
-;;; () => 
+;;; (as type value) => value'
 ;;; ---------------------------------------------------------------------
 
 (defmethod as ((type (eql 'map)) value &key &allow-other-keys)
@@ -108,9 +112,9 @@
     (t (error "Not a valid map: ~s" value))))
 
 
-;;; function 
+;;; function contains-key?
 ;;;
-;;; () => 
+;;; (contains-key? map key &key (test 'eql)) => Generalized Boolean
 ;;; ---------------------------------------------------------------------
 
 (defmethod contains-key? ((x cl:cons) key &key (test 'eql))
@@ -119,9 +123,9 @@
 (defmethod contains-key? ((x wb-map) key &key &allow-other-keys)
   (fset:domain-contains? x key))
 
-;;; function 
+;;; function contains-value?
 ;;;
-;;; () => 
+;;; (contains-value? map value &key (test 'eql)) => Generalized Boolean
 ;;; ---------------------------------------------------------------------
 
 (defmethod contains-value? ((x cl:cons) value &key (test 'eql))
@@ -130,9 +134,9 @@
 (defmethod contains-value? ((x wb-map) value &key &allow-other-keys)
   (fset:range-contains? x value))
 
-;;; function 
+;;; function get-key
 ;;;
-;;; () => 
+;;; (get-key map key &test (test 'eql)(default nil)) => Anything
 ;;; ---------------------------------------------------------------------
 
 (defmethod get-key ((x cl:cons) key &key (test 'eql)(default nil))
@@ -148,9 +152,9 @@
         default
         result)))
 
-;;; function 
+;;; function keys
 ;;;
-;;; () => 
+;;; (keys map) => sequence
 ;;; ---------------------------------------------------------------------
 
 (defmethod keys ((x cl:cons))
@@ -162,9 +166,9 @@
 (defmethod keys ((x wb-map))
   (fset:convert 'cl:list (fset:domain x)))
 
-;;; function 
+;;; function make
 ;;;
-;;; () => 
+;;; (make type &key (contents nil) &allow-other-keys) => map
 ;;; ---------------------------------------------------------------------
 
 (defmethod make ((type (eql 'map)) &key (contents nil) &allow-other-keys)
@@ -180,9 +184,9 @@
 (defmethod make ((type (eql 'wb-map)) &key (contents nil) &allow-other-keys)
   (fset:convert 'wb-map (make 'alist :contents contents)))
 
-;;; function 
+;;; function map?
 ;;;
-;;; () => 
+;;; (map? thing) => Generalized Boolean
 ;;; ---------------------------------------------------------------------
 
 (defmethod map? (x) nil)
@@ -192,9 +196,9 @@
   (or (alist? x)
       (plist? x)))
 
-;;; function 
+;;; function merge
 ;;;
-;;; () => 
+;;; (merge map1 map2) => map3
 ;;; ---------------------------------------------------------------------
 
 (defmethod merge ((map1 cl:null) (map2 cl:null) &key test &allow-other-keys)
@@ -227,9 +231,9 @@
 (defmethod merge ((map1 wb-map)(map2 wb-map)  &key &allow-other-keys)
   (fset:map-union map1 map2))
 
-;;; function 
+;;; function plist
 ;;;
-;;; () => 
+;;; (plist &rest elements) => plist
 ;;; ---------------------------------------------------------------------
 
 (defun plist (&rest keys-and-values)
@@ -238,9 +242,9 @@
       (error "Malformed plist: ~s"
              keys-and-values)))
 
-;;; function 
+;;; function put-key
 ;;;
-;;; () => 
+;;; (put-key map key value) => map'
 ;;; ---------------------------------------------------------------------
 
 (defmethod put-key ((x null) key value &key &allow-other-keys)
@@ -255,9 +259,9 @@
 (defmethod put-key ((x wb-map) key value &key &allow-other-keys)
   (fset:with x key value))
 
-;;; function 
+;;; function values
 ;;;
-;;; () => 
+;;; (values map) => sequence
 ;;; ---------------------------------------------------------------------
 
 (defmethod values ((x cl:cons))
@@ -269,9 +273,9 @@
 (defmethod values ((x wb-map))
   (fset:convert 'cl:list (fset:range x)))
 
-;;; function 
+;;; function wb-map?
 ;;;
-;;; () => 
+;;; (wb-map? thing) => Boolean
 ;;; ---------------------------------------------------------------------
 
 (defmethod wb-map? (thing)

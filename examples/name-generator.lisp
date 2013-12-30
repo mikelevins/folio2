@@ -17,36 +17,40 @@
 
 (in-package :net.bardcode.folio.examples)
 
+(defmethod triples ((s sequence)) 
+    (by 3 s))
 
-(defmethod parse-names ((lines sequence))
-  (scan-image (partition 'first (^ l -> (reduce 'append (rest l))))
-              (scan-image 'triples
-                          (filter (complement 'empty?) 
-                                  (image 'trim lines)))))
+(defmethod valid-lines ((path string))
+  (filter (complement 'empty?)
+          (image 'trim
+                 (lines (pathname path)))))
 
-(defmethod read-names ((path string))
-  (parse-names (with-open-file (in path)
-                 (loop for line = (read-line in nil :eof) 
-                    until (eq line :eof)
-                    collect line))))
+(defmethod long-enough? ((s sequence))
+  (>= (length s) 3))
 
+(defmethod rules ((path string))
+  (let* ((lines (vaid-lines lines))
+         (triples (image 'triples lines))
+         (starts (image 'first triples))
+         (parts (reduce 'append (image 'rest triples))))
+    (values (filter 'long-enough? starts)
+            (filter 'long-enough? parts))))
 
-(defmethod build-name ((start string)(parts sequence))
-  (iterate build ((name start))
-           (let ((chunk (any (filter (partial 'prefix-match? [(penult name)(last name)])
-                                     parts))))
-             (if chunk
-                 (build (append name (drop 2 chunk)))
-                 name))))
+(defmethod choose-segment ((start string)(parts sequence))
+  (any (filter (partial 'prefix-match? (leave 2 segment))
+               parts)))
 
-(defmethod build-names ((starts sequence)(parts sequence))
-  (repeat (build-name (any starts) parts)))
+(defmethod name-builder ((parts sequence))
+  (lambda (name)
+    (let ((segment (choose-segment name parts)))
+      (if segment
+          (append name (drop 2 segment))
+          nil))))
+
+(defmethod build-name ((starts sequence)(parts sequence))
+  (take-while 'something?
+              (iterate (name-builder parts) (any starts))))
 
 (defmethod names ((path string) &optional (number 10))
-  (bind ((starts parts (read-names path))
-         (names (build-names starts parts)))
-    (take number names)))
-
-
-
-
+  (multiple-value-bind (starts parts)(rules path)
+    (take number (repeat (build-name starts parts)))))

@@ -3,7 +3,7 @@
 ;;;;
 ;;;; Name:          package.lisp
 ;;;; Project:       folio - Bard features in Common Lisp
-;;;; Purpose:       series package
+;;;; Purpose:       sequences package
 ;;;; Author:        mikel evins
 ;;;; Copyright:     2013 by mikel evins
 ;;;;
@@ -11,36 +11,29 @@
 
 (in-package :cl-user)
 
-(defpackage :net.bardcode.folio.series
+(defpackage :net.bardcode.folio.sequences
   (:use :cl :net.bardcode.folio.as :net.bardcode.folio.make)
   (:shadow :append :find :last :length :search :sequence)
+  (:import-from :fset :wb-seq)
   (:export
-   ;; (unbounded) series
-   :add-first
-   :by
+   :add-first :add-last :any :append
+   :binary-append :binary-join :by
    :coalesce
    :drop :drop-while
-   :element :empty?
-   :filter :first
-   :generate :generator
+   :element :empty? :every?
+   :filter :find :first
    :head
    :image :indexes :interleave :interpose
-   :partition :position :prefix-match?
-   :range-from :reduce :remove :repeat :repeatedly :rest
-   :scan :scan-image :second :select :series :series? :some? :subseries
-   :tail :tails :take :take-by :take-while
-   ;; (bounded) sequences
-   :add-last :any :append
-   :binary-append :binary-join
-   :every?
-   :find
    :join
-   :last :length
-   :penult
-   :range :reverse
-   :search :sequence :sequence? :shuffle :sort :split :subsequence :suffix-match?
-   :unique :unzip
-   :fset-sequence :fset-sequence?
+   :last :leave :length 
+   :partition :penult :position :prefix-match?
+   :range :reduce :remove :rest :reverse
+   :search :second :select :sequence :sequence?
+   :shuffle :some? :sort :split :subsequence :suffix-match?
+   :tail :tails :take :take-by :take-while
+   :unique :unzip 
+   :wb-seq :wb-seq?
    :zip))
+
 
 

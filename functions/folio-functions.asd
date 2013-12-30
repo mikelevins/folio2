@@ -17,11 +17,12 @@
   :serial t
   :description "associating paris of values"
   :license "Lisp Lesser GNU Public License"
-  :depends-on (:net.bardcode.folio.as :net.bardcode.folio.make)
+  :depends-on (:alexandria)
   :components ((:module "src"
                         :serial t
                         :components ((:file "package")
-                                     (:file "functions")))))
+                                     (:file "functions")
+                                     (:file "syntax")))))
 
 (asdf:defsystem :net.bardcode.folio.functions.tests
   :serial t

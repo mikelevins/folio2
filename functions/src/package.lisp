@@ -13,7 +13,7 @@
 
 (defpackage :net.bardcode.folio.functions
   (:use :cl :net.bardcode.folio.as :net.bardcode.folio.make)
-  (:shadow :apply)
-  (:export :$ :^ :-> :apply :cascade :compose :conjoin :disjoin :flip :fn :function? :functional?
-           :generic-function? :iterate :method? :partial :rpartial))
+  (:import-from :alexandria :compose :conjoin :disjoin :multiple-value-compose)
+  (:export :^ :-> :cascade :compose :conjoin :disjoin :flip :fn :function? :functional?
+           :generic-function? :iterate :method? :multiple-value-compose :partial :rpartial))
 
