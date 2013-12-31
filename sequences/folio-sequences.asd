@@ -23,8 +23,7 @@
   :components ((:module "src"
                         :serial t
                         :components ((:file "package")
-                                     (:file "functions-sequences")
-                                     (:file "functions-series")))))
+                                     (:file "functions")))))
 
 (asdf:defsystem :net.bardcode.folio.sequences.tests
   :serial t
@@ -33,8 +32,7 @@
   :depends-on (:net.bardcode.folio.sequences :lift)
   :components ((:module "tests"
                         :serial t
-                        :components ((:file "sequences")
-                                     (:file "series")))))
+                        :components ((:file "sequences")))))
 
 (defun load-sequences ()
   (asdf:oos 'asdf:load-op :net.bardcode.folio.sequences))

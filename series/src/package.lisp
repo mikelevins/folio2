@@ -17,6 +17,7 @@
   (:shadow :append :find :last :length :search :sequence)
   (:import-from :series :foundation-series)
   (:export
+   :coalesce
    :foundation-series
    :range-from :repeat
    :scan :series :series?))
