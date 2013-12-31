@@ -19,6 +19,7 @@
   :license "Lisp Lesser GNU Public License"
   :depends-on (:net.bardcode.folio.as
                :net.bardcode.folio.make
+               :net.bardcode.folio.pairs
                :fset :series)
   :components ((:module "src"
                         :serial t

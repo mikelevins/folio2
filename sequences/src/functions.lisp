@@ -50,6 +50,23 @@
 ;;; sequence functions
 ;;; ---------------------------------------------------------------------
 
+;;; function acons [bounded]
+;;;
+;;; (acons key value sequence) => sequence'
+;;; ---------------------------------------------------------------------
+
+(defmethod acons (key value (sequence cl:null)) 
+  (cl:cons (cl:cons key value) sequence))
+
+(defmethod acons (key value (sequence cl:cons)) 
+  (cl:cons (cl:cons key value) sequence))
+
+(defmethod acons (key value (sequence cl:vector)) 
+  (cl:concatenate 'cl:vector (cl:vector (cl:cons key value)) sequence))
+
+(defmethod acons (key value (sequence wb-seq)) 
+  (fset:concat (wb-seq (cl:cons key value)) sequence))
+
 ;;; function add-first
 ;;;
 ;;; (add-first x sequence) => sequence'
@@ -146,6 +163,67 @@
 (defmethod binary-append ((sequence1 wb-seq) (sequence2 cl:vector)) (fset:concat sequence1 sequence2))
 (defmethod binary-append ((sequence1 wb-seq) (sequence2 wb-seq)) (fset:concat sequence1 sequence2))
 
+;;; function assoc [bounded]
+;;;
+;;; (assoc item sequence &key key test) => pair
+;;; ---------------------------------------------------------------------
+
+(defmethod assoc (item (sequence cl:null) &key (key 'cl:identity) (test 'cl:eql))
+  nil)
+
+(defmethod assoc (item (sequence cl:cons) &key (key 'cl:identity) (test 'cl:eql))
+  (cl:assoc item sequence :test test :key key))
+
+(defmethod assoc (item (sequence cl:vector) &key (key 'cl:identity) (test 'cl:eql))
+  (block searching
+    (progn
+      (loop for x across sequence
+         do (when (funcall test item (funcall key (left x)))
+              (return-from searching x)))
+      nil)))
+
+(defmethod assoc (item (sequence wb-seq) &key (key 'cl:identity) (test 'cl:eql))
+  (block searching
+    (progn
+      (loop for i from 0 below (fset:size sequence)
+         do (when (funcall test item (funcall key (left (fset:@ sequence i))))
+              (return-from searching (fset:@ sequence i))))
+      nil)))
+
+;;; function assoc-if [bounded]
+;;;
+;;; (assoc predicate sequence &key key) => pair
+;;; ---------------------------------------------------------------------
+
+(defmethod assoc-if (predicate (sequence cl:null) &key (key 'cl:identity))
+  nil)
+
+(defmethod assoc-if (predicate (sequence cl:cons) &key (key 'cl:identity))
+  (cl:assoc-if predicate sequence :key key))
+
+(defmethod assoc-if (predicate (sequence cl:vector) &key (key 'cl:identity))
+  (block searching
+    (progn
+      (loop for x across sequence
+         do (when (funcall predicate (funcall key (left x)))
+              (return-from searching x)))
+      nil)))
+
+(defmethod assoc-if (predicate (sequence wb-seq) &key (key 'cl:identity))
+  (block searching
+    (progn
+      (loop for i from 0 below (fset:size sequence)
+         do (when (funcall predicate (funcall key (left (fset:@ sequence i))))
+              (return-from searching (fset:@ sequence i))))
+      nil)))
+
+;;; function assoc-if-not [bounded]
+;;;
+;;; (assoc predicate sequence &key key) => pair
+;;; ---------------------------------------------------------------------
+
+(defun assoc-if-not (predicate sequence &key (key 'cl:identity))
+  (assoc-if (complement predicate) sequence :key key))
 
 ;;; function by
 ;;;
@@ -691,14 +769,137 @@
         (loop for i downfrom start above end by step collect i))))
 
 ;;;reduce  [bounded]
+
+(defmethod reduce (fn (sequence cl:sequence) &key (key 'cl:identity) (initial-value nil))
+  (cl:reduce fn sequence :key key :initial-value initial-value))
+
+(defmethod reduce (fn (sequence wb-seq) &key (key 'cl:identity) (initial-value nil))
+  (fset:reduce fn sequence :key key :initial-value initial-value))
+
 ;;;remove
-;;;remove-duplicates  [bounded]
 ;;;remove-if
 ;;;remove-if-not
-;;;rest 
-;;;reverse [bounded]
-;;;search  [bounded]
-;;;second 
+
+;;; function remove [bounded]
+;;;
+;;; (remove item sequence &key test start end key) => anything
+;;; ---------------------------------------------------------------------
+
+(defmethod remove (item (sequence cl:null) &key (test 'eql) (start 0) end (key 'cl:identity)) 
+  nil)
+
+(defmethod remove (item (sequence cl:sequence) &key (test 'eql) (start 0) end (key 'cl:identity))
+  (cl:remove item sequence :test test :start start :end end :key key))
+
+(defmethod remove (item (sequence wb-seq) &key (test 'eql) (start 0) end (key 'cl:identity))
+  (let ((sequence (fset:subseq sequence start end)))
+    (fset:remove item sequence :key key :test test)))
+
+;;; function remove-if [bounded]
+;;;
+;;; (remove-if predicate sequence &key start end key) => anything
+;;; ---------------------------------------------------------------------
+
+(defmethod remove-if (predicate (sequence cl:null) &key (start 0) end (key 'cl:identity)) 
+  nil)
+
+(defmethod remove-if (predicate (sequence cl:sequence) &key (start 0) end (key 'cl:identity))
+  (cl:remove-if predicate sequence :start start :end end :key key))
+
+(defmethod remove-if (predicate (sequence wb-seq) &key (start 0) end (key 'cl:identity))
+  (let ((sequence (fset:subseq sequence start end)))
+    (fset:remove-if predicate sequence :start start :end end :key key)))
+
+;;; function remove-if-not [bounded]
+;;;
+;;; (remove-if-not predicate sequence &key start end key) => anything
+;;; ---------------------------------------------------------------------
+
+(defun remove-if-not (predicate sequence &key (start 0) end (key 'cl:identity)) 
+  (remove-if (cl:complement predicate) :start start :end end :key key))
+
+;;; function remove-duplicates [bounded]
+;;;
+;;; (remove-duplicates sequence &key test start end key) => sequence'
+;;; ---------------------------------------------------------------------
+
+(defmethod remove-duplicates ((sequence cl:null) &key (test 'eql) (start 0) end (key 'cl:identity)) 
+  nil)
+
+(defmethod remove-duplicates ((sequence cl:sequence) &key (test 'eql) (start 0) end (key 'cl:identity)) 
+  (cl:remove-duplicates :test test :start start :end end :key key))
+
+(defmethod remove-duplicates ((sequence wb-seq) &key (test 'eql) (start 0) end (key 'cl:identity)) 
+  (as 'wb-seq (cl:remove-duplicates (as 'cl:vector sequence) :test test :start start :end end :key key)))
+
+;;; function rest
+;;;
+;;; (rest sequence) => sequence'
+;;; ---------------------------------------------------------------------
+
+(defmethod rest ((sequence cl:null))
+  nil)
+
+(defmethod rest ((sequence cl:sequence))
+  (cl:subseq sequence 1))
+
+(defmethod rest ((sequence wb-seq))
+  (fset:subseq sequence 1))
+
+;;; reverse [bounded]
+;;;
+;;; (reverse sequence) => sequence'
+;;; ---------------------------------------------------------------------
+
+(defmethod reverse ((sequence cl:null))
+  nil)
+
+(defmethod reverse ((sequence cl:sequence))
+  (cl:reverse sequence))
+
+(defmethod reverse ((sequence wb-seq))
+  (fset:reverse sequence))
+
+;;; search  [bounded]
+;;;
+;;; (search sequence1 sequence2 &key start1 end1 start2 end2 test key) => Generalized Boolean
+;;; ---------------------------------------------------------------------
+
+(defmethod search ((sequence1 cl:null)(sequence2 cl:null) &key (start1 0) end1 (start2 0) end2 (test 'cl:equal) (key 'cl:identity)) 0)
+(defmethod search ((sequence1 cl:null)(sequence2 cl:sequence) &key (start1 0) end1 (start2 0) end2 (test 'cl:equal) (key 'cl:identity)) 0)
+(defmethod search ((sequence1 cl:null)(sequence2 wb-seq) &key (start1 0) end1 (start2 0) end2 (test 'cl:equal) (key 'cl:identity)) 0)
+
+(defmethod search ((sequence1 cl:sequence)(sequence2 cl:null) &key (start1 0) end1 (start2 0) end2 (test 'cl:equal) (key 'cl:identity)) 
+  nil)
+
+(defmethod search ((sequence1 cl:sequence)(sequence2 cl:sequence) &key (start1 0) end1 (start2 0) end2 (test 'cl:equal) (key 'cl:identity)) 
+  (cl:search sequence1 sequence2 :start1 start1 :start2 start2 :end1 end1 :end2 end2 :test test :key key))
+
+(defmethod search ((sequence1 cl:sequence)(sequence2 wb-seq) &key (start1 0) end1 (start2 0) end2 (test 'cl:equal) (key 'cl:identity)) 
+  (cl:search sequence1 (as 'cl:vector sequence2) :start1 start1 :start2 start2 :end1 end1 :end2 end2 :test test :key key))
+
+(defmethod search ((sequence1 wb-seq)(sequence2 cl:null) &key (start1 0) end1 (start2 0) end2 (test 'cl:equal) (key 'cl:identity)) nil)
+
+(defmethod search ((sequence1 wb-seq)(sequence2 cl:sequence) &key (start1 0) end1 (start2 0) end2 (test 'cl:equal) (key 'cl:identity)) 
+  (cl:search (as 'cl:vector sequence1) sequence2 :start1 start1 :start2 start2 :end1 end1 :end2 end2 :test test :key key))
+
+(defmethod search ((sequence1 wb-seq)(sequence2 wb-seq) &key (start1 0) end1 (start2 0) end2 (test 'cl:equal) (key 'cl:identity)) 
+  (cl:search (as 'cl:vector sequence1) (as 'cl:vector sequence2) :start1 start1 :start2 start2 :end1 end1 :end2 end2 :test test :key key))
+
+;;; function second 
+;;;
+;;; (second sequence) => anything
+;;; ---------------------------------------------------------------------
+
+(defmethod second ((sequence cl:null))
+  nil)
+
+(defmethod second ((sequence cl:sequence))
+  (cl:second sequence))
+
+(defmethod second ((sequence wb-seq))
+  (fset:@ sequence 1))
+
 ;;;select 
 ;;;sequence 
 ;;;sequence? 
@@ -745,5 +946,57 @@
 (defmethod wb-seq? (x) nil)
 (defmethod wb-seq? ((x fset:seq)) t)
 
-;;;zip
+;;; function zip
+;;;
+;;; (zip sequence1 sequence2) => sequence3
+;;; ---------------------------------------------------------------------
 
+(defmethod zip ((sequence1 cl:null) (sequence2 cl:null)) nil)
+(defmethod zip ((sequence1 cl:null) (sequence2 cl:cons)) nil)
+(defmethod zip ((sequence1 cl:null) (sequence2 cl:vector)) nil)
+(defmethod zip ((sequence1 cl:null) (sequence2 wb-seq)) nil)
+
+(defmethod zip ((sequence1 cl:cons) (sequence2 cl:null)) nil)
+(defmethod zip ((sequence1 cl:cons) (sequence2 cl:cons)) (mapcar 'cl:cons sequence1 sequence2))
+
+(defmethod zip ((sequence1 cl:cons) (sequence2 cl:vector)) 
+  (loop for x in sequence1 for y across sequence2 collect (cons x y)))
+
+(defmethod zip ((sequence1 cl:cons) (sequence2 wb-seq)) 
+  (loop for x in sequence1 for y from 0 below (fset:size sequence2) 
+     collect (cons x (fset:@ sequence2 y))))
+
+(defmethod zip ((sequence1 cl:vector) (sequence2 cl:null)) (vector))
+
+(defmethod zip ((sequence1 cl:vector) (sequence2 cl:cons))
+  (as 'cl:vector 
+      (loop for x across sequence1 for y in sequence2 collect (cons x y))))
+
+(defmethod zip ((sequence1 cl:vector) (sequence2 cl:vector))
+  (as 'cl:vector 
+      (loop for x across sequence1 for y across sequence2 collect (cons x y))))
+
+(defmethod zip ((sequence1 cl:vector) (sequence2 wb-seq))
+  (as 'cl:vector
+      (loop for x across sequence1 for y from 0 below (fset:size sequence2) 
+         collect (cons x (fset:@ sequence2 y)))))
+
+(defmethod zip ((sequence1 cl:string) (sequence2 cl:null)) "")
+
+(defmethod zip ((sequence1 wb-seq) (sequence2 cl:null)) (wb-seq))
+
+(defmethod zip ((sequence1 wb-seq) (sequence2 cl:cons)) 
+  (as 'wb-seq
+   (loop for x from 0 below (fset:size sequence1) for y in sequence2
+      collect (cons (fset:@ sequence1 x) y))))
+
+(defmethod zip ((sequence1 wb-seq) (sequence2 cl:vector)) 
+  (as 'wb-seq
+      (loop for x from 0 below (fset:size sequence1) for y across sequence2
+         collect (cons (fset:@ sequence1 x) y))))
+
+(defmethod zip ((sequence1 wb-seq) (sequence2 wb-seq)) 
+  (as 'wb-seq
+      (loop for x from 0 below (fset:size sequence1) for y from 0 below (fset:size sequence2)
+         collect (cons (fset:@ sequence1 x)
+                       (fset:@ sequence2 y)))))

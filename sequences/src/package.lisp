@@ -12,14 +12,18 @@
 (in-package :cl-user)
 
 (defpackage :net.bardcode.folio.sequences
-  (:use :cl :net.bardcode.folio.as :net.bardcode.folio.make)
-  (:shadow :append :count :count-if :count-if-not :find :find-if :find-if-not :first :last :length 
-           :mismatch :position :position-if :position-if-not 
-           :remove :remove-duplicates :remove-if :remove-if-not
-           :search :sequence :sort :stable-sort  :substitute :substitute-if :substitute-if-not)
+  (:use :cl :net.bardcode.folio.as :net.bardcode.folio.make :net.bardcode.folio.pairs)
+  (:shadow :acons :assoc :assoc-if :assoc-if-not :append
+           :count :count-if :count-if-not
+           :find :find-if :find-if-not :first
+           :last :length 
+           :mismatch
+           :position :position-if :position-if-not 
+           :reduce :remove :remove-duplicates :remove-if :remove-if-not :rest :reverse
+           :search :sequence :second :sort :stable-sort :substitute :substitute-if :substitute-if-not)
   (:import-from :fset :wb-seq)
   (:export
-   :add-first :add-last :any :append
+   :acons :add-first :add-last :any :append :assoc
    :binary-append :binary-join :by
    :count :count-if :count-if-not
    :drop :drop-while
