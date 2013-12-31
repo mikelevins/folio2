@@ -43,6 +43,16 @@
   sequence)
 
 ;;; ---------------------------------------------------------------------
+;;; copying
+;;; ---------------------------------------------------------------------
+
+(defmethod deep-copy ((sequence wb-seq) &key &allow-other-keys) 
+  (fset:image 'deep-copy sequence))
+
+(defmethod shallow-copy ((sequence wb-seq) &key &allow-other-keys) 
+  (fset:image 'cl:identity sequence))
+
+;;; ---------------------------------------------------------------------
 ;;; constructions: make
 ;;; ---------------------------------------------------------------------
 
@@ -162,6 +172,27 @@
 (defmethod binary-append ((sequence1 wb-seq) (sequence2 cl:cons)) (fset:concat sequence1 sequence2))
 (defmethod binary-append ((sequence1 wb-seq) (sequence2 cl:vector)) (fset:concat sequence1 sequence2))
 (defmethod binary-append ((sequence1 wb-seq) (sequence2 wb-seq)) (fset:concat sequence1 sequence2))
+
+;;; function apportion [bounded]
+;;;
+;;; (apportion seq &rest fn1 fn2 fn3...) => seq1 seq2 seq3...
+;;; ---------------------------------------------------------------------
+;;; returns a number of sequences equal to the number of FUNCTIONS.
+;;; the elements of SEQ1 are those elements of seq for which FN1
+;;; returns true; the elements of SEQ2 are those elements of seq for
+;;; which FN2 returns true; and so on
+
+(defmethod apportion ((seq null) &rest fns) nil)
+
+(defmethod apportion ((seq cl:sequence) &rest fns)
+  (apply #'values (cl:map 'cl:list
+                          (lambda (fn)(cl:remove-if-not fn seq))
+                          fns)))
+
+(defmethod apportion ((seq wb-seq) &rest fns)
+  (apply #'values (cl:map 'cl:list
+                          (lambda (fn)(fset:remove-if-not fn seq))
+                          fns)))
 
 ;;; function assoc [bounded]
 ;;;
@@ -299,6 +330,26 @@
 
 (defun count-if-not (predicate sequence &key (start 0) end (key 'cl:identity)) 
   (count-if (cl:complement predicate) sequence :start start :end end :key key))
+
+;;; function dispose [bounded]
+;;;
+;;; (dispose seq &rest fn1 fn2 fn3...) => seq1 seq2 seq3...
+;;; ---------------------------------------------------------------------
+;;; returns a number of sequences equal to the number of FUNCTIONS.
+;;; the elements of SEQ1 are the results of (fn1 x), where x is an element
+;;; of SEQ; the elements of SEQ2 are the results of (fn2 x); and so on
+
+(defmethod dispose ((seq null) &rest fns) nil)
+
+(defmethod dispose ((seq cl:sequence) &rest fns)
+  (apply #'values (cl:map 'cl:list
+                          (lambda (fn)(cl:map (cl:type-of seq) fn seq))
+                          fns)))
+
+(defmethod dispose ((seq wb-seq) &rest fns)
+  (apply #'values (cl:map 'cl:list
+                          (lambda (fn)(fset:image fn seq))
+                          fns)))
 
 ;;; function drop
 ;;;
@@ -726,41 +777,46 @@
 ;;; (prefix-match? prefix sequence &key test key) => Generalized Boolean
 ;;; ---------------------------------------------------------------------
 
-(defmethod prefix-match? ((prefix cl:null)(sequence cl:null) &key (test 'cl:eql) (key 'cl:identity)) t)
-(defmethod prefix-match? ((prefix cl:null)(sequence cl:sequence) &key (test 'cl:eql) (key 'cl:identity)) t)
-(defmethod prefix-match? ((prefix cl:null)(sequence wb-seq) &key (test 'cl:eql) (key 'cl:identity)) t)
+(defun %general-prefix-match (prefix sequence &key (test 'cl:equal) (key 'cl:identity))
+  (or (empty? prefix)
+      (and (<= (length prefix)
+               (length sequence))
+           (block searching
+             (progn
+               (loop for i from 0 below (length prefix)
+                  do (unless (funcall test
+                                      (funcall key (element prefix i))
+                                      (funcall key (element sequence i)))
+                       (return-from searching nil)))
+               t)))))
 
-(defmethod prefix-match? ((prefix cl:sequence)(sequence cl:null) &key (test 'cl:eql) (key 'cl:identity)) 
-  (empty? prefix))
+(defmethod prefix-match? (prefix sequence &key test key) nil)
 
-(defmethod prefix-match? ((prefix cl:sequence)(sequence cl:sequence) &key (test 'cl:eql) (key 'cl:identity)) 
-  (let ((pos (mismatch prefix sequence :test test :key key)))
-    (if pos
-        (>= pos (cl:length prefix))
-        t)))
+(defmethod prefix-match? ((prefix cl:null)(sequence cl:null) &key test key) t)
+(defmethod prefix-match? ((prefix cl:null)(sequence cl:sequence) &key test key) t)
+(defmethod prefix-match? ((prefix cl:null)(sequence wb-seq) &key test key) t)
 
-(defmethod prefix-match? ((prefix cl:sequence)(sequence wb-seq) &key (test 'cl:eql) (key 'cl:identity)) 
-  (let ((pos (mismatch prefix sequence :test test :key key)))
-    (if pos
-        (>= pos (cl:length prefix))
-        t)))
+(defmethod prefix-match? ((prefix cl:sequence)(sequence cl:null) &key test key)(empty? prefix))
 
-(defmethod prefix-match? ((prefix wb-seq)(sequence cl:null) &key (test 'cl:eql) (key 'cl:identity)) 
-  (empty? prefix))
+(defmethod prefix-match? ((prefix cl:sequence)(sequence cl:sequence) &key (test 'cl:equal) (key 'cl:identity)) 
+  (%general-prefix-match prefix sequence :test test :key key))
 
-(defmethod prefix-match? ((prefix wb-seq)(sequence cl:sequence) &key (test 'cl:eql) (key 'cl:identity)) 
-  (let ((pos (mismatch prefix sequence :test test :key key)))
-    (if pos
-        (>= pos (fset:size prefix))
-        t)))
+(defmethod prefix-match? ((prefix cl:sequence)(sequence wb-seq) &key (test 'cl:equal) (key 'cl:identity)) 
+  (%general-prefix-match prefix sequence :test test :key key))
 
-(defmethod prefix-match? ((prefix wb-seq)(sequence wb-seq) &key (test 'cl:eql) (key 'cl:identity)) 
-  (let ((pos (mismatch prefix sequence :test test :key key)))
-    (if pos
-        (>= pos (fset:size prefix))
-        t)))
 
-;;;range 
+(defmethod prefix-match? ((prefix wb-seq)(sequence cl:null) &key test key)(empty? prefix))
+
+(defmethod prefix-match? ((prefix wb-seq)(sequence cl:sequence) &key (test 'cl:equal) (key 'cl:identity)) 
+  (%general-prefix-match prefix sequence :test test :key key))
+
+(defmethod prefix-match? ((prefix wb-seq)(sequence wb-seq) &key (test 'cl:equal) (key 'cl:identity)) 
+  (%general-prefix-match prefix sequence :test test :key key))
+
+;;; function range [bounded]
+;;;
+;;; (range start end &key by) => sequence
+;;; ---------------------------------------------------------------------
 
 (defmethod range ((start integer) (end integer) &key (by 1))
   (let ((step by))
@@ -768,17 +824,16 @@
         (loop for i from start below end by step collect i)
         (loop for i downfrom start above end by step collect i))))
 
-;;;reduce  [bounded]
+;;; function reduce [bounded]
+;;;
+;;; (reduce fn sequence &key key initial-value) => sequence'
+;;; ---------------------------------------------------------------------
 
 (defmethod reduce (fn (sequence cl:sequence) &key (key 'cl:identity) (initial-value nil))
   (cl:reduce fn sequence :key key :initial-value initial-value))
 
 (defmethod reduce (fn (sequence wb-seq) &key (key 'cl:identity) (initial-value nil))
   (fset:reduce fn sequence :key key :initial-value initial-value))
-
-;;;remove
-;;;remove-if
-;;;remove-if-not
 
 ;;; function remove [bounded]
 ;;;
@@ -900,22 +955,347 @@
 (defmethod second ((sequence wb-seq))
   (fset:@ sequence 1))
 
-;;;select 
-;;;sequence 
-;;;sequence? 
-;;;shuffle  [bounded]
-;;;some?  [bounded]
-;;;sort  [bounded]
-;;;split  [bounded]
-;;;stable-sort [bounded]
-;;;subsequence  [bounded]
-;;;substitute 
-;;;substitute-if 
-;;;substitute-if-not 
-;;;suffix-match? [bounded]  
-;;;tail 
-;;;tails 
+;;; function select
+;;;
+;;; (select sequence1 sequence2 &key key test) => sequence3
+;;; ---------------------------------------------------------------------
 
+;;; null
+(defmethod select ((sequence1 cl:null)(sequence2 cl:null) &key (key 'cl:identity) (test 'cl:eql)) nil)
+(defmethod select ((sequence1 cl:null)(sequence2 cl:cons) &key (key 'cl:identity) (test 'cl:eql)) nil)
+(defmethod select ((sequence1 cl:null)(sequence2 cl:vector) &key (key 'cl:identity) (test 'cl:eql)) (vector))
+(defmethod select ((sequence1 cl:null)(sequence2 wb-seq) &key (key 'cl:identity) (test 'cl:eql)) (wb-seq))
+
+;;; cons
+(defmethod select ((sequence1 cl:cons)(sequence2 cl:null) &key (key 'cl:identity) (test 'cl:eql)) nil)
+
+(defmethod select ((sequence1 cl:cons)(sequence2 cl:cons) &key (key 'cl:identity) (test 'cl:eql)) 
+  (mapcar (lambda (x)(cl:elt sequence2 x)) sequence1))
+
+(defmethod select ((sequence1 cl:cons)(sequence2 cl:vector) &key (key 'cl:identity) (test 'cl:eql)) 
+  (as 'cl:vector (mapcar (lambda (x)(cl:elt sequence2 x)) sequence1)))
+
+(defmethod select ((sequence1 cl:cons)(sequence2 cl:string) &key (key 'cl:identity) (test 'cl:eql)) 
+  (let ((result (mapcar (lambda (x)(cl:elt sequence2 x)) sequence1)))
+    (if (cl:every 'cl:characterp result)
+        (cl:coerce result 'cl:string)
+        (cl:coerce result 'cl:vector))))
+
+(defmethod select ((sequence1 cl:cons)(sequence2 wb-seq) &key (key 'cl:identity) (test 'cl:eql)) 
+  (as 'wb-seq (mapcar (lambda (x)(element sequence2 x)) sequence1)))
+
+;;; vector
+(defmethod select ((sequence1 cl:vector)(sequence2 cl:null) &key (key 'cl:identity) (test 'cl:eql)) nil)
+
+(defmethod select ((sequence1 cl:vector)(sequence2 cl:cons) &key (key 'cl:identity) (test 'cl:eql)) 
+  (loop for i across sequence1 collect (cl:elt sequence2 i)))
+
+(defmethod select ((sequence1 cl:vector)(sequence2 cl:vector) &key (key 'cl:identity) (test 'cl:eql)) 
+  (as 'cl:vector (loop for i across sequence1 collect (cl:elt sequence2 i))))
+
+(defmethod select ((sequence1 cl:vector)(sequence2 cl:string) &key (key 'cl:identity) (test 'cl:eql)) 
+  (let ((result (loop for i across sequence1 collect (cl:elt sequence2 i))))
+    (if (cl:every 'cl:characterp result)
+        (cl:coerce result 'cl:string)
+        result)))
+
+(defmethod select ((sequence1 cl:vector)(sequence2 wb-seq) &key (key 'cl:identity) (test 'cl:eql)) 
+  (as 'wb-seq (loop for i across sequence1 collect (element sequence2 i))))
+
+;;; wb-seq
+(defmethod select ((sequence1 wb-seq)(sequence2 cl:null) &key (key 'cl:identity) (test 'cl:eql)) nil)
+
+(defmethod select ((sequence1 wb-seq)(sequence2 cl:cons) &key (key 'cl:identity) (test 'cl:eql)) 
+  (loop for i from 0 below (fset:size sequence1) collect (cl:elt sequence2 (fset:@ sequence1 i))))
+
+(defmethod select ((sequence1 wb-seq)(sequence2 cl:vector) &key (key 'cl:identity) (test 'cl:eql)) 
+  (as 'cl:vector (loop for i from 0 below (fset:size sequence1) collect (cl:elt sequence2 (fset:@ sequence1 i)))))
+
+(defmethod select ((sequence1 wb-seq)(sequence2 cl:string) &key (key 'cl:identity) (test 'cl:eql)) 
+  (let ((result (loop for i from 0 below (fset:size sequence1) collect (cl:elt sequence2 (fset:@ sequence1 i)))))
+    (if (cl:every 'cl:characterp result)
+        (cl:coerce result 'cl:string)
+        result)))
+
+(defmethod select ((sequence1 wb-seq)(sequence2 wb-seq) &key (key 'cl:identity) (test 'cl:eql)) 
+  (as 'wb-seq (loop for i from 0 below (fset:size sequence1) collect (fset:@ sequence2 (fset:@ sequence1 i)))))
+
+;;;sequence 
+
+;;; function sequence
+;;;
+;;; (sequence &rest elements) => sequence
+;;; ---------------------------------------------------------------------
+
+(defun sequence (&rest elements)
+  (as 'cl:vector elements))
+
+;;; function sequence?
+;;;
+;;; (sequence? thing) => Boolean
+;;; ---------------------------------------------------------------------
+
+(defmethod sequence? (thing) nil)
+(defmethod sequence? ((thing cl:null)) t)
+(defmethod sequence? ((thing cl:cons)) t)
+(defmethod sequence? ((thing wb-seq)) t)
+
+;;; function shuffle  [bounded]
+;;;
+;;; (shuffle sequence) => sequence'
+;;; ---------------------------------------------------------------------
+
+(defmethod shuffle ((sequence cl:null)) nil)
+(defmethod shuffle ((sequence cl:sequence)) (cl:sort (copy sequence) (lambda (x y)(cl:elt '(nil t)(random 2)))))
+(defmethod shuffle ((sequence wb-seq)) (fset:sort sequence (lambda (x y)(cl:elt '(nil t)(random 2)))))
+
+;;;some?  [bounded]
+
+;;; function some?  [bounded]
+;;;
+;;; (some? predicate sequence &rest sequences) => anything
+;;; ---------------------------------------------------------------------
+
+(defun some? (predicate sequence &rest sequences) 
+  (let* ((sequences (cons sequence sequences))
+         (lens (mapcar 'length sequences))
+         (len (apply 'cl:min lens)))
+    (block searching
+      (loop for i from 0 below len
+         do (let* ((args (mapcar (lambda (s)(element s i)) sequences))
+                   (result (apply predicate args)))
+              (when result (return-from searching result))
+              nil)))))
+
+;;; function sort  [bounded]
+;;;
+;;; (sort sequence predicate &key key) => sequence'
+;;; ---------------------------------------------------------------------
+
+(defmethod sort ((sequence cl:null) predicate &key (key 'cl:identity)) nil)
+
+(defmethod sort ((sequence cl:sequence) predicate &key (key 'cl:identity))
+  (cl:sort (copy sequence) predicate :key key))
+
+(defmethod sort ((sequence wb-seq) predicate &key (key 'cl:identity))
+  (fset:sort sequence predicate :key key))
+
+;;; function split  [bounded]
+;;;
+;;; (split sequence sentinel &key key test) => sequence'
+;;; ---------------------------------------------------------------------
+
+;;; null
+(defmethod split ((sequence cl:null)(sentinel cl:null) &key (key 'cl:identity)(test 'cl:eql)) nil)
+(defmethod split ((sequence cl:null)(sentinel cl:cons) &key (key 'cl:identity)(test 'cl:eql)) nil)
+(defmethod split ((sequence cl:null)(sentinel cl:vector) &key (key 'cl:identity)(test 'cl:eql)) nil)
+(defmethod split ((sequence cl:null)(sentinel wb-seq) &key (key 'cl:identity)(test 'cl:eql)) nil)
+
+;;; cons
+(defmethod split ((sequence cl:cons)(sentinel cl:null) &key (key 'cl:identity)(test 'cl:eql)) 
+  (by 1 sequence))
+
+(defmethod split ((sequence cl:cons)(sentinel cl:cons) &key (key 'cl:identity)(test 'cl:eql)) 
+  (if (empty? sentinel)
+      (by 1 sequence)
+      (if (< (length sequence)
+             (length sentinel))
+          (list sequence)
+          (let ((pos (search sentinel sequence :key key :test test)))
+            (if pos
+                (cons (cl:subseq sequence 0 pos)
+                      (split (cl:subseq sequence (+ pos (length sentinel)))
+                             sentinel :key key :test test))
+                (list sequence))))))
+
+(defmethod split ((sequence cl:cons)(sentinel cl:vector) &key (key 'cl:identity)(test 'cl:eql)) 
+  (if (empty? sentinel)
+      (by 1 sequence)
+      (split sequence (as 'cl:list sentinel) :key key :test test)))
+
+(defmethod split ((sequence cl:cons)(sentinel wb-seq) &key (key 'cl:identity)(test 'cl:eql)) 
+  (if (empty? sentinel)
+      (by 1 sequence)
+      (split sequence (as 'cl:list sentinel) :key key :test test)))
+
+;;; vector
+(defmethod split ((sequence cl:vector)(sentinel cl:null) &key (key 'cl:identity)(test 'cl:eql)) 
+  (by 1 sequence))
+
+(defmethod split ((sequence cl:vector)(sentinel cl:cons) &key (key 'cl:identity)(test 'cl:eql)) 
+  (split sequence (as 'cl:vector sentinel)))
+
+(defmethod split ((sequence cl:vector)(sentinel cl:vector) &key (key 'cl:identity)(test 'cl:eql)) 
+  (if (empty? sentinel)
+      (by 1 sequence)
+      (if (< (length sequence)
+             (length sentinel))
+          (if (empty? sequence)
+              (cl:vector)
+              (cl:vector sequence))
+          (let ((pos (search sentinel sequence :key key :test test)))
+            (if pos
+                (concatenate 'cl:vector
+                             (cl:vector (cl:subseq sequence 0 pos))
+                             (split (cl:subseq sequence (+ pos (length sentinel)))
+                                    sentinel :key key :test test))
+                (if (empty? sequence)
+                    (cl:vector)
+                    (cl:vector sequence)))))))
+
+(defmethod split ((sequence cl:vector)(sentinel wb-seq) &key (key 'cl:identity)(test 'cl:eql)) 
+  (split sequence (as 'cl:vector sentinel)))
+
+;;; wb-seq
+(defmethod split ((sequence wb-seq)(sentinel cl:null) &key (key 'cl:identity)(test 'cl:eql)) 
+  (by 1 sequence))
+
+(defmethod split ((sequence wb-seq)(sentinel cl:cons) &key (key 'cl:identity)(test 'cl:eql)) 
+  (split sequence (as 'wb-seq sentinel)))
+
+(defmethod split ((sequence wb-seq)(sentinel cl:vector) &key (key 'cl:identity)(test 'cl:eql)) 
+  (split sequence (as 'wb-seq sentinel)))
+
+(defmethod split ((sequence wb-seq)(sentinel wb-seq) &key (key 'cl:identity)(test 'cl:eql)) 
+  (if (empty? sentinel)
+      (by 1 sequence)
+      (if (< (length sequence)
+             (length sentinel))
+          (if (empty? sequence)
+              (wb-seq)
+              (wb-seq sequence))
+          (let ((pos (search sentinel sequence :key key :test test)))
+            (if pos
+                (fset:concat
+                 (wb-seq (fset:subseq sequence 0 pos))
+                 (split (fset::subseq sequence (+ pos (length sentinel)))
+                        sentinel :key key :test test))
+                (if (empty? sequence)
+                    (wb-seq)
+                    (wb-seq sequence)))))))
+
+;;; function subsequence  [bounded]
+;;;
+;;; (subsequence sequence start &optional end) => sequence'
+;;; ---------------------------------------------------------------------
+
+(defmethod subsequence ((sequence cl:sequence) (start integer) &optional (end nil))
+  (let ((end (or end (length sequence))))
+    (cl:subseq sequence start end)))
+
+(defmethod subsequence ((sequence wb-seq) (start integer) &optional (end nil))
+  (let ((end (or end (length sequence))))
+    (fset:subseq sequence start end)))
+
+;;; function substitute  [bounded]
+;;;
+;;; (substitute new-item old-item sequence &key key) => sequence'
+;;; ---------------------------------------------------------------------
+
+(defmethod substitute (new-item old-item (sequence cl:sequence) &key (key 'cl:identity))
+  (cl:substitute new-item old-item sequence :key key))
+
+(defmethod substitute (new-item old-item (sequence wb-seq) &key (key 'cl:identity))
+  (fset:substitute new-item old-item sequence :key key))
+
+;;; function substitute-if  [bounded]
+;;;
+;;; (substitute-if new-item predicate sequence &key key) => sequence'
+;;; ---------------------------------------------------------------------
+
+(defmethod substitute-if (new-item predicate (sequence cl:sequence) &key (key 'cl:identity))
+  (cl:substitute-if new-item predicate sequence :key key))
+
+(defmethod substitute-if (new-item predicate (sequence wb-seq) &key (key 'cl:identity))
+  (fset:substitute-if new-item predicate sequence :key key))
+
+;;; function substitute-if-not  [bounded]
+;;;
+;;; (substitute-if-not new-item predicate sequence &key key) => sequence'
+;;; ---------------------------------------------------------------------
+
+(defmethod substitute-if-not (new-item predicate (sequence cl:sequence) &key (key 'cl:identity))
+  (cl:substitute-if new-item (cl:complement predicate) sequence :key key))
+
+(defmethod substitute-if-not (new-item predicate (sequence wb-seq) &key (key 'cl:identity))
+  (fset:substitute-if new-item (cl:complement predicate) sequence :key key))
+
+;;; function suffix-match? [bounded]  
+;;;
+;;; (suffix-match? sequence suffix &key test key) => Generalized Boolean
+;;; ---------------------------------------------------------------------
+
+(defun %general-suffix-match (sequence suffix &key (test 'cl:equal) (key 'cl:identity))
+  (or (empty? suffix)
+      (let* ((sufflen (length suffix))
+             (seqlen (length sequence))
+             (suffstart (- seqlen sufflen)))
+        (and (<= sufflen seqlen)
+             (block searching
+               (progn
+                 (loop for i from 0 below (length suffix)
+                    do (unless (funcall test
+                                        (funcall key (element suffix i))
+                                        (funcall key (element sequence (+ suffstart i))))
+                         (return-from searching nil)))
+                 t))))))
+
+(defmethod suffix-match? (sequence suffix &key test key) nil)
+
+(defmethod suffix-match? ((sequence cl:null)(suffix cl:null) &key test key) t)
+(defmethod suffix-match? ((sequence cl:sequence)(suffix cl:null) &key test key) t)
+(defmethod suffix-match? ((sequence wb-seq)(suffix cl:null) &key test key) t)
+
+(defmethod suffix-match? ((sequence cl:null)(suffix cl:sequence) &key test key)(empty? suffix))
+
+(defmethod suffix-match? ((sequence cl:sequence)(suffix cl:sequence) &key (test 'cl:equal) (key 'cl:identity)) 
+  (%general-suffix-match sequence suffix :test test :key key))
+
+(defmethod suffix-match? ((sequence wb-seq)(suffix cl:sequence) &key (test 'cl:equal) (key 'cl:identity)) 
+  (%general-suffix-match sequence suffix :test test :key key))
+
+
+(defmethod suffix-match? ((sequence cl:null)(suffix wb-seq) &key test key)(empty? suffix))
+
+(defmethod suffix-match? ((sequence cl:sequence)(suffix wb-seq) &key (test 'cl:equal) (key 'cl:identity)) 
+  (%general-suffix-match sequence suffix :test test :key key))
+
+(defmethod suffix-match? ((sequence wb-seq)(suffix wb-seq) &key (test 'cl:equal) (key 'cl:identity)) 
+  (%general-suffix-match sequence suffix :test test :key key))
+
+;;; function tail
+;;;
+;;; (tail sequence) => anything
+;;; ---------------------------------------------------------------------
+
+(defmethod tail ((sequence cl:null))
+  nil)
+
+(defmethod tail ((sequence cl:sequence))
+  (cl:subseq sequence 1))
+
+(defmethod tail ((sequence wb-seq))
+  (fset:subseq sequence 1))
+
+;;; function tails
+;;;
+;;; (tails sequence &key by) => list
+;;; ---------------------------------------------------------------------
+
+(defun %general-tails-by (sequence step)
+  (let ((indexes (range 0 (length sequence) :by step)))
+    (loop for i in indexes collect (subsequence sequence i))))
+
+(defmethod tails ((sequence cl:null) &key by) nil)
+
+(defmethod tails ((sequence cl:cons) &key (by 1)) 
+  (%general-tails-by sequence by))
+
+(defmethod tails ((sequence cl:vector) &key (by 1)) 
+  (%general-tails-by sequence by))
+
+(defmethod tails ((sequence wb-seq) &key (by 1)) 
+  (%general-tails-by sequence by))
 
 ;;; function take
 ;;;
@@ -924,12 +1304,56 @@
 
 (defmethod take ((n (eql 0))(sequence cl:null)) nil)
 (defmethod take ((n integer)(sequence cl:null)) (error "Can't take ~s items from NIL" n))
-(defmethod take ((n integer)(sequence cl:sequence))(cl:subseq sequence 0 n))
-(defmethod take ((n integer)(sequence wb-seq))(fset:subseq sequence 0 n))
+(defmethod take ((n integer)(sequence cl:sequence))(cl:subseq sequence 0 (cl:min n (length sequence))))
+(defmethod take ((n integer)(sequence wb-seq))(fset:subseq sequence 0 (cl:min n (length sequence))))
 
-;;;take-by 
-;;;take-while
-;;;unzip 
+;;; function take
+;;;
+;;; (take-by m n sequence) => sequences
+;;; ---------------------------------------------------------------------
+
+(defmethod take-by ((m (eql 0))(n (eql 0))(sequence cl:null)) nil)
+(defmethod take-by ((m integer)(n integer)(sequence cl:null)) (error "Can't take-by ~s ~s items from NIL" m n))
+
+(defmethod take-by ((m integer)(n integer)(sequence cl:sequence))
+  (mapcar (lambda (s)(take m s))
+          (tails sequence :by n)))
+
+(defmethod take-by ((m integer)(n integer)(sequence wb-seq))
+  (mapcar (lambda (s)(take m s))
+          (tails sequence :by n)))
+
+;;; function take-while
+;;;
+;;; (take-while predicate sequence) => sequence'
+;;; ---------------------------------------------------------------------
+
+(defmethod take-while (predicate (sequence cl:null)) nil)
+
+(defmethod take-while (predicate (sequence cl:sequence)) 
+  (let ((pos (position-if-not predicate sequence)))
+    (if pos
+        (subsequence sequence 0 pos)
+        sequence)))
+
+(defmethod take-while (predicate (sequence wb-seq)) 
+  (let ((pos (position-if-not predicate sequence)))
+    (if pos
+        (subsequence sequence 0 pos)
+        sequence)))
+
+;;; function unzip
+;;;
+;;; (unzip sequence1) => sequence2, sequence3
+;;; ---------------------------------------------------------------------
+
+(defmethod unzip ((sequence cl:null))(values nil nil))
+
+(defmethod unzip ((sequence cl:sequence))
+  (dispose sequence 'left 'right))
+
+(defmethod unzip ((sequence wb-seq))
+  (dispose sequence 'left 'right))
 
 ;;; function wb-seq
 ;;;
