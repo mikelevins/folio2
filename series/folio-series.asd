@@ -19,10 +19,13 @@
   :license "Lisp Lesser GNU Public License"
   :depends-on (:net.bardcode.folio.as
                :net.bardcode.folio.make
+               :net.bardcode.folio.sequences
+               :net.bardcode.folio.pairs
                :fset :series)
   :components ((:module "src"
                         :serial t
                         :components ((:file "package")
+                                     (:file "syntax")
                                      (:file "functions")))))
 
 (asdf:defsystem :net.bardcode.folio.series.tests
@@ -32,8 +35,7 @@
   :depends-on (:net.bardcode.folio.series :lift)
   :components ((:module "tests"
                         :serial t
-                        :components ((:file "series")
-                                     (:file "series")))))
+                        :components ((:file "series")))))
 
 (defun load-series ()
   (asdf:oos 'asdf:load-op :net.bardcode.folio.series))

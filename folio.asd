@@ -17,10 +17,39 @@
   :serial t
   :description "the folio umbrella system"
   :license "Lisp Lesser GNU Public License"
-  :depends-on (:net.bardcode.folio.as :net.bardcode.folio.make))
+  :depends-on (:fset :series :alexandria 
+                     :net.bardcode.folio.as
+                     :net.bardcode.folio.boxes
+                     :net.bardcode.folio.comparisons
+                     :net.bardcode.folio.copy
+                     :net.bardcode.folio.functions
+                     :net.bardcode.folio.make
+                     :net.bardcode.folio.maps
+                     :net.bardcode.folio.pairs
+                     :net.bardcode.folio.sequences
+                     :net.bardcode.folio.series
+                     ;;:net.bardcode.folio.sets
+                     ;;:net.bardcode.folio.taps
+                     )
+  :components ((:file "package")))
 
 
 (defun load-folio ()
-  (asdf:oos 'asdf:load-op :net.bardcode.folio))
+  (let* ((project-root (slot-value (asdf:find-system :net.bardcode.folio) 'asdf::absolute-pathname))
+         (sysdefs (list (merge-pathnames "as/folio-as.asd" project-root)
+                        (merge-pathnames "boxes/folio-boxes.asd" project-root)
+                        (merge-pathnames "comparisons/folio-comparisons.asd" project-root)
+                        (merge-pathnames "copy/folio-copy.asd" project-root)
+                        (merge-pathnames "functions/folio-functions.asd" project-root)
+                        (merge-pathnames "make/folio-make.asd" project-root)
+                        (merge-pathnames "maps/folio-maps.asd" project-root)
+                        (merge-pathnames "pairs/folio-pairs.asd" project-root)
+                        (merge-pathnames "sequences/folio-sequences.asd" project-root)
+                        (merge-pathnames "series/folio-series.asd" project-root)
+                        ;;(merge-pathnames "sets/folio-sets.asd" project-root)
+                        ;;(merge-pathnames "taps/folio-taps.asd" project-root)
+                        )))
+    (dolist (def sysdefs)(load def))
+    (asdf:oos 'asdf:load-op :net.bardcode.folio)))
 
 ;;; (load-folio)

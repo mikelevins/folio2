@@ -139,40 +139,6 @@
 (defun append (&rest sequences)
   (cl:reduce 'binary-append sequences))
 
-;;; function binary-append [bounded]
-;;;
-;;; (binary-append sequence1 sequence2) => sequence3
-;;; ---------------------------------------------------------------------
-
-(defmethod binary-append ((sequence1 cl:null) (sequence2 cl:null)) nil)
-(defmethod binary-append ((sequence1 cl:null) (sequence2 cl:cons)) sequence2)
-(defmethod binary-append ((sequence1 cl:null) (sequence2 cl:vector)) (coerce sequence2 'cl:list))
-(defmethod binary-append ((sequence1 cl:null) (sequence2 wb-seq)) (as 'cl:list sequence2))
-
-(defmethod binary-append ((sequence1 cl:cons) (sequence2 cl:null)) sequence1)
-(defmethod binary-append ((sequence1 cl:cons) (sequence2 cl:cons)) (cl:append sequence1 sequence2))
-(defmethod binary-append ((sequence1 cl:cons) (sequence2 cl:vector)) (cl:concatenate 'cl:list sequence1 sequence2))
-(defmethod binary-append ((sequence1 cl:cons) (sequence2 wb-seq)) (cl:append sequence1 (as 'cl:list sequence2)))
-
-(defmethod binary-append ((sequence1 cl:vector) (sequence2 cl:null)) sequence1)
-(defmethod binary-append ((sequence1 cl:vector) (sequence2 cl:cons))(cl:concatenate 'cl:vector sequence1 sequence2))
-(defmethod binary-append ((sequence1 cl:vector) (sequence2 cl:vector))(cl:concatenate 'cl:vector sequence1 sequence2))
-(defmethod binary-append ((sequence1 cl:vector) (sequence2 wb-seq))
-    (cl:concatenate 'cl:vector sequence1 (as 'cl:vector sequence2)))
-
-(defmethod binary-append ((sequence1 cl:string) (sequence2 cl:null)) sequence1)
-(defmethod binary-append ((sequence1 cl:string) (sequence2 cl:sequence))
-  (if (cl:every 'cl:characterp sequence2)
-      (cl:concatenate 'cl:string sequence1 sequence2)
-      (cl:concatenate 'cl:vector sequence1 sequence2)))
-(defmethod binary-append ((sequence1 cl:string) (sequence2 wb-seq))
-  (binary-append sequence1 (as 'cl:vector sequence2)))
-
-(defmethod binary-append ((sequence1 wb-seq) (sequence2 cl:null)) sequence1)
-(defmethod binary-append ((sequence1 wb-seq) (sequence2 cl:cons)) (fset:concat sequence1 sequence2))
-(defmethod binary-append ((sequence1 wb-seq) (sequence2 cl:vector)) (fset:concat sequence1 sequence2))
-(defmethod binary-append ((sequence1 wb-seq) (sequence2 wb-seq)) (fset:concat sequence1 sequence2))
-
 ;;; function apportion [bounded]
 ;;;
 ;;; (apportion seq &rest fn1 fn2 fn3...) => seq1 seq2 seq3...
@@ -256,6 +222,40 @@
 (defun assoc-if-not (predicate sequence &key (key 'cl:identity))
   (assoc-if (complement predicate) sequence :key key))
 
+;;; function binary-append [bounded]
+;;;
+;;; (binary-append sequence1 sequence2) => sequence3
+;;; ---------------------------------------------------------------------
+
+(defmethod binary-append ((sequence1 cl:null) (sequence2 cl:null)) nil)
+(defmethod binary-append ((sequence1 cl:null) (sequence2 cl:cons)) sequence2)
+(defmethod binary-append ((sequence1 cl:null) (sequence2 cl:vector)) (coerce sequence2 'cl:list))
+(defmethod binary-append ((sequence1 cl:null) (sequence2 wb-seq)) (as 'cl:list sequence2))
+
+(defmethod binary-append ((sequence1 cl:cons) (sequence2 cl:null)) sequence1)
+(defmethod binary-append ((sequence1 cl:cons) (sequence2 cl:cons)) (cl:append sequence1 sequence2))
+(defmethod binary-append ((sequence1 cl:cons) (sequence2 cl:vector)) (cl:concatenate 'cl:list sequence1 sequence2))
+(defmethod binary-append ((sequence1 cl:cons) (sequence2 wb-seq)) (cl:append sequence1 (as 'cl:list sequence2)))
+
+(defmethod binary-append ((sequence1 cl:vector) (sequence2 cl:null)) sequence1)
+(defmethod binary-append ((sequence1 cl:vector) (sequence2 cl:cons))(cl:concatenate 'cl:vector sequence1 sequence2))
+(defmethod binary-append ((sequence1 cl:vector) (sequence2 cl:vector))(cl:concatenate 'cl:vector sequence1 sequence2))
+(defmethod binary-append ((sequence1 cl:vector) (sequence2 wb-seq))
+    (cl:concatenate 'cl:vector sequence1 (as 'cl:vector sequence2)))
+
+(defmethod binary-append ((sequence1 cl:string) (sequence2 cl:null)) sequence1)
+(defmethod binary-append ((sequence1 cl:string) (sequence2 cl:sequence))
+  (if (cl:every 'cl:characterp sequence2)
+      (cl:concatenate 'cl:string sequence1 sequence2)
+      (cl:concatenate 'cl:vector sequence1 sequence2)))
+(defmethod binary-append ((sequence1 cl:string) (sequence2 wb-seq))
+  (binary-append sequence1 (as 'cl:vector sequence2)))
+
+(defmethod binary-append ((sequence1 wb-seq) (sequence2 cl:null)) sequence1)
+(defmethod binary-append ((sequence1 wb-seq) (sequence2 cl:cons)) (fset:concat sequence1 sequence2))
+(defmethod binary-append ((sequence1 wb-seq) (sequence2 cl:vector)) (fset:concat sequence1 sequence2))
+(defmethod binary-append ((sequence1 wb-seq) (sequence2 wb-seq)) (fset:concat sequence1 sequence2))
+
 ;;; function by
 ;;;
 ;;; (by n sequence) => sequences
@@ -331,7 +331,7 @@
 (defun count-if-not (predicate sequence &key (start 0) end (key 'cl:identity)) 
   (count-if (cl:complement predicate) sequence :start start :end end :key key))
 
-;;; function dispose [bounded]
+;;; function dispose
 ;;;
 ;;; (dispose seq &rest fn1 fn2 fn3...) => seq1 seq2 seq3...
 ;;; ---------------------------------------------------------------------
@@ -699,7 +699,7 @@
 (defmethod mismatch ((sequence1 wb-seq)(sequence2 wb-seq) &key (test 'cl:eql) (key 'cl:identity) (start1 0) (start2 0) end1 end2) 
   (mismatch (as 'cl:vector sequence1)(as 'cl:vector sequence2) :test test :key key :start1 start1 :start2 start2 :end1 end1 :end2 end2))
 
-;;; function partition  [bounded]
+;;; function partition 
 ;;;
 ;;; (partition predicate sequence1) => sequence2, sequence3
 ;;; ---------------------------------------------------------------------
@@ -835,9 +835,9 @@
 (defmethod reduce (fn (sequence wb-seq) &key (key 'cl:identity) (initial-value nil))
   (fset:reduce fn sequence :key key :initial-value initial-value))
 
-;;; function remove [bounded]
+;;; function remove
 ;;;
-;;; (remove item sequence &key test start end key) => anything
+;;; (remove item sequence &key test start end key) => sequence'
 ;;; ---------------------------------------------------------------------
 
 (defmethod remove (item (sequence cl:null) &key (test 'eql) (start 0) end (key 'cl:identity)) 
@@ -850,9 +850,9 @@
   (let ((sequence (fset:subseq sequence start end)))
     (fset:remove item sequence :key key :test test)))
 
-;;; function remove-if [bounded]
+;;; function remove-if
 ;;;
-;;; (remove-if predicate sequence &key start end key) => anything
+;;; (remove-if predicate sequence &key start end key) => sequence'
 ;;; ---------------------------------------------------------------------
 
 (defmethod remove-if (predicate (sequence cl:null) &key (start 0) end (key 'cl:identity)) 
@@ -865,12 +865,12 @@
   (let ((sequence (fset:subseq sequence start end)))
     (fset:remove-if predicate sequence :start start :end end :key key)))
 
-;;; function remove-if-not [bounded]
+;;; function remove-if-not
 ;;;
 ;;; (remove-if-not predicate sequence &key start end key) => anything
 ;;; ---------------------------------------------------------------------
 
-(defun remove-if-not (predicate sequence &key (start 0) end (key 'cl:identity)) 
+(defmethod remove-if-not (predicate sequence &key (start 0) end (key 'cl:identity)) 
   (remove-if (cl:complement predicate) :start start :end end :key key))
 
 ;;; function remove-duplicates [bounded]
@@ -1174,7 +1174,7 @@
                     (wb-seq)
                     (wb-seq sequence)))))))
 
-;;; function subsequence  [bounded]
+;;; function subsequence 
 ;;;
 ;;; (subsequence sequence start &optional end) => sequence'
 ;;; ---------------------------------------------------------------------
@@ -1187,18 +1187,18 @@
   (let ((end (or end (length sequence))))
     (fset:subseq sequence start end)))
 
-;;; function substitute  [bounded]
+;;; function substitute
 ;;;
 ;;; (substitute new-item old-item sequence &key key) => sequence'
 ;;; ---------------------------------------------------------------------
 
-(defmethod substitute (new-item old-item (sequence cl:sequence) &key (key 'cl:identity))
-  (cl:substitute new-item old-item sequence :key key))
+(defmethod substitute (new-item old-item (sequence cl:sequence) &key (test 'cl:eql) (key 'cl:identity))
+  (cl:substitute new-item old-item sequence :test test :key key))
 
 (defmethod substitute (new-item old-item (sequence wb-seq) &key (key 'cl:identity))
   (fset:substitute new-item old-item sequence :key key))
 
-;;; function substitute-if  [bounded]
+;;; function substitute-if
 ;;;
 ;;; (substitute-if new-item predicate sequence &key key) => sequence'
 ;;; ---------------------------------------------------------------------
@@ -1209,7 +1209,7 @@
 (defmethod substitute-if (new-item predicate (sequence wb-seq) &key (key 'cl:identity))
   (fset:substitute-if new-item predicate sequence :key key))
 
-;;; function substitute-if-not  [bounded]
+;;; function substitute-if-not
 ;;;
 ;;; (substitute-if-not new-item predicate sequence &key key) => sequence'
 ;;; ---------------------------------------------------------------------
@@ -1307,7 +1307,7 @@
 (defmethod take ((n integer)(sequence cl:sequence))(cl:subseq sequence 0 (cl:min n (length sequence))))
 (defmethod take ((n integer)(sequence wb-seq))(fset:subseq sequence 0 (cl:min n (length sequence))))
 
-;;; function take
+;;; function take-by
 ;;;
 ;;; (take-by m n sequence) => sequences
 ;;; ---------------------------------------------------------------------

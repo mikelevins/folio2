@@ -21,7 +21,7 @@
            :mismatch
            :position :position-if :position-if-not 
            :reduce :remove :remove-duplicates :remove-if :remove-if-not :rest :reverse
-           :search :sequence :second :sort :stable-sort :substitute :substitute-if :substitute-if-not)
+           :search :sequence :second :sort :substitute :substitute-if :substitute-if-not)
   (:import-from :fset :wb-seq)
   (:export
    :acons :add-first :add-last :any :append :apportion :assoc
@@ -37,7 +37,7 @@
    :make :mismatch
    :partition :penult :position :position-if :position-if-not :prefix-match?
    :range :reduce :remove :remove-duplicates  :remove-if :remove-if-not :rest :reverse
-   :search :second :select :sequence :sequence? :shallow-copy :shuffle :some? :sort :stable-sort
+   :search :second :select :sequence :sequence? :shallow-copy :shuffle :some? :sort
    :split :subsequence :substitute :substitute-if :substitute-if-not :suffix-match?
    :tail :tails :take :take-by :take-while
    :unzip 
