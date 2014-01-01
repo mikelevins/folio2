@@ -28,9 +28,7 @@
                      :net.bardcode.folio.pairs
                      :net.bardcode.folio.sequences
                      :net.bardcode.folio.series
-                     ;;:net.bardcode.folio.sets
-                     ;;:net.bardcode.folio.taps
-                     )
+                     :net.bardcode.folio.taps)
   :components ((:file "package")))
 
 
@@ -46,9 +44,7 @@
                         (merge-pathnames "pairs/folio-pairs.asd" project-root)
                         (merge-pathnames "sequences/folio-sequences.asd" project-root)
                         (merge-pathnames "series/folio-series.asd" project-root)
-                        ;;(merge-pathnames "sets/folio-sets.asd" project-root)
-                        ;;(merge-pathnames "taps/folio-taps.asd" project-root)
-                        )))
+                        (merge-pathnames "taps/folio-taps.asd" project-root))))
     (dolist (def sysdefs)(load def))
     (asdf:oos 'asdf:load-op :net.bardcode.folio)))
 

@@ -36,20 +36,18 @@
     (values (filter 'long-enough? starts)
             (filter 'long-enough? parts))))
 
-(defmethod choose-segment ((start string)(parts sequence))
-  (any (filter (partial 'prefix-match? (leave 2 segment))
-               parts)))
-
-(defmethod name-builder ((parts sequence))
-  (lambda (name)
-    (let ((segment (choose-segment name parts)))
+(defun make-name-extender (parts)
+  (lambda (start)
+    (let ((segment (any (filter (partial 'prefix-match? (leave 2 start)))
+                        parts)))
       (if segment
-          (append name (drop 2 segment))
+          (append start (drop 2 segment))
           nil))))
 
+(defparameter extend-name (make-name-extender parts))
+
 (defmethod build-name ((starts sequence)(parts sequence))
-  (take-while 'something?
-              (iterate (name-builder parts) (any starts))))
+  (take-while 'something (iterate extend-name (any starts))))
 
 (defmethod names ((path string) &optional (number 10))
   (multiple-value-bind (starts parts)(rules path)

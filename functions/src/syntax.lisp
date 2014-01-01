@@ -85,6 +85,6 @@
   (let ((arg (gensym)))
     `(series:scan-fn t
                      (lambda () ,init)
-                     (lambda (,arg) (,fn ,arg)))))
+                     (lambda (,arg) (funcall ,fn ,arg)))))
 
 
