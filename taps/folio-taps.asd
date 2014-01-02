@@ -17,7 +17,7 @@
   :serial t
   :description "operations on taps of values"
   :license "Lisp Lesser GNU Public License"
-  :depends-on (:fset
+  :depends-on (:fset :closer-mop
                :net.bardcode.folio.as
                :net.bardcode.folio.make
                :net.bardcode.folio.maps

@@ -22,9 +22,9 @@
               `(cl:cons ,(car first) ,(cdr first)))
             (%expand-alist-pairs (cdr pairs)))))
 
-(defmethod %merge-alists ((alist1 cl:null)(alist2 cl:null) &key test) nil)
-(defmethod %merge-alists ((alist1 cl:cons)(alist2 cl:null) &key test) alist1)
-(defmethod %merge-alists ((alist1 cl:null)(alist2 cl:cons) &key test) alist2)
+(defmethod %merge-alists ((alist1 cl:null)(alist2 cl:null) &key test)(declare (ignore test)) nil)
+(defmethod %merge-alists ((alist1 cl:cons)(alist2 cl:null) &key test)(declare (ignore test)) alist1)
+(defmethod %merge-alists ((alist1 cl:null)(alist2 cl:cons) &key test)(declare (ignore test)) alist2)
 
 (defmethod %merge-alists ((alist1 cl:cons)(alist2 cl:cons) &key (test 'eql))
   (append alist2 (set-difference alist1 alist2 :key 'car :test test)))
@@ -159,7 +159,7 @@
 
 (defmethod keys ((x cl:cons))
   (cond
-    ((plist? x)(loop for tail on x by 'cddr collect (car tail)))
+    ((plist? x)(loop for tail on x by #'cddr collect (car tail)))
     ((alist? x)(mapcar 'car x))
     (t (error "Not a valid map: ~s" x))))
 
@@ -179,7 +179,7 @@
 
 (defmethod make ((type (eql 'alist)) &key (contents nil) &allow-other-keys)
   (let ((plist (apply 'plist contents)))
-    (loop for tail on plist by 'cddr collect (cons (car tail)(cadr tail)))))
+    (loop for tail on plist by #'cddr collect (cons (car tail)(cadr tail)))))
 
 (defmethod make ((type (eql 'wb-map)) &key (contents nil) &allow-other-keys)
   (fset:convert 'wb-map (make 'alist :contents contents)))
@@ -189,7 +189,7 @@
 ;;; (map? thing) => Generalized Boolean
 ;;; ---------------------------------------------------------------------
 
-(defmethod map? (x) nil)
+(defmethod map? (x)(declare (ignore x)) nil)
 (defmethod map? ((x wb-map)) t)
 
 (defmethod map? ((x cons)) 
@@ -202,15 +202,19 @@
 ;;; ---------------------------------------------------------------------
 
 (defmethod merge ((map1 cl:null) (map2 cl:null) &key test &allow-other-keys)
+  (declare (ignore map1 map2 test))
   nil)
 
 (defmethod merge ((map1 cl:null) (map2 cl:cons) &key test &allow-other-keys)
+  (declare (ignore map1 test))
   map2)
 
 (defmethod merge ((map1 cl:null) (map2 wb-map) &key test &allow-other-keys)
+  (declare (ignore map1 test))
   (as 'plist map2))
 
 (defmethod merge ((map1 cl:cons) (map2 cl:null) &key test &allow-other-keys)
+  (declare (ignore map2 test))
   map1)
 
 (defmethod merge ((map1 cl:cons) (map2 cl:cons) &key (test 'eql) &allow-other-keys)
@@ -220,9 +224,10 @@
     (t (error "Not a valid map: ~s" map1))))
 
 (defmethod merge ((map1 cl:cons) (map2 wb-map) &key test &allow-other-keys)
-  (merge map1 (as 'alist map2)))
+  (merge map1 (as 'alist map2) :test test))
 
-(defmethod merge ((map1 wb-map)(map2 cl:null)  &key &allow-other-keys)
+(defmethod merge ((map1 wb-map)(map2 cl:null) &key test &allow-other-keys)
+  (declare (ignore map2 test))
   map1)
 
 (defmethod merge ((map1 wb-map) (map2 cl:cons) &key &allow-other-keys)
@@ -266,7 +271,7 @@
 
 (defmethod values ((x cl:cons))
   (cond
-    ((plist? x)(loop for tail on x by 'cddr collect (cadr tail)))
+    ((plist? x)(loop for tail on x by #'cddr collect (cadr tail)))
     ((alist? x)(mapcar 'cdr x))
     (t (error "Not a valid map: ~s" x))))
 

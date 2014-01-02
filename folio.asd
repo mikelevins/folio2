@@ -33,7 +33,9 @@
 
 
 (defun load-folio ()
-  (let* ((project-root (slot-value (asdf:find-system :net.bardcode.folio) 'asdf::absolute-pathname))
+  (let* ((asdf:*compile-file-warnings-behaviour* #+sbcl :ignore #-sbcl :warn)
+         (asdf:*compile-file-failure-behaviour* #+sbcl :ignore #-sbcl :warn)
+         (project-root (slot-value (asdf:find-system :net.bardcode.folio) 'asdf::absolute-pathname))
          (sysdefs (list (merge-pathnames "as/folio-as.asd" project-root)
                         (merge-pathnames "boxes/folio-boxes.asd" project-root)
                         (merge-pathnames "comparisons/folio-comparisons.asd" project-root)

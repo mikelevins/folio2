@@ -1,4 +1,4 @@
-g;;;; ***********************************************************************
+;;;; ***********************************************************************
 ;;;; FILE IDENTIFICATION
 ;;;;
 ;;;; Name:          package.lisp
@@ -13,6 +13,8 @@ g;;;; ***********************************************************************
 
 (defpackage :net.bardcode.folio.taps
   (:use :cl :net.bardcode.folio.as :net.bardcode.folio.make)
+  (:import-from :fset :wb-map :wb-seq)
+  (:import-from :net.bardcode.folio.maps :alist :alist? :plist :plist?)
   (:export
    :characters
    :elements

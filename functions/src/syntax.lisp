@@ -33,7 +33,7 @@
 ;;; where v1 is (h1 (g1 (f1 a))), and so on for the other values.
 
 (defmacro -> (&rest fns)
-  (let ((args (loop for fn in fns collecting (gensym))))
+  (let ((args (mapcar (lambda (ignored)(declare (ignore ignored))(gensym)) fns)))
     `(lambda (,@args)
        (apply 'values
               (mapcar (lambda (fn arg)(funcall fn arg))
@@ -64,7 +64,7 @@
 (defmacro cascade (args &rest fns)
   (if (null fns)
       `(values ,@args)
-      (let ((params (loop for arg in args collecting (gensym)))
+      (let ((params (mapcar (lambda (ignored)(declare (ignore ignored))(gensym)) fns))
             (fn (car fns))
             (more-fns (cdr fns)))
         `(multiple-value-bind (,@params)(funcall ,fn ,@args)

@@ -150,6 +150,7 @@
 (defun %make-toggle (&rest args)
   (let ((state t))
     (lambda (&rest args)
+      (declare (ignore args))
       (setf state (not state)))))
 
 (defmethod interleave ((sequence1 foundation-series)(sequence2 cl:null))(series))
@@ -202,7 +203,9 @@
 ;;; there is no practical way to determine whether an unbounded
 ;;; prefix matches an unbounded series
 
-(defmethod prefix-match? ((prefix cl:null)(sequence foundation-series) &key test key) t)
+(defmethod prefix-match? ((prefix cl:null)(sequence foundation-series) &key test key)
+  (declare (ignore test key))
+  t)
 
 (defmethod prefix-match? ((prefix cl:sequence)(sequence foundation-series) &key (test 'cl:eql) (key 'cl:identity)) 
   (series:collect-and (series:map-fn t
@@ -292,12 +295,12 @@
 
 ;;; function select
 ;;;
-;;; (select sequence1 sequence2 &key key test) => sequence3
+;;; (select sequence1 sequence2) => sequence3
 ;;; ---------------------------------------------------------------------
 
-(defmethod select ((sequence1 cl:null)(sequence2 foundation-series) &key (key 'cl:identity) (test 'cl:eql)) (series))
+(defmethod select ((sequence1 cl:null)(sequence2 foundation-series))(series))
 
-(defmethod select ((sequence1 cl:sequence)(sequence2 foundation-series) &key (key 'cl:identity) (test 'cl:eql))
+(defmethod select ((sequence1 cl:sequence)(sequence2 foundation-series))
   (series:choose (series:mask (scan sequence1))
                  sequence2))
 
@@ -478,6 +481,6 @@
 ;;; (series? thing) => Boolean
 ;;; ---------------------------------------------------------------------
 
-(defmethod series? (thing) nil)
+(defmethod series? (thing)(declare (ignore thing)) nil)
 (defmethod series? ((thing foundation-series)) t)
 

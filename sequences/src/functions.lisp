@@ -148,7 +148,9 @@
 ;;; returns true; the elements of SEQ2 are those elements of seq for
 ;;; which FN2 returns true; and so on
 
-(defmethod apportion ((seq null) &rest fns) nil)
+(defmethod apportion ((seq null) &rest fns)
+  (declare (ignore fns))
+  nil)
 
 (defmethod apportion ((seq cl:sequence) &rest fns)
   (apply #'values (cl:map 'cl:list
@@ -166,6 +168,7 @@
 ;;; ---------------------------------------------------------------------
 
 (defmethod assoc (item (sequence cl:null) &key (key 'cl:identity) (test 'cl:eql))
+  (declare (ignore item sequence key test))
   nil)
 
 (defmethod assoc (item (sequence cl:cons) &key (key 'cl:identity) (test 'cl:eql))
@@ -193,6 +196,7 @@
 ;;; ---------------------------------------------------------------------
 
 (defmethod assoc-if (predicate (sequence cl:null) &key (key 'cl:identity))
+  (declare (ignore predicate sequence key))
   nil)
 
 (defmethod assoc-if (predicate (sequence cl:cons) &key (key 'cl:identity))
@@ -295,6 +299,7 @@
 ;;; ---------------------------------------------------------------------
 
 (defmethod count (item (sequence cl:null) &key start end key test) 
+  (declare (ignore item sequence start end key test))
   0)
 
 (defmethod count (item (sequence cl:sequence) &key (start 0) end (key 'cl:identity) (test 'cl:eql)) 
@@ -310,6 +315,7 @@
 ;;; ---------------------------------------------------------------------
 
 (defmethod count-if (predicate (sequence cl:null) &key start end key) 
+  (declare (ignore predicate sequence start end key))
   0)
 
 (defmethod count-if (predicate (sequence cl:sequence) &key (start 0) end (key 'cl:identity)) 
@@ -339,7 +345,9 @@
 ;;; the elements of SEQ1 are the results of (fn1 x), where x is an element
 ;;; of SEQ; the elements of SEQ2 are the results of (fn2 x); and so on
 
-(defmethod dispose ((seq null) &rest fns) nil)
+(defmethod dispose ((seq null) &rest fns)
+  (declare (ignore seq fns))
+  nil)
 
 (defmethod dispose ((seq cl:sequence) &rest fns)
   (apply #'values (cl:map 'cl:list
@@ -366,7 +374,7 @@
 ;;; (drop-while predicate sequence) => sequence'
 ;;; ---------------------------------------------------------------------
 
-(defmethod drop-while (predicate (sequence cl:null)) nil)
+(defmethod drop-while (predicate (sequence cl:null))(declare (ignore predicate sequence)) nil)
 (defmethod drop-while (predicate (sequence cl:sequence))
   (let ((pos (count-if predicate sequence)))
     (if pos
@@ -415,7 +423,9 @@
 ;;; (filter x sequence) => sequence'
 ;;; ---------------------------------------------------------------------
 
-(defmethod filter (predicate (sequence cl:null)) nil)
+(defmethod filter (predicate (sequence cl:null)) 
+  (declare (ignore predicate))
+  nil)
 
 (defmethod filter (predicate (sequence cl:sequence))
   (cl:remove-if-not predicate sequence))
@@ -429,6 +439,7 @@
 ;;; ---------------------------------------------------------------------
 
 (defmethod find (item (sequence cl:null) &key (test 'eql) (start 0) end (key 'cl:identity)) 
+  (declare (ignore item sequence test start end key))
   nil)
 
 (defmethod find (item (sequence cl:sequence) &key (test 'eql) (start 0) end (key 'cl:identity))
@@ -444,6 +455,7 @@
 ;;; ---------------------------------------------------------------------
 
 (defmethod find-if (predicate (sequence cl:null) &key (start 0) end (key 'cl:identity)) 
+  (declare (ignore predicate start end key))
   nil)
 
 (defmethod find-if (predicate (sequence cl:sequence) &key (start 0) end (key 'cl:identity))
@@ -495,6 +507,7 @@
 ;;; ---------------------------------------------------------------------
 
 (defmethod image (function (sequence cl:null))
+  (declare (ignore function sequence))
   nil)
 
 (defmethod image (function (sequence cl:cons))
@@ -518,7 +531,7 @@
   nil)
 
 (defmethod indexes ((sequence cl:cons))
-  (loop for i from 0 for it in sequence collect i))
+  (loop for i from 0 below (cl:length sequence) collect i))
 
 (defmethod indexes ((sequence cl:vector))
   (loop for i from 0 below (cl:length sequence) collect i))
@@ -581,7 +594,9 @@
 ;;; (interpose item sequence) => sequence'
 ;;; ---------------------------------------------------------------------
 
-(defmethod interpose (item (sequence cl:null)) nil)
+(defmethod interpose (item (sequence cl:null))
+  (declare (ignore item sequence))
+  nil)
 
 (defmethod interpose (item (sequence cl:cons)) 
   (if (null (cdr sequence))
@@ -648,21 +663,21 @@
 
 (defmethod leave ((n integer)(sequence cl:null)) 
   (cond
-    ((< n 0)(error "Can't leave fewer than 0 elements" n))
+    ((< n 0)(error "Can't leave fewer than 0 elements"))
     ((= n 0) nil)
     (t (error "NIL has fewer than ~s elements" n))))
 
 (defmethod leave ((n integer)(sequence cl:sequence)) 
   (let ((len (cl:length sequence)))
     (cond
-      ((< n 0)(error "Can't leave fewer than 0 elements" n))
+      ((< n 0)(error "Can't leave fewer than 0 elements"))
       ((<= n len)(cl:subseq sequence (- len n) len))
       (t (error "Sequence has fewer than ~s elements" n)))))
 
 (defmethod leave ((n integer)(sequence wb-seq)) 
   (let ((len (fset:size sequence)))
     (cond
-      ((< n 0)(error "Can't leave fewer than 0 elements" n))
+      ((< n 0)(error "Can't leave fewer than 0 elements"))
       ((<= n len)(fset:subseq sequence (- len n) len))
       (t (error "Sequence has fewer than ~s elements" n)))))
 
@@ -685,6 +700,7 @@
 ;;; ---------------------------------------------------------------------
 
 (defmethod mismatch ((sequence1 cl:null)(sequence2 cl:null) &key test key start1 start2 end1 end2) 
+  (declare (ignore sequence1 sequence2 test key start1 start2 end1 end2))
   nil)
 
 (defmethod mismatch ((sequence1 cl:sequence)(sequence2 cl:sequence) &key (test 'cl:eql) (key 'cl:identity) (start1 0) (start2 0) end1 end2) 
@@ -705,6 +721,7 @@
 ;;; ---------------------------------------------------------------------
 
 (defmethod partition (predicate (sequence cl:null)) 
+  (declare (ignore predicate sequence))
   (values nil nil))
 
 (defmethod partition (predicate (sequence cl:sequence))
@@ -740,6 +757,7 @@
 ;;; ---------------------------------------------------------------------
 
 (defmethod position (item (sequence cl:null) &key (test 'eql) (start 0) end (key 'cl:identity)) 
+  (declare (ignore item sequence test start end key))
   nil)
 
 (defmethod position (item (sequence cl:sequence) &key (test 'eql) (start 0) end (key 'cl:identity))
@@ -755,6 +773,7 @@
 ;;; ---------------------------------------------------------------------
 
 (defmethod position-if (predicate (sequence cl:null) &key (start 0) end (key 'cl:identity)) 
+  (declare (ignore predicate sequence start end key))
   nil)
 
 (defmethod position-if (predicate (sequence cl:sequence) &key (start 0) end (key 'cl:identity))
@@ -790,13 +809,17 @@
                        (return-from searching nil)))
                t)))))
 
-(defmethod prefix-match? (prefix sequence &key test key) nil)
+(defmethod prefix-match? (prefix sequence &key test key) 
+  (declare (ignore prefix sequence test key))
+  nil)
 
-(defmethod prefix-match? ((prefix cl:null)(sequence cl:null) &key test key) t)
-(defmethod prefix-match? ((prefix cl:null)(sequence cl:sequence) &key test key) t)
-(defmethod prefix-match? ((prefix cl:null)(sequence wb-seq) &key test key) t)
+(defmethod prefix-match? ((prefix cl:null)(sequence cl:null) &key test key)(declare (ignore prefix sequence test key)) t)
+(defmethod prefix-match? ((prefix cl:null)(sequence cl:sequence) &key test key)(declare (ignore prefix sequence test key)) t)
+(defmethod prefix-match? ((prefix cl:null)(sequence wb-seq) &key test key)(declare (ignore prefix sequence test key)) t)
 
-(defmethod prefix-match? ((prefix cl:sequence)(sequence cl:null) &key test key)(empty? prefix))
+(defmethod prefix-match? ((prefix cl:sequence)(sequence cl:null) &key test key)
+  (declare (ignore test key))
+  (empty? prefix))
 
 (defmethod prefix-match? ((prefix cl:sequence)(sequence cl:sequence) &key (test 'cl:equal) (key 'cl:identity)) 
   (%general-prefix-match prefix sequence :test test :key key))
@@ -805,7 +828,9 @@
   (%general-prefix-match prefix sequence :test test :key key))
 
 
-(defmethod prefix-match? ((prefix wb-seq)(sequence cl:null) &key test key)(empty? prefix))
+(defmethod prefix-match? ((prefix wb-seq)(sequence cl:null) &key test key)
+  (declare (ignore test key))
+  (empty? prefix))
 
 (defmethod prefix-match? ((prefix wb-seq)(sequence cl:sequence) &key (test 'cl:equal) (key 'cl:identity)) 
   (%general-prefix-match prefix sequence :test test :key key))
@@ -841,6 +866,7 @@
 ;;; ---------------------------------------------------------------------
 
 (defmethod remove (item (sequence cl:null) &key (test 'eql) (start 0) end (key 'cl:identity)) 
+  (declare (ignore item sequence test start end key))
   nil)
 
 (defmethod remove (item (sequence cl:sequence) &key (test 'eql) (start 0) end (key 'cl:identity))
@@ -856,6 +882,7 @@
 ;;; ---------------------------------------------------------------------
 
 (defmethod remove-if (predicate (sequence cl:null) &key (start 0) end (key 'cl:identity)) 
+  (declare (ignore predicate start end key))
   nil)
 
 (defmethod remove-if (predicate (sequence cl:sequence) &key (start 0) end (key 'cl:identity))
@@ -871,7 +898,7 @@
 ;;; ---------------------------------------------------------------------
 
 (defmethod remove-if-not (predicate sequence &key (start 0) end (key 'cl:identity)) 
-  (remove-if (cl:complement predicate) :start start :end end :key key))
+  (remove-if (cl:complement predicate) sequence :start start :end end :key key))
 
 ;;; function remove-duplicates [bounded]
 ;;;
@@ -879,10 +906,11 @@
 ;;; ---------------------------------------------------------------------
 
 (defmethod remove-duplicates ((sequence cl:null) &key (test 'eql) (start 0) end (key 'cl:identity)) 
+  (declare (ignore test start end key))
   nil)
 
 (defmethod remove-duplicates ((sequence cl:sequence) &key (test 'eql) (start 0) end (key 'cl:identity)) 
-  (cl:remove-duplicates :test test :start start :end end :key key))
+  (cl:remove-duplicates sequence :test test :start start :end end :key key))
 
 (defmethod remove-duplicates ((sequence wb-seq) &key (test 'eql) (start 0) end (key 'cl:identity)) 
   (as 'wb-seq (cl:remove-duplicates (as 'cl:vector sequence) :test test :start start :end end :key key)))
@@ -920,11 +948,20 @@
 ;;; (search sequence1 sequence2 &key start1 end1 start2 end2 test key) => Generalized Boolean
 ;;; ---------------------------------------------------------------------
 
-(defmethod search ((sequence1 cl:null)(sequence2 cl:null) &key (start1 0) end1 (start2 0) end2 (test 'cl:equal) (key 'cl:identity)) 0)
-(defmethod search ((sequence1 cl:null)(sequence2 cl:sequence) &key (start1 0) end1 (start2 0) end2 (test 'cl:equal) (key 'cl:identity)) 0)
-(defmethod search ((sequence1 cl:null)(sequence2 wb-seq) &key (start1 0) end1 (start2 0) end2 (test 'cl:equal) (key 'cl:identity)) 0)
+(defmethod search ((sequence1 cl:null)(sequence2 cl:null) &key (start1 0) end1 (start2 0) end2 (test 'cl:equal) (key 'cl:identity))
+  (declare (ignore sequence1 sequence2 start1 end1 start2 end2 test key))
+  0)
+
+(defmethod search ((sequence1 cl:null)(sequence2 cl:sequence) &key (start1 0) end1 (start2 0) end2 (test 'cl:equal) (key 'cl:identity)) 
+  (declare (ignore sequence1 sequence2 start1 end1 start2 end2 test key))
+  0)
+
+(defmethod search ((sequence1 cl:null)(sequence2 wb-seq) &key (start1 0) end1 (start2 0) end2 (test 'cl:equal) (key 'cl:identity)) 
+  (declare (ignore sequence1 sequence2 start1 end1 start2 end2 test key))
+  0)
 
 (defmethod search ((sequence1 cl:sequence)(sequence2 cl:null) &key (start1 0) end1 (start2 0) end2 (test 'cl:equal) (key 'cl:identity)) 
+  (declare (ignore sequence1 sequence2 start1 end1 start2 end2 test key))
   nil)
 
 (defmethod search ((sequence1 cl:sequence)(sequence2 cl:sequence) &key (start1 0) end1 (start2 0) end2 (test 'cl:equal) (key 'cl:identity)) 
@@ -933,7 +970,9 @@
 (defmethod search ((sequence1 cl:sequence)(sequence2 wb-seq) &key (start1 0) end1 (start2 0) end2 (test 'cl:equal) (key 'cl:identity)) 
   (cl:search sequence1 (as 'cl:vector sequence2) :start1 start1 :start2 start2 :end1 end1 :end2 end2 :test test :key key))
 
-(defmethod search ((sequence1 wb-seq)(sequence2 cl:null) &key (start1 0) end1 (start2 0) end2 (test 'cl:equal) (key 'cl:identity)) nil)
+(defmethod search ((sequence1 wb-seq)(sequence2 cl:null) &key (start1 0) end1 (start2 0) end2 (test 'cl:equal) (key 'cl:identity))
+  (declare (ignore start1 start2 end1 end2 test key))
+  nil)
 
 (defmethod search ((sequence1 wb-seq)(sequence2 cl:sequence) &key (start1 0) end1 (start2 0) end2 (test 'cl:equal) (key 'cl:identity)) 
   (cl:search (as 'cl:vector sequence1) sequence2 :start1 start1 :start2 start2 :end1 end1 :end2 end2 :test test :key key))
@@ -947,6 +986,7 @@
 ;;; ---------------------------------------------------------------------
 
 (defmethod second ((sequence cl:null))
+  (declare (ignore sequence))
   nil)
 
 (defmethod second ((sequence cl:sequence))
@@ -957,68 +997,41 @@
 
 ;;; function select
 ;;;
-;;; (select sequence1 sequence2 &key key test) => sequence3
+;;; (select sequence1 sequence2) => sequence3
 ;;; ---------------------------------------------------------------------
 
 ;;; null
-(defmethod select ((sequence1 cl:null)(sequence2 cl:null) &key (key 'cl:identity) (test 'cl:eql)) nil)
-(defmethod select ((sequence1 cl:null)(sequence2 cl:cons) &key (key 'cl:identity) (test 'cl:eql)) nil)
-(defmethod select ((sequence1 cl:null)(sequence2 cl:vector) &key (key 'cl:identity) (test 'cl:eql)) (vector))
-(defmethod select ((sequence1 cl:null)(sequence2 wb-seq) &key (key 'cl:identity) (test 'cl:eql)) (wb-seq))
+(defmethod select ((sequence1 cl:null)(sequence2 cl:null)) nil)
+(defmethod select ((sequence1 cl:null)(sequence2 cl:cons)) nil)
+(defmethod select ((sequence1 cl:null)(sequence2 cl:vector)) (vector))
+(defmethod select ((sequence1 cl:null)(sequence2 wb-seq)) (wb-seq))
 
 ;;; cons
-(defmethod select ((sequence1 cl:cons)(sequence2 cl:null) &key (key 'cl:identity) (test 'cl:eql)) nil)
+(defmethod select ((sequence1 cl:cons)(sequence2 cl:null)) nil)
 
-(defmethod select ((sequence1 cl:cons)(sequence2 cl:cons) &key (key 'cl:identity) (test 'cl:eql)) 
-  (mapcar (lambda (x)(cl:elt sequence2 x)) sequence1))
+(defmethod select ((sequence1 cl:cons)(sequence2 cl:sequence)) 
+  (loop for i in sequence1 collect (cl:elt sequence2 i)))
 
-(defmethod select ((sequence1 cl:cons)(sequence2 cl:vector) &key (key 'cl:identity) (test 'cl:eql)) 
-  (as 'cl:vector (mapcar (lambda (x)(cl:elt sequence2 x)) sequence1)))
-
-(defmethod select ((sequence1 cl:cons)(sequence2 cl:string) &key (key 'cl:identity) (test 'cl:eql)) 
-  (let ((result (mapcar (lambda (x)(cl:elt sequence2 x)) sequence1)))
-    (if (cl:every 'cl:characterp result)
-        (cl:coerce result 'cl:string)
-        (cl:coerce result 'cl:vector))))
-
-(defmethod select ((sequence1 cl:cons)(sequence2 wb-seq) &key (key 'cl:identity) (test 'cl:eql)) 
-  (as 'wb-seq (mapcar (lambda (x)(element sequence2 x)) sequence1)))
+(defmethod select ((sequence1 cl:cons)(sequence2 wb-seq)) 
+  (loop for i in sequence1 collect (fset:@ sequence2 i)))
 
 ;;; vector
-(defmethod select ((sequence1 cl:vector)(sequence2 cl:null) &key (key 'cl:identity) (test 'cl:eql)) nil)
+(defmethod select ((sequence1 cl:vector)(sequence2 cl:null)) nil)
 
-(defmethod select ((sequence1 cl:vector)(sequence2 cl:cons) &key (key 'cl:identity) (test 'cl:eql)) 
+(defmethod select ((sequence1 cl:vector)(sequence2 cl:sequence)) 
   (loop for i across sequence1 collect (cl:elt sequence2 i)))
 
-(defmethod select ((sequence1 cl:vector)(sequence2 cl:vector) &key (key 'cl:identity) (test 'cl:eql)) 
-  (as 'cl:vector (loop for i across sequence1 collect (cl:elt sequence2 i))))
-
-(defmethod select ((sequence1 cl:vector)(sequence2 cl:string) &key (key 'cl:identity) (test 'cl:eql)) 
-  (let ((result (loop for i across sequence1 collect (cl:elt sequence2 i))))
-    (if (cl:every 'cl:characterp result)
-        (cl:coerce result 'cl:string)
-        result)))
-
-(defmethod select ((sequence1 cl:vector)(sequence2 wb-seq) &key (key 'cl:identity) (test 'cl:eql)) 
-  (as 'wb-seq (loop for i across sequence1 collect (element sequence2 i))))
+(defmethod select ((sequence1 cl:vector)(sequence2 wb-seq)) 
+  (loop for i across sequence1 collect (fset:@ sequence2 i)))
 
 ;;; wb-seq
-(defmethod select ((sequence1 wb-seq)(sequence2 cl:null) &key (key 'cl:identity) (test 'cl:eql)) nil)
+(defmethod select ((sequence1 wb-seq)(sequence2 cl:null)) nil)
 
-(defmethod select ((sequence1 wb-seq)(sequence2 cl:cons) &key (key 'cl:identity) (test 'cl:eql)) 
-  (loop for i from 0 below (fset:size sequence1) collect (cl:elt sequence2 (fset:@ sequence1 i))))
+(defmethod select ((sequence1 wb-seq)(sequence2 cl:sequence)) 
+  (fset:convert 'cl:vector (fset:image (lambda (i)(fset:@ sequence2 i)) sequence1)))
 
-(defmethod select ((sequence1 wb-seq)(sequence2 cl:vector) &key (key 'cl:identity) (test 'cl:eql)) 
-  (as 'cl:vector (loop for i from 0 below (fset:size sequence1) collect (cl:elt sequence2 (fset:@ sequence1 i)))))
-
-(defmethod select ((sequence1 wb-seq)(sequence2 cl:string) &key (key 'cl:identity) (test 'cl:eql)) 
-  (let ((result (loop for i from 0 below (fset:size sequence1) collect (cl:elt sequence2 (fset:@ sequence1 i)))))
-    (if (cl:every 'cl:characterp result)
-        (cl:coerce result 'cl:string)
-        result)))
-
-(defmethod select ((sequence1 wb-seq)(sequence2 wb-seq) &key (key 'cl:identity) (test 'cl:eql)) 
-  (as 'wb-seq (loop for i from 0 below (fset:size sequence1) collect (fset:@ sequence2 (fset:@ sequence1 i)))))
+(defmethod select ((sequence1 wb-seq)(sequence2 wb-seq)) 
+  (fset:image (lambda (i)(fset:@ sequence2 i)) sequence1))
 
 ;;;sequence 
 
@@ -1035,19 +1048,19 @@
 ;;; (sequence? thing) => Boolean
 ;;; ---------------------------------------------------------------------
 
-(defmethod sequence? (thing) nil)
-(defmethod sequence? ((thing cl:null)) t)
-(defmethod sequence? ((thing cl:cons)) t)
-(defmethod sequence? ((thing wb-seq)) t)
+(defmethod sequence? (thing)(declare (ignore thing)) nil)
+(defmethod sequence? ((thing cl:null))(declare (ignore thing)) t)
+(defmethod sequence? ((thing cl:cons))(declare (ignore thing)) t)
+(defmethod sequence? ((thing wb-seq))(declare (ignore thing)) t)
 
 ;;; function shuffle  [bounded]
 ;;;
 ;;; (shuffle sequence) => sequence'
 ;;; ---------------------------------------------------------------------
 
-(defmethod shuffle ((sequence cl:null)) nil)
-(defmethod shuffle ((sequence cl:sequence)) (cl:sort (copy sequence) (lambda (x y)(cl:elt '(nil t)(random 2)))))
-(defmethod shuffle ((sequence wb-seq)) (fset:sort sequence (lambda (x y)(cl:elt '(nil t)(random 2)))))
+(defmethod shuffle ((sequence cl:null))(declare (ignore sequence)) nil)
+(defmethod shuffle ((sequence cl:sequence)) (cl:sort (copy sequence) (lambda (x y)(declare (ignore x y))(cl:elt '(nil t)(random 2)))))
+(defmethod shuffle ((sequence wb-seq)) (fset:sort sequence (lambda (x y)(declare (ignore x y))(cl:elt '(nil t)(random 2)))))
 
 ;;;some?  [bounded]
 
@@ -1072,7 +1085,9 @@
 ;;; (sort sequence predicate &key key) => sequence'
 ;;; ---------------------------------------------------------------------
 
-(defmethod sort ((sequence cl:null) predicate &key (key 'cl:identity)) nil)
+(defmethod sort ((sequence cl:null) predicate &key (key 'cl:identity)) 
+  (declare (ignore sequence predicate key))
+  nil)
 
 (defmethod sort ((sequence cl:sequence) predicate &key (key 'cl:identity))
   (cl:sort (copy sequence) predicate :key key))
@@ -1086,13 +1101,25 @@
 ;;; ---------------------------------------------------------------------
 
 ;;; null
-(defmethod split ((sequence cl:null)(sentinel cl:null) &key (key 'cl:identity)(test 'cl:eql)) nil)
-(defmethod split ((sequence cl:null)(sentinel cl:cons) &key (key 'cl:identity)(test 'cl:eql)) nil)
-(defmethod split ((sequence cl:null)(sentinel cl:vector) &key (key 'cl:identity)(test 'cl:eql)) nil)
-(defmethod split ((sequence cl:null)(sentinel wb-seq) &key (key 'cl:identity)(test 'cl:eql)) nil)
+(defmethod split ((sequence cl:null)(sentinel cl:null) &key (key 'cl:identity)(test 'cl:eql))
+  (declare (ignore key test))
+  nil)
+
+(defmethod split ((sequence cl:null)(sentinel cl:cons) &key (key 'cl:identity)(test 'cl:eql)) 
+  (declare (ignore key test))
+  nil)
+
+(defmethod split ((sequence cl:null)(sentinel cl:vector) &key (key 'cl:identity)(test 'cl:eql)) 
+  (declare (ignore key test))
+  nil)
+
+(defmethod split ((sequence cl:null)(sentinel wb-seq) &key (key 'cl:identity)(test 'cl:eql)) 
+  (declare (ignore key test))
+  nil)
 
 ;;; cons
 (defmethod split ((sequence cl:cons)(sentinel cl:null) &key (key 'cl:identity)(test 'cl:eql)) 
+  (declare (ignore key test))
   (by 1 sequence))
 
 (defmethod split ((sequence cl:cons)(sentinel cl:cons) &key (key 'cl:identity)(test 'cl:eql)) 
@@ -1120,10 +1147,11 @@
 
 ;;; vector
 (defmethod split ((sequence cl:vector)(sentinel cl:null) &key (key 'cl:identity)(test 'cl:eql)) 
+  (declare (ignore sentinel key test))
   (by 1 sequence))
 
 (defmethod split ((sequence cl:vector)(sentinel cl:cons) &key (key 'cl:identity)(test 'cl:eql)) 
-  (split sequence (as 'cl:vector sentinel)))
+  (split sequence (as 'cl:vector sentinel) :key key :test test))
 
 (defmethod split ((sequence cl:vector)(sentinel cl:vector) &key (key 'cl:identity)(test 'cl:eql)) 
   (if (empty? sentinel)
@@ -1144,17 +1172,18 @@
                     (cl:vector sequence)))))))
 
 (defmethod split ((sequence cl:vector)(sentinel wb-seq) &key (key 'cl:identity)(test 'cl:eql)) 
-  (split sequence (as 'cl:vector sentinel)))
+  (split sequence (as 'cl:vector sentinel) :key key :test test))
 
 ;;; wb-seq
 (defmethod split ((sequence wb-seq)(sentinel cl:null) &key (key 'cl:identity)(test 'cl:eql)) 
+  (declare (ignore sentinel key test))
   (by 1 sequence))
 
 (defmethod split ((sequence wb-seq)(sentinel cl:cons) &key (key 'cl:identity)(test 'cl:eql)) 
-  (split sequence (as 'wb-seq sentinel)))
+  (split sequence (as 'wb-seq sentinel) :key key :test test))
 
 (defmethod split ((sequence wb-seq)(sentinel cl:vector) &key (key 'cl:identity)(test 'cl:eql)) 
-  (split sequence (as 'wb-seq sentinel)))
+  (split sequence (as 'wb-seq sentinel) :key key :test test))
 
 (defmethod split ((sequence wb-seq)(sentinel wb-seq) &key (key 'cl:identity)(test 'cl:eql)) 
   (if (empty? sentinel)
@@ -1240,13 +1269,25 @@
                          (return-from searching nil)))
                  t))))))
 
-(defmethod suffix-match? (sequence suffix &key test key) nil)
+(defmethod suffix-match? (sequence suffix &key test key) 
+  (declare (ignore sequence suffix test key))
+  nil)
 
-(defmethod suffix-match? ((sequence cl:null)(suffix cl:null) &key test key) t)
-(defmethod suffix-match? ((sequence cl:sequence)(suffix cl:null) &key test key) t)
-(defmethod suffix-match? ((sequence wb-seq)(suffix cl:null) &key test key) t)
+(defmethod suffix-match? ((sequence cl:null)(suffix cl:null) &key test key)
+  (declare (ignore sequence suffix test key))
+  t)
 
-(defmethod suffix-match? ((sequence cl:null)(suffix cl:sequence) &key test key)(empty? suffix))
+(defmethod suffix-match? ((sequence cl:sequence)(suffix cl:null) &key test key)
+  (declare (ignore sequence suffix test key))
+  t)
+
+(defmethod suffix-match? ((sequence wb-seq)(suffix cl:null) &key test key)
+  (declare (ignore sequence suffix test key))
+  t)
+
+(defmethod suffix-match? ((sequence cl:null)(suffix cl:sequence) &key test key)
+  (declare (ignore test key))
+  (empty? suffix))
 
 (defmethod suffix-match? ((sequence cl:sequence)(suffix cl:sequence) &key (test 'cl:equal) (key 'cl:identity)) 
   (%general-suffix-match sequence suffix :test test :key key))
@@ -1255,7 +1296,9 @@
   (%general-suffix-match sequence suffix :test test :key key))
 
 
-(defmethod suffix-match? ((sequence cl:null)(suffix wb-seq) &key test key)(empty? suffix))
+(defmethod suffix-match? ((sequence cl:null)(suffix wb-seq) &key test key)
+  (declare (ignore test key))
+  (empty? suffix))
 
 (defmethod suffix-match? ((sequence cl:sequence)(suffix wb-seq) &key (test 'cl:equal) (key 'cl:identity)) 
   (%general-suffix-match sequence suffix :test test :key key))
@@ -1286,7 +1329,9 @@
   (let ((indexes (range 0 (length sequence) :by step)))
     (loop for i in indexes collect (subsequence sequence i))))
 
-(defmethod tails ((sequence cl:null) &key by) nil)
+(defmethod tails ((sequence cl:null) &key by) 
+  (declare (ignore sequence by))
+  nil)
 
 (defmethod tails ((sequence cl:cons) &key (by 1)) 
   (%general-tails-by sequence by))
@@ -1302,7 +1347,7 @@
 ;;; (take n sequence) => sequence'
 ;;; ---------------------------------------------------------------------
 
-(defmethod take ((n (eql 0))(sequence cl:null)) nil)
+(defmethod take ((n (eql 0))(sequence cl:null)) (declare (ignore n sequence)) nil)
 (defmethod take ((n integer)(sequence cl:null)) (error "Can't take ~s items from NIL" n))
 (defmethod take ((n integer)(sequence cl:sequence))(cl:subseq sequence 0 (cl:min n (length sequence))))
 (defmethod take ((n integer)(sequence wb-seq))(fset:subseq sequence 0 (cl:min n (length sequence))))
@@ -1328,7 +1373,7 @@
 ;;; (take-while predicate sequence) => sequence'
 ;;; ---------------------------------------------------------------------
 
-(defmethod take-while (predicate (sequence cl:null)) nil)
+(defmethod take-while (predicate (sequence cl:null))(declare (ignore predicate)) nil)
 
 (defmethod take-while (predicate (sequence cl:sequence)) 
   (let ((pos (position-if-not predicate sequence)))
@@ -1355,19 +1400,12 @@
 (defmethod unzip ((sequence wb-seq))
   (dispose sequence 'left 'right))
 
-;;; function wb-seq
-;;;
-;;; (wb-seq &rest elements) => sequence
-;;; ---------------------------------------------------------------------
-
-(defun wb-seq (&rest elements)(fset:convert 'fset:seq elements))
-
 ;;; function wb-seq?
 ;;;
 ;;; (wb-seq? thing) => Boolean
 ;;; ---------------------------------------------------------------------
 
-(defmethod wb-seq? (x) nil)
+(defmethod wb-seq? (x)(declare (ignore x)) nil)
 (defmethod wb-seq? ((x fset:seq)) t)
 
 ;;; function zip
@@ -1424,3 +1462,4 @@
       (loop for x from 0 below (fset:size sequence1) for y from 0 below (fset:size sequence2)
          collect (cons (fset:@ sequence1 x)
                        (fset:@ sequence2 y)))))
+

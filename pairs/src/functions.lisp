@@ -59,9 +59,9 @@
 ;;; ---------------------------------------------------------------------
 ;;; return a true value if VAL is a pair
 
-(defmethod pair? (val) nil)
-(defmethod pair? ((val null)) t)
-(defmethod pair? ((val cons)) t)
+(defmethod pair? (val)(declare (ignore val)) nil)
+(defmethod pair? ((val null))(declare (ignore val)) t)
+(defmethod pair? ((val cons))(declare (ignore val)) t)
 
 
 ;;; function right

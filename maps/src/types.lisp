@@ -17,7 +17,9 @@
 ;;; for the purposes of folio, an alist is a list all of whose
 ;;; elements are lists
 
-(defmethod alist? (thing) nil)
+(defmethod alist? (thing)
+  (declare (ignore thing))
+  nil)
 
 (defmethod alist? ((thing cons)) 
   (and thing
@@ -33,12 +35,14 @@
 ;;; for the purposes of folio, a plist is a list with an even number of
 ;;; elements whose even-indexed elements are atoms
 
-(defmethod plist? (thing) nil)
+(defmethod plist? (thing)
+    (declare (ignore thing))
+    nil)
 
 (defmethod plist? ((thing cons)) 
   (and thing
        (block testing
-         (loop for tail on thing by 'cddr
+         (loop for tail on thing by #'cddr
             do (unless (and (cdr tail)
                             (atom (car tail)))
                  (return-from testing nil)))
