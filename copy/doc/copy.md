@@ -1,50 +1,23 @@
 # copy
 
-A generic, extensible copying utility.
+A generic, extensible utility for comparing values.
 
-**Package:** `net.bardcode.folio.copy`<br>
-**Exports:** `copy`, `deep-copy`, `shallow-copy`
+**Package:** net.bardcode.folio.copy<br>
+**Exports:** copy deep-copy shallow-copy
 
-`copy` exports three symbols named `copy`, `deep-copy`, and
-`shallow-copy`. These symbols name generic functions that are intended
-to be imported and specialized as-needed to provide value-copying
-semantics.
+The **copy** package exports the extensible generic functions **copy**, **deep-copy**, and **shallow-copy**. By specializing these generic functions for your types you can provide copying semantics for them.
 
-Each of the provided generic functions has a lambda list with &key and
-&allow-other-keys keywords, so that specializations may introduce
-additional keywords to control copying strategies. The provided
-implementations of the generic functions do not use these keyword
-parameters.
+When specializing the copying operators, it's usually best to avoid changing the definition of **copy**, unless you know that you need behavior that's different from the default. The default behavior of **copy** is to call **shallow-copy**. Only if you're sure that's the wrong behavior should you specialize **copy**.
 
-The `copy` package is intended to work well with `use`; it exports
-only the three symbols, minimizing the chance of name conflicts.
+All three generic functions are defined to accept keword arguments, so that your specializations can use keyword parameters to exercise fine control over copying behavior.
 
 ## Reference
 
-**`copy`** *Generic function* 
+**copy** *value* &key &allow-other-keys  => Anything  &nbsp;&nbsp;&nbsp;&nbsp;[*Generic function*]<br>
+Returns a new copy of *value*. The default implementation of **copy** calls **shallow-copy**.
 
-`copy value &key &allow-other-keys => Anything`<br> 
-Returns a new copy of `value` using a default strategy for the type of
-`value`. The normal default strategy is shallow copy.
+**deep-copy=** *value* &key &allow-other-keys  => Anything  &nbsp;&nbsp;&nbsp;&nbsp;[*Generic function*]<br>
+Returns a new copy of *value* constructed by instantiating a value of the same type and initializing its slots or contents with new copies of the slots or contents in *value*. The slot contents or elements used in the new copy are themselves also new copies; they are not the values from the original *value*.
 
-**`deep copy`** *Generic function* 
-
-`deep-copy value &key &allow-other-keys => Anything`<br> 
-Returns a new copy of `value` using a strategy that recursively copies
-each and every component element of `value`. As an example, calling
-`deep-copy` on a list makes copies not only of the cons cells that
-form the list, but also of the elements of the list, and of any
-component parts of those values.
-
-**`shallow-copy`** *Generic function* 
-
-`shallow-copy value &key &allow-other-keys => Anything`<br> 
-Returns a new copy of `value` using a strategy that copies only the
-topmost element or elements of the value. As an example, applying
-`shallow-copy` to a list makes copies of the cons cells that for the
-spine of the list, but does not copy the elements of the list; the
-elements in the new list are EQ to the values that were in the
-original list.
-
-
-
+**shallow-copy** *value* &key &allow-other-keys  => Anything  &nbsp;&nbsp;&nbsp;&nbsp;[*Generic function*]<br>
+Returns a new copy of *value* constructed by instantiating a value of the same type and initializing its slots or contents with the slots or contents in *value*. Only the top-level *value* is copied. The slot contents or elements are the same values that were found in the original *value*, not copies. In other words, if you **shallow-copy** a list of strings, the returned list is a new value, but the strings are exactly the same ones that were in the riginal list; they are not copies of those strings. To copy a value by making new copies of its contents, use **deep-copy**.
