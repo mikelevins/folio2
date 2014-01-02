@@ -997,7 +997,7 @@
 
 ;;; function select
 ;;;
-;;; (select sequence1 sequence2) => sequence3
+;;; (select sequence indexes) => sequence2
 ;;; ---------------------------------------------------------------------
 
 ;;; null
@@ -1009,29 +1009,29 @@
 ;;; cons
 (defmethod select ((sequence1 cl:cons)(sequence2 cl:null)) nil)
 
-(defmethod select ((sequence1 cl:cons)(sequence2 cl:sequence)) 
-  (loop for i in sequence1 collect (cl:elt sequence2 i)))
+(defmethod select ((sequence1 cl:sequence)(sequence2 cl:cons)) 
+  (loop for i in sequence2 collect (cl:elt sequence1 i)))
 
-(defmethod select ((sequence1 cl:cons)(sequence2 wb-seq)) 
-  (loop for i in sequence1 collect (fset:@ sequence2 i)))
+(defmethod select ((sequence1 wb-seq)(sequence2 cl:cons)) 
+  (loop for i in sequence2 collect (fset:@ sequence1 i)))
 
 ;;; vector
-(defmethod select ((sequence1 cl:vector)(sequence2 cl:null)) nil)
+(defmethod select ((sequence1 cl:null)(sequence2 cl:vector)) nil)
 
-(defmethod select ((sequence1 cl:vector)(sequence2 cl:sequence)) 
-  (loop for i across sequence1 collect (cl:elt sequence2 i)))
+(defmethod select ((sequence1 cl:sequence)(sequence2 cl:vector)) 
+  (loop for i across sequence2 collect (cl:elt sequence1 i)))
 
-(defmethod select ((sequence1 cl:vector)(sequence2 wb-seq)) 
-  (loop for i across sequence1 collect (fset:@ sequence2 i)))
+(defmethod select ((sequence1 wb-seq)(sequence2 cl:vector)) 
+  (loop for i across sequence2 collect (fset:@ sequence1 i)))
 
 ;;; wb-seq
-(defmethod select ((sequence1 wb-seq)(sequence2 cl:null)) nil)
+(defmethod select ((sequence1 cl:null)(sequence2 wb-seq)) nil)
 
-(defmethod select ((sequence1 wb-seq)(sequence2 cl:sequence)) 
-  (fset:convert 'cl:vector (fset:image (lambda (i)(fset:@ sequence2 i)) sequence1)))
+(defmethod select ((sequence1 cl:sequence)(sequence2 wb-seq)) 
+  (fset:convert 'cl:vector (fset:image (lambda (i)(fset:@ sequence1 i)) sequence2)))
 
 (defmethod select ((sequence1 wb-seq)(sequence2 wb-seq)) 
-  (fset:image (lambda (i)(fset:@ sequence2 i)) sequence1))
+  (fset:image (lambda (i)(fset:@ sequence1 i)) sequence2))
 
 ;;;sequence 
 

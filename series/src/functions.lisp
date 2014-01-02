@@ -307,14 +307,14 @@
 
 ;;; function select
 ;;;
-;;; (select sequence1 sequence2) => sequence3
+;;; (select sequence indexes) => sequence2
 ;;; ---------------------------------------------------------------------
 
-(defmethod select ((sequence1 cl:null)(sequence2 foundation-series))(series))
+(defmethod select ((sequence1 foundation-series)(sequence2 cl:null))(series))
 
-(defmethod select ((sequence1 cl:sequence)(sequence2 foundation-series))
-  (series:choose (series:mask (scan sequence1))
-                 sequence2))
+(defmethod select ((sequence1 foundation-series)(sequence2 cl:sequence))
+  (series:choose (series:mask (scan sequence2))
+                 sequence1))
 
 
 ;;; function subsequence

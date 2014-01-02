@@ -1,16 +1,18 @@
 # make
 
-A generic, extensible value-construction utility.
+A generic, extensible utility for constructing values.
 
-**Package:** `net.bardcode.folio.make`<br>
-**Exports:** `as`
+**Package:** net.bardcode.folio.make<br>
+**Exports:** make
 
-`make` exports a single symbol named `make`, which names a generic function. The function `make` is an extensible value-construction utility. It can be specialized as-needed to provide a constructor for arbitrary datatypes.
+The **make** package exports the extensible generic function **make**. By specializing this generic function you can implement custom constructors for arbitrary types.
 
-The `make` package is intended to work well with `use`; it exports only the one symbol, minimizing the chance of name conflicts. The generic function `make` is intended to be specialized in order to provide convenient value construction as-needed.
+**make** is defined to accept keword arguments, so that your specializations can use keyword parameters to exercise fine control over constructor behavior.
+
+The exportation of a single name is intentional. It's meant to make it easy and convenient to `USE` or `IMPORT` the **make** function and extend it as-needed.
 
 ## Reference
 
-**`make`** *Generic function* <br>
-`make type &key &allow-other-keys  => Anything`<br>
-Returns a new value of type `type`. Keyword parameters, if any, are used to initialize the new value.
+**make** *type* &key &allow-other-keys  => Anything  &nbsp;&nbsp;&nbsp;&nbsp;[*Generic function*]<br>
+Returns a new instance of *type*, constructed according to the specifications passed in the keyword parameters.
+

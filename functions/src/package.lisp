@@ -15,5 +15,5 @@
   (:use :cl :net.bardcode.folio.as :net.bardcode.folio.make)
   (:import-from :alexandria :compose :conjoin :disjoin :multiple-value-compose)
   (:export :^ :-> :cascade :compose :conjoin :disjoin :flip :fn :function? :functional?
-           :generic-function? :iterate :method? :multiple-value-compose :partial :rpartial))
+           :generic-function? :iterate :method? :partial :rpartial))
 

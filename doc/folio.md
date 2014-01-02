@@ -67,7 +67,7 @@ elements are the names of slots on a map, a hash-table, or an instance
 of a CLOS class, and whose right elements are the associated values.
 
 
-## Style
+## Style and conventions
 
 folio code has its own style and flavor, which emphasizes generating
 collections of values and mapping functions over them. This style is
@@ -76,6 +76,8 @@ considerable debt to Dylan, ML, Scheme, and Haskell.
 
 For examples of folio style, see the sample code provided in the
 examples directory.
+
+folio itself observes a few conventions in its code. When computing new sequences, maps, and series from inputs that are sequences, maps, or series, folio in most cases makes an effort to return a result that is of the type as the first input. In a few cases, where this convention seems clearly contrary to the spirit of the function, this rule is broken.
 
 ## Dependencies and Acknowledgements
 
