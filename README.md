@@ -17,7 +17,7 @@ folio offers the following features:
 - an extensible contructor function for arbitrary values
 - extensible comparison functions
 
-folio incorporates and depends on Zach Beabe's Quicklisp, and on three
+folio incorporates and depends on Zach Beane's Quicklisp, and on three
 other libraries available through Quicklisp:
 
 * **FSet**, is Scott Burson's library of efficient pure-functional
