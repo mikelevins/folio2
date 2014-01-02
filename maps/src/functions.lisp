@@ -218,7 +218,7 @@
   map1)
 
 (defmethod merge ((map1 cl:cons) (map2 cl:cons) &key (test 'eql) &allow-other-keys)
-  (cond
+4  (cond
     ((plist? map1)(as 'plist (%merge-alists (as 'alist map1)(as 'alist map2) :test test)))
     ((alist? map1)(as 'alist (%merge-alists (as 'alist map1)(as 'alist map2) :test test)))
     (t (error "Not a valid map: ~s" map1))))

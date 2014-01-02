@@ -79,6 +79,26 @@ examples directory.
 
 folio itself observes a few conventions in its code. When computing new sequences, maps, and series from inputs that are sequences, maps, or series, folio in most cases makes an effort to return a result that is of the type as the first input. In a few cases, where this convention seems clearly contrary to the spirit of the function, this rule is broken.
 
+## The name
+
+The name "folio" is a little obscure and arbitrary. It's a term from the craft of printing that refers to certain esoteric details about how books are printed, but I chose it for its relation to the works of Shakespeare: the **First Folio** is an early printed edition of Shakespeare's plays, published in 1623.
+
+What has William Shakespeare to do with Lisp libraries? Nothing in particular; the choice of "folio" as a name for this library encapsulates a little bit of personal history.
+
+The folio library has its origin in work I've done on an experimental dialect of Lisp named **Bard**. The folio library reflects the style and design of Bard in several respects.
+
+Bard in turn incorporates influences from several programming languages, but undoubtedly the most important in Dylan. Although Bard no longer closely resembles Dylan in its design, it began years ago as a simple Lisp that closely resembled Dylan before that language gained its infix syntax and lost its Lisp-like s-expressions.
+
+Dylan in turn got its name during an extended discussion among its designers and users at Apple, Inc. During development it was called "Ralph", after Ralph Ellison, but the consensus was that it needed a more euphonious name. Many were proposed, most of them not as good as "Ralph". Late in the game, some of us raised the point that there was a venerable tradition of naming languages for inspiring people--for scientists such as Blaise Pascal, mathematicians such as Haskell Curry, and intellectual pioneers such as Lady Ada Lovelace. In that context, the name "Dylan" was proposed. It seemed particularly apropos because, on the one hand it was a reference to Dylan Thomas, a poet that many of us loved, and on the other hand it was easy to conceive of it as a contraction of "Dynamic Language", which it most certainly was.
+
+In later years, when I was trying to think of a name for the Dylan-influenced language I'd been working on, I hit upon the idea of calling it "Bard". A bard is a poet, which made the name an oblique reference to its ancestor, Dylan. It seemed appropriate that the reference was oblique and general, because the language had evolved away from Dylan as I worked on it.
+
+At the same time, "the Bard" (or "the Bard of Avon") is of course a conventional way to refer to William Shakespeare. Besides working on Dylan and the Newton, I spent part of my time at Apple working on SK8, a very powerful authoring and application-development tool. Metaphors drawn from theater and acting were common in SK8--for example, the abstract container that represented all the objects visible on the screen during a session was called the **stage**.
+
+It's always been my ultimate intention to recapitulate some of the best features of these older programming tools, including SK8. That being the case, it seemed satisfying to give my experimental programming language a name that referred to Shakespeare as well as the poetic tradition, and that thereby connected it, however loosely, with Dylan and SK8. 
+
+When it came time to give a name to the Common Lisp library I was using to support and expedite my work on Bard, I naturally turned to thoughts of the literary, of poets, and of SHakespeare. "folio" is the name that fell out.
+
 ## Dependencies and Acknowledgements
 
 folio depends on several other Common Lisp libraries. 
