@@ -9,46 +9,72 @@
 ;;;;
 ;;;; ***********************************************************************
 
-(in-package :cl-user)
+(in-package :folio)
 
-(defpackage :net.bardcode.folio.examples
-  (:use :net.bardcode.folio.as :net.bardcode.folio.bind
-        :net.bardcode.folio.make :net.bardcode.folio.with-exit))
+(defparameter long-enough? (compose (partial 'cl:<= 3) 'length))
 
-(in-package :net.bardcode.folio.examples)
+(defmethod triples ((s cl:sequence)) 
+  (take-by 3 1 s))
 
-(defmethod triples ((s sequence)) 
-    (by 3 s))
+(defmethod read-names ((path pathname)) 
+  (lines path))
 
-(defmethod valid-lines ((path string))
-  (filter (complement 'empty?)
-          (image 'trim
-                 (lines (pathname path)))))
+(defmethod read-names ((path string)) 
+  (filter long-enough?
+          (as 'cl:sequence (read-names (pathname path)))))
 
-(defmethod long-enough? ((s sequence))
-  (>= (length s) 3))
+;;; (read-names "/Users/mikel/Workshop/folio2/examples/namefiles/dickens.names")
 
-(defmethod rules ((path string))
-  (let* ((lines (vaid-lines lines))
-         (triples (image 'triples lines))
-         (starts (image 'first triples))
-         (parts (reduce 'append (image 'rest triples))))
-    (values (filter 'long-enough? starts)
-            (filter 'long-enough? parts))))
+(defmethod rules ((names cl:sequence))
+  (multiple-value-bind (starts parts)(dispose (image 'triples names) 'left 'right)
+    (cl:values starts (reduce 'append parts))))
 
-(defun make-name-extender (parts)
+(defparameter +maximum-name-length+ 12)
+
+(defun pending? (nm)
+  (right nm))
+
+(defun name-part (nm)
+  (left nm))
+
+(defun find-extension (nm parts)
+  (any (filter (partial 'prefix-match? (leave 2 nm))
+               parts)))
+
+(defun merge-name (nm segment)
+  (case (length segment)
+    (0 nm)
+    ((1 2) (append nm segment))
+    (t (append nm (drop 2 segment)))))
+
+(defun make-name-builder (parts)
   (lambda (start)
-    (let ((segment (any (filter (partial 'prefix-match? (leave 2 start)))
-                        parts)))
-      (if segment
-          (append start (drop 2 segment))
-          nil))))
+    (let* ((nm (left start))
+           (pending (right start))
+           (extension (find-extension nm parts)))
+      (let ((next-nm (merge-name nm extension)))
+        (if (or (< (length extension) 3)
+                (> (length next-nm) +maximum-name-length+))
+            (pair next-nm nil)
+            (pair next-nm t))))))
 
-(defparameter extend-name (make-name-extender parts))
+(defmethod build-name ((starts cl:sequence)(parts cl:sequence))
+  (name-part (last (as 'cl:list
+                       (take-while 'pending?
+                                   (iterate (make-name-builder parts)
+                                       (pair (any starts) t)))))))
 
-(defmethod build-name ((starts sequence)(parts sequence))
-  (take-while 'something (iterate extend-name (any starts))))
+;;; (multiple-value-setq ($starts $parts) (rules (read-names "/Users/mikel/Workshop/folio2/examples/namefiles/dickens.names")))
+;;; (build-name $starts $parts)
 
 (defmethod names ((path string) &optional (number 10))
-  (multiple-value-bind (starts parts)(rules path)
-    (take number (repeat (build-name starts parts)))))
+  (multiple-value-bind (starts parts)(rules (read-names path))
+    (as 'cl:list (take number (repeat (build-name starts parts))))))
+
+
+;;; (names "/Users/mikel/Workshop/folio2/examples/namefiles/dickens.names" 10)
+;;; (dolist (nm (names "/Users/mikel/Workshop/folio2/examples/namefiles/dickens.names" 30) (terpri))(terpri)(princ nm))
+;;; (dolist (nm (names "/Users/mikel/Workshop/folio2/examples/namefiles/gnome-female.names" 30) (terpri))(terpri)(princ nm))
+;;; (dolist (nm (names "/Users/mikel/Workshop/folio2/examples/namefiles/gnome-male.names" 30) (terpri))(terpri)(princ nm))
+;;; (dolist (nm (names "/Users/mikel/Workshop/folio2/examples/namefiles/us.names" 30) (terpri))(terpri)(princ nm))
+;;; (dolist (nm (names "/usr/share/dict/words" 30) (terpri))(terpri)(princ nm))

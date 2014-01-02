@@ -15,6 +15,18 @@
 ;;; conversions: as
 ;;; ---------------------------------------------------------------------
 
+(defmethod as ((type (eql 'foundation-series)) (value cl:sequence) &key &allow-other-keys)
+  (series:scan value))
+
+(defmethod as ((type (eql 'series)) (value cl:sequence) &key &allow-other-keys)
+  (series:scan value))
+
+(defmethod as ((type (eql 'cl:sequence)) (value foundation-series) &key &allow-other-keys)
+  (series:collect value))
+
+(defmethod as ((type (eql 'cl:list)) (value foundation-series) &key &allow-other-keys)
+  (cl:coerce (series:collect value) 'cl:list))
+
 ;;; ---------------------------------------------------------------------
 ;;; copying
 ;;; ---------------------------------------------------------------------
