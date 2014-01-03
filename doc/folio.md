@@ -162,7 +162,7 @@ When it came time to give a name to the Common Lisp library I was using to suppo
 folio depends on several other Common Lisp libraries. 
 
 Quicklisp is Zach Beane's indispensible Lisp library manager. All of
-folio's dependencies are available through QcuikLisp.
+folio's dependencies are available through QuickLisp.
 
 http://www.quicklisp.org/beta/
 
@@ -181,7 +181,7 @@ http://series.sourceforge.net/
 
 **Alexandria** is a collection of portable public-domain utilities for
 Common Lisp designed to provide some common conveniences in a
-conservative manner. folio 2 uses Alexandrai versions of some
+conservative manner. folio 2 uses Alexandria versions of some
 utilities--notably partial application--rather than relying on
 homegrown versions.
 
