@@ -24,6 +24,16 @@
                                      (:file "types")
                                      (:file "functions")))))
 
+(asdf:defsystem :net.bardcode.folio.maps-syntax
+  :serial t
+  :description "reader syntax for maps"
+  :license "Lisp Lesser GNU Public License"
+  :depends-on (:net.bardcode.folio.maps)
+  :components ((:module "src"
+                        :serial t
+                        :components ((:file "package")
+                                     (:file "syntax")))))
+
 (asdf:defsystem :net.bardcode.folio.maps.tests
   :serial t
   :description "map tests"
@@ -33,8 +43,10 @@
                         :serial t
                         :components ((:file "maps")))))
 
-(defun load-maps ()
-  (asdf:oos 'asdf:load-op :net.bardcode.folio.maps))
+(defun load-maps (&key (load-syntax t))
+  (asdf:oos 'asdf:load-op :net.bardcode.folio.maps)
+  (when load-syntax
+    (asdf:oos 'asdf:load-op :net.bardcode.folio.maps-syntax)))
 
 (defun load-map-tests ()
   (asdf:oos 'asdf:load-op :net.bardcode.folio.maps.tests))

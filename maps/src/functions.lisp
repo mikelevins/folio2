@@ -105,6 +105,9 @@
 (defmethod as ((type (eql 'wb-map)) value &key &allow-other-keys)
   (make 'wb-map :contents value))
 
+(defmethod as ((type (eql 'wb-map)) (value cl:null) &key &allow-other-keys)
+  (fset:wb-map))
+
 (defmethod as ((type (eql 'wb-map)) (value cl:cons) &key &allow-other-keys)
   (cond
     ((plist? value)(make 'wb-map :contents value))

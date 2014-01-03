@@ -66,6 +66,64 @@ string. The `slots` function returns a series of pairs whose left
 elements are the names of slots on a map, a hash-table, or an instance
 of a CLOS class, and whose right elements are the associated values.
 
+## Syntax
+
+folio provides a few extensions to Common Lisp syntax for the sake of convenience. Some, particularly those in the **functions** package, are regular macros. A few are reader macros which alter the lexical syntax of Common Lisp.
+
+Because reader macros can sometimes conflict with reader macros defined by other libraries or by user code, the folio syntax extensions that define reader macros are optional. They're provided by separate subsystems that can be loaded or not, as you prefer.
+
+### Type-constraint syntax
+
+The **as** package provides a reader macro that makes inline type-conversions easy. For example:
+
+    CL-USER> #[list](list 1 2 3)
+    (1 2 3)
+    CL-USER> #[vector](list 1 2 3)
+    #[ 1 2 3 ]
+    CL-USER> #[fset:wb-seq](list 1 2 3)
+    #[ 1 2 3 ]
+
+When you write
+
+    #[vector]
+    
+it means that the value of the next expression read is to be treated as a vector. More specifically, the reader macro causes this expression:
+
+    #[vector](list 1 2 3)
+
+to be read as this one:
+
+    (as 'vector (list 1 2 3))
+
+In order for the reader macro to work properly, a method definition must exist for the function **as** that specializes on the target type and the type of the input expressions. The vector example works because the **sequences** package provides a specialization for **as** on `(vector cons)`.
+
+
+### Map and sequence syntax
+
+The optional syntax extension of the **sequences** package provides a succinct way of writing literal lists:
+
+    CL-USER> [1 2 3]
+    (1 2 3)
+
+By combining this syntax with the type-constraint syntax, you can easily construct various types of sequences with compact expressions:
+
+    CL-USER> #[list][1 2 3]
+    (1 2 3)
+    CL-USER> #[vector][1 2 3]
+    #[ 1 2 3 ]
+    CL-USER> #[fset:wb-seq][1 2 3]
+    #[ 1 2 3 ]
+
+Similarly, the **maps** package provides a compact syntax for maps:
+
+    CL-USER> {}
+    { }
+    CL-USER> {:a 1 :b 2}
+    { :A 1 :B 2 }
+
+The **maps** reader macro constructs a map of type `fset:wb-map`. As with the literal syntax for lists, you can use **as** or the type-constraint syntax to convert maps to any supported map representation.
+
+Again, each of these syntax extensions is optional; you can elect not to load them if you choose not to use them,
 
 ## Style and conventions
 

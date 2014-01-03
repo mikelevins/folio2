@@ -27,6 +27,16 @@
                         :components ((:file "package")
                                      (:file "functions")))))
 
+(asdf:defsystem :net.bardcode.folio.sequences-syntax
+  :serial t
+  :description "reader syntax for sequences"
+  :license "Lisp Lesser GNU Public License"
+  :depends-on (:net.bardcode.folio.sequences)
+  :components ((:module "src"
+                        :serial t
+                        :components ((:file "package")
+                                     (:file "syntax")))))
+
 (asdf:defsystem :net.bardcode.folio.sequences.tests
   :serial t
   :description "sequence and series tests"
@@ -36,8 +46,10 @@
                         :serial t
                         :components ((:file "sequences")))))
 
-(defun load-sequences ()
-  (asdf:oos 'asdf:load-op :net.bardcode.folio.sequences))
+(defun load-sequences (&key (load-syntax t))
+  (asdf:oos 'asdf:load-op :net.bardcode.folio.sequences)
+  (when load-syntax
+    (asdf:oos 'asdf:load-op :net.bardcode.folio.sequences-syntax)))
 
 (defun load-sequence-tests ()
   (asdf:oos 'asdf:load-op :net.bardcode.folio.sequences.tests))
