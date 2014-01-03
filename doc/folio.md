@@ -79,7 +79,7 @@ The **as** package provides a reader macro that makes inline type-conversions ea
     CL-USER> #[list](list 1 2 3)
     (1 2 3)
     CL-USER> #[vector](list 1 2 3)
-    #[ 1 2 3 ]
+    #(1 2 3)
     CL-USER> #[fset:wb-seq](list 1 2 3)
     #[ 1 2 3 ]
 
