@@ -110,7 +110,7 @@ By combining this syntax with the type-constraint syntax, you can easily constru
     CL-USER> #[list][1 2 3]
     (1 2 3)
     CL-USER> #[vector][1 2 3]
-    #[ 1 2 3 ]
+    #(1 2 3)
     CL-USER> #[fset:wb-seq][1 2 3]
     #[ 1 2 3 ]
 
