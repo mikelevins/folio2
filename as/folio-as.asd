@@ -49,7 +49,7 @@
   (when load-syntax
     (asdf:oos 'asdf:load-op :net.bardcode.folio.as-syntax)))
 
-(defun load-folio-tests ()
+(defun load-as-tests ()
   (asdf:oos 'asdf:load-op :net.bardcode.folio.as.tests))
 
 ;;; (load-as)
