@@ -61,30 +61,15 @@
 ;;; output values become the inputs to F2. F2's outputs are the inputs
 ;;; to F3, and so on. The outputs of FN are VAL1..VALK
 
+(defun %gen-vars (vals)
+  (loop for i from 0 below (length vals) collect (gensym)))
+
 (defmacro cascade (args &rest fns)
   (if (null fns)
       `(values ,@args)
-      (let ((params (mapcar (lambda (ignored)(declare (ignore ignored))(gensym)) fns))
-            (fn (car fns))
-            (more-fns (cdr fns)))
-        `(multiple-value-bind (,@params)(funcall ,fn ,@args)
-           (cascade (,@params) ,@more-fns)))))
+      (let ((vars (%gen-vars args)))
+        `(multiple-value-bind ,vars (funcall ,(car fns) ,@args)
+           (cascade (,@vars) ,@(cdr fns))))))
 
-;;; macro iterate
-;;;
-;;; (iterate fn init) => vals
-;;; ---------------------------------------------------------------------
-;;; Accepts a function FN that accepts a single argument and returns a
-;;; single value. Returns a series of values given by
-;;;  init
-;;;  (fn init)
-;;;  (fn (fn init))
-;;;  ...
-
-(defmacro iterate (fn init)
-  (let ((arg (gensym)))
-    `(series:scan-fn t
-                     (lambda () ,init)
-                     (lambda (,arg) (funcall ,fn ,arg)))))
 
 

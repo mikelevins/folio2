@@ -12,8 +12,7 @@
 (in-package :cl-user)
 
 (defpackage :net.bardcode.folio.sequences
-  (:use :cl :net.bardcode.folio.as :net.bardcode.folio.copy
-        :net.bardcode.folio.make :net.bardcode.folio.pairs)
+  (:use :cl :net.bardcode.folio.as :net.bardcode.folio.make :net.bardcode.folio.pairs)
   (:shadow :acons :assoc :assoc-if :assoc-if-not :append
            :count :count-if :count-if-not
            :find :find-if :find-if-not :first

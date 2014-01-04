@@ -18,7 +18,6 @@
   :description "operations on sequences of values"
   :license "Lisp Lesser GNU Public License"
   :depends-on (:net.bardcode.folio.as
-               :net.bardcode.folio.copy
                :net.bardcode.folio.make
                :net.bardcode.folio.pairs
                :fset :series)

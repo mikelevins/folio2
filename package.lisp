@@ -13,60 +13,43 @@
 
 (defpackage :net.bardcode.folio
   (:nicknames :folio)
-  #|(:shadow :< :<= :> :>= 
-           :acons :append :assoc 
-           :count :count-if :count-if-not 
-           :find :find-if :find-if-not :first 
-           :last :length 
-           :map :merge :mismatch 
-           :position :position-if :position-if-not 
-           :reduce :remove :remove-duplicates :remove-if :remove-if-not :rest :reverse 
-           :search :second :sequence :sort :substitute :substitute-if :substitute-if-not :values )|#
-  (:use :cl
-        :net.bardcode.folio.as
-        :net.bardcode.folio.boxes
-        :net.bardcode.folio.comparisons
-        :net.bardcode.folio.copy
-        :net.bardcode.folio.functions
-        :net.bardcode.folio.make
-        :net.bardcode.folio.maps
-        :net.bardcode.folio.pairs
-        :net.bardcode.folio.sequences
-        :net.bardcode.folio.series
-        :net.bardcode.folio.taps)
-  (:shadowing-import-from :net.bardcode.folio.comparisons :< :<= :> :>=)
+  (:use :cl)
+  (:use :net.bardcode.folio.as)
+  (:use :net.bardcode.folio.boxes)
+  (:use :net.bardcode.folio.functions)
+  (:use :net.bardcode.folio.make)
+  (:use :net.bardcode.folio.pairs)
+  (:use :net.bardcode.folio.taps)
+  (:import-from :net.bardcode.folio.maps :alist :alist? :contains-key? :contains-value?
+                :get-key :keys :map? :plist :plist? :put-key :wb-map :wb-map?)
   (:shadowing-import-from :net.bardcode.folio.maps :values :merge :map)
+  (:import-from :net.bardcode.folio.sequences
+                :add-first :add-last :any :apportion
+                :binary-append :binary-join :by
+                :dispose :drop :drop-while
+                :element :empty? :every?
+                :filter
+                :head
+                :image :indexes :interleave :interpose
+                :join
+                :leave
+                :make
+                :partition :penult :prefix-match?
+                :range
+                :select :sequence? :shuffle :some?
+                :split :subsequence :suffix-match?
+                :tail :tails :take :take-by :take-while
+                :unzip 
+                :wb-seq :wb-seq?
+                :zip)
   (:shadowing-import-from :net.bardcode.folio.sequences
-                          :acons :append :assoc :count :count-if :count-if-not :find :find-if :find-if-not :first 
-                          :last :length :mismatch :position :position-if :position-if-not :reduce :remove :remove-duplicates
-                          :remove-if :remove-if-not :rest :reverse :search :second :sequence :sort :substitute :substitute-if
-                          :substitute-if-not)
-
-  #|(:export
-   :-> :> :>= :< :<= :^ 
-   :acons :add-first :add-last :alist :alist? :any :append :apportion :as :assoc
-   :binary-< :binary-<= :binary-> :binary->=  :binary-append :binary-equivalent? :binary-join :box :box? :by
-   :cascade :characters :coalesce :compose :conjoin :contains-key? :contains-value? :copy :count :count-if :count-if-not
-   :deep-copy :disjoin :dispose :drop :drop-while
-   :element :elements :empty? :equivalent? :every?
-   :filter :find :find-if :find-if-not :first :flip :fn :foundation-series :function? :functional?
-   :generic-function? :get-key 
-   :head
-   :image :indexes :interleave :interpose :iterate 
-   :join 
-   :keys
-   :last :leave :left :length :lines
-   :make :map :map? :merge :method? :mismatch :multiple-value-compose
-   :octets
-   :pair :pair? :partial :partition :penult :plist :plist? :position :position-if :position-if-not :prefix-match? :put-key
-   :range :range-from :reduce :remove :remove-duplicates :remove-if :remove-if-not :repeat :rest :reverse :right :rpartial
-   :scan :search :second :select :sequence :sequence? :series :series? :set-box! :set-left! :set-right! :shallow-copy
-   :shuffle :slots :some? :sort :split :subsequence :substitute :substitute-if :substitute-if-not :suffix-match? 
-   :tail :tails :take :take-by :take-while :tokens 
-   :unbox :unzip 
-   :values 
-   :wb-map :wb-map? :wb-seq :wb-seq?
-   :zip)|#
-  )
+                          :acons :assoc :assoc-if :assoc-if-not :append
+                          :count :count-if :count-if-not
+                          :find :find-if :find-if-not :first
+                          :last :length 
+                          :mismatch
+                          :position :position-if :position-if-not 
+                          :reduce :remove :remove-duplicates :remove-if :remove-if-not :rest :reverse
+                          :search :sequence :second :sort :substitute :substitute-if :substitute-if-not))
 
 

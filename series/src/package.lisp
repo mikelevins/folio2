@@ -12,14 +12,14 @@
 (in-package :cl-user)
 
 (defpackage :net.bardcode.folio.series
-  (:use :cl :net.bardcode.folio.as :net.bardcode.folio.copy :net.bardcode.folio.make)
+  (:use :cl :net.bardcode.folio.as :net.bardcode.folio.make)
   (:import-from :fset :wb-seq)
   (:import-from :series :foundation-series)
   (:import-from :net.bardcode.folio.pairs :left :pair :right)
   (:shadowing-import-from :net.bardcode.folio.sequences
                           :add-first :add-last :any :append :apportion :assoc
                           :binary-append :binary-join :by
-                          :copy :count :count-if :count-if-not
+                          :count :count-if :count-if-not
                           :deep-copy :dispose :drop :drop-while
                           :element :empty? :every?
                           :filter :find :find-if :find-if-not :first

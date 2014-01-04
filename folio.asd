@@ -20,8 +20,6 @@
   :depends-on (:fset :series :alexandria 
                      :net.bardcode.folio.as
                      :net.bardcode.folio.boxes
-                     :net.bardcode.folio.comparisons
-                     :net.bardcode.folio.copy
                      :net.bardcode.folio.functions
                      :net.bardcode.folio.make
                      :net.bardcode.folio.maps
@@ -38,8 +36,6 @@
          (project-root (slot-value (asdf:find-system :net.bardcode.folio) 'asdf::absolute-pathname))
          (sysdefs (list (merge-pathnames "as/folio-as.asd" project-root)
                         (merge-pathnames "boxes/folio-boxes.asd" project-root)
-                        (merge-pathnames "comparisons/folio-comparisons.asd" project-root)
-                        (merge-pathnames "copy/folio-copy.asd" project-root)
                         (merge-pathnames "functions/folio-functions.asd" project-root)
                         (merge-pathnames "make/folio-make.asd" project-root)
                         (merge-pathnames "maps/folio-maps.asd" project-root)

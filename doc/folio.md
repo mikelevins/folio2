@@ -43,13 +43,6 @@ sequences.
 **As** provides a single extensible generic function, `as`, for
 converting values from one type to another.
 
-**Comparisons** offers generic, extensible versions of magnitude
-comparisons and equivalence predicates.
-
-**Copy** provides the generic functions `copy`, `deep-copy`, and
-`shallow-copy`, which together provide an extensible common framework
-for copying values.
-
 **Functions** provides various conveniences for working with
 functions, including partial application and composition operators. It
 also offers a compact shorthand for Common Lisp's LAMBDA, to reduce
@@ -161,7 +154,7 @@ When it came time to give a name to the Common Lisp library I was using to suppo
 
 folio depends on several other Common Lisp libraries. 
 
-Quicklisp is Zach Beane's indispensible Lisp library manager. All of
+**Quicklisp** is Zach Beane's indispensible Lisp library manager. All of
 folio's dependencies are available through QuickLisp.
 
 http://www.quicklisp.org/beta/
