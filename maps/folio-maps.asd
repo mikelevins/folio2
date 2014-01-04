@@ -38,7 +38,7 @@
   :serial t
   :description "map tests"
   :license "Lisp Lesser GNU Public License"
-  :depends-on (:net.bardcode.folio.maps :lift)
+  :depends-on (:net.bardcode.folio.maps :net.bardcode.folio.maps-syntax :lift)
   :components ((:module "tests"
                         :serial t
                         :components ((:file "maps")))))
