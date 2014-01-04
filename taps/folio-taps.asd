@@ -36,14 +36,13 @@
   :depends-on (:net.bardcode.folio.taps :lift)
   :components ((:module "tests"
                         :serial t
-                        :components ((:file "package")
-                                     (:file "functions")))))
+                        :components ((:file "taps")))))
 
 (defun load-taps ()
   (asdf:oos 'asdf:load-op :net.bardcode.folio.taps))
 
-(defun load-sequence-tests ()
+(defun load-tap-tests ()
   (asdf:oos 'asdf:load-op :net.bardcode.folio.taps.tests))
 
 ;;; (load-taps)
-;;; (load-sequence-tests)
+;;; (load-tap-tests)

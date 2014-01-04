@@ -30,6 +30,10 @@
 (deftestsuite function-syntax-tests (function-tests) ())
 
 (addtest (function-syntax-tests)
+  test-$
+  (ensure-same 5 ($ (^ () 5))))
+
+(addtest (function-syntax-tests)
   test-^
   (ensure-same 5 (funcall (^ () 5)))
   (ensure-same 5 (funcall (^ (x y) (+ x y)) 2 3)))

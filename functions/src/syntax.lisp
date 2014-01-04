@@ -11,6 +11,17 @@
 
 (in-package :net.bardcode.folio.functions)
 
+;;; macro $
+;;; 
+;;; ($ fn  expr1..exprk) => Anything
+;;; ---------------------------------------------------------------------
+;;; A more compact synonym for FUNCALL. This macro is not intended as
+;;; a replacement for FUNCALL, but as a convenience for cases in
+;;; which the clarity of functional code benefits from compactness.
+
+(defmacro $ (f &rest args)
+  `(funcall ,f ,@args))
+
 ;;; macro ^
 ;;; 
 ;;; (^ (arg1..argk)  expr1..exprk) => a function

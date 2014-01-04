@@ -50,6 +50,7 @@
                           :mismatch
                           :position :position-if :position-if-not 
                           :reduce :remove :remove-duplicates :remove-if :remove-if-not :rest :reverse
-                          :search :sequence :second :sort :substitute :substitute-if :substitute-if-not))
+                          :search :sequence :second :sort :substitute :substitute-if :substitute-if-not)
+  (:use :net.bardcode.folio.series))
 
 

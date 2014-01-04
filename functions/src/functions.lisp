@@ -11,7 +11,6 @@
 
 (in-package :net.bardcode.folio.functions)
 
-
 ;;; function flip
 ;;;
 ;;; (flip f1) => f2

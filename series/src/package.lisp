@@ -39,6 +39,7 @@
   (:export
    :coalesce
    :foundation-series
+   :iterate
    :range-from
    :repeat
    :scan
