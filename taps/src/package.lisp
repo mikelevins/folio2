@@ -19,6 +19,7 @@
    :characters
    :elements
    :lines
+   :objects
    :octets
    :slots
    :tokens))
