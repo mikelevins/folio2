@@ -27,13 +27,11 @@
 (defmethod as ((type (eql 'cl:list)) (value foundation-series) &key &allow-other-keys)
   (cl:coerce (series:collect value) 'cl:list))
 
-;;; ---------------------------------------------------------------------
-;;; copying
-;;; ---------------------------------------------------------------------
+(defmethod as ((type (eql 'cl:vector)) (value foundation-series) &key &allow-other-keys)
+  (cl:coerce (series:collect value) 'cl:vector))
 
-;;; ---------------------------------------------------------------------
-;;; constructions: make
-;;; ---------------------------------------------------------------------
+(defmethod as ((type (eql 'cl:string)) (value foundation-series) &key &allow-other-keys)
+  (cl:coerce (series:collect value) 'cl:string))
 
 ;;; ---------------------------------------------------------------------
 ;;; sequence functions
@@ -71,7 +69,12 @@
 ;;; ---------------------------------------------------------------------
 
 (defmethod by ((n integer)(series foundation-series))
-  (scan (multiple-value-list (series:chunk n n series))))
+  (let* ((starts (series:scan-range :by n))
+         (ends (drop 1 starts)))
+    (series:map-fn t 
+                   (lambda (x y)(series:subseries series x y))
+                   starts
+                   ends)))
 
 ;;; function dispose
 ;;;

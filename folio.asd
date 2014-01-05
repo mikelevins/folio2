@@ -466,7 +466,7 @@
                :net.bardcode.folio.maps.tests
                :net.bardcode.folio.pairs.tests
                ;;:net.bardcode.folio.sequences.tests
-               ;;:net.bardcode.folio.series.tests
+               :net.bardcode.folio.series.tests
                :net.bardcode.folio.taps.tests)
   :components ((:module "src"
                         :serial t
