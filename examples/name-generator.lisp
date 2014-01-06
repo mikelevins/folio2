@@ -65,4 +65,4 @@
 ;;; (dolist (nm (names "/Users/mikel/Workshop/folio2/examples/namefiles/dickens.names" 30) (terpri))(terpri)(princ nm))
 ;;; (dolist (nm (names "/Users/mikel/Workshop/folio2/examples/namefiles/gnome-female.names" 30) (terpri))(terpri)(princ nm))
 ;;; (dolist (nm (names "/Users/mikel/Workshop/folio2/examples/namefiles/gnome-male.names" 30) (terpri))(terpri)(princ nm))
-;;; (dolist (nm (names "/Users/mikel/Workshop/folio2/examples/namefiles/us.names" 30) (terpri))(terpri)(princ nm))
+;;; (dolist (nm (names "/Users/mikel/Workshop/folio2/examples/namefiles/us.names" 100) (terpri))(terpri)(princ nm))
