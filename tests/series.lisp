@@ -15,7 +15,9 @@
 (defpackage :net.bardcode.folio.series.tests
   (:use :cl :net.bardcode.folio.as :net.bardcode.folio.make :net.bardcode.folio.series :lift)
   (:import-from :net.bardcode.folio.sequences
-                :add-first :by :dispose :element :take)
+                :add-first :by :dispose :drop :drop-while :element :filter 
+                :head :image :indexes :interleave
+                :take)
   (:shadowing-import-from :net.bardcode.folio.sequences
                           :first))
 
@@ -71,6 +73,48 @@
     (multiple-value-bind (odds evens)(dispose ints 'cl:oddp 'cl:evenp)
       (ensure-same '(1 3 5) (as 'cl:list (take 3 (series:choose odds ints))))
       (ensure-same '(0 2 4) (as 'cl:list (take 3 (series:choose evens ints)))))))
+
+(addtest (series-tests)
+  test-drop
+  (ensure-same '(2 3) (as 'cl:list (drop 2 (series 0 1 2 3)))))
+
+(addtest (series-tests)
+  test-drop-while
+  (ensure-same '(2 3 4) (as 'cl:list (drop-while 'cl:oddp (series 1 1 1 1 1 2 3 4)))))
+
+(addtest (series-tests)
+  test-element
+  (ensure-same 3 (element (series 0 1 2 3 4) 3))
+  (ensure-same #\e (element (scan "abcdefgh") 4)))
+
+(addtest (series-tests)
+  test-filter
+  (ensure-same '(1 3 5 7 9) (as 'cl:list (filter 'cl:oddp (series 0 1 2 3 4 5 6 7 8 9)))))
+
+(addtest (series-tests)
+  test-first
+  (ensure-same 0 (first (series 0 1 2 3 4 5 6 7 8 9)))
+  (ensure-same #\a (first (scan "abcdef"))))
+
+(addtest (series-tests)
+  test-head
+  (ensure-same 0 (head (series 0 1 2 3 4 5 6 7 8 9)))
+  (ensure-same #\a (head (scan "abcdef"))))
+
+(addtest (series-tests)
+  test-image
+  (ensure-same '(t nil t nil) (as 'cl:list (image 'evenp (series 0 1 2 3))))
+  (ensure-same '(nil 1 nil 2 nil 3 nil 4) (as 'cl:list (image 'cl:digit-char-p (scan "a1b2c3d4")))))
+
+(addtest (series-tests)
+  test-indexes
+  (ensure-same 3  (element (indexes (scan "abcdef")) 3))
+  (ensure-same 3  (element (indexes (scan (vector 0 1 2 3 4 5))) 3)))
+
+(addtest (series-tests)
+  test-interleave
+  (ensure-same '(a x b x) (as 'cl:list (take 4 (interleave '(a b c d) (repeat 'x)))))
+  (ensure-same "a1b2" (as 'cl:string (take 4 (interleave '(#\a #\b #\c) "123")))))
 
 ;;; ---------------------------------------------------------------------
 ;;; run tests

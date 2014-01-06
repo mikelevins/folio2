@@ -27,6 +27,11 @@
 (defmethod as ((type (eql 'cl:vector))(sequence cl:cons) &key &allow-other-keys)
   (cl:coerce sequence 'cl:vector))
 
+(defmethod as ((type (eql 'cl:string))(sequence cl:cons) &key &allow-other-keys)
+  (if (cl:every 'cl:characterp sequence)
+      (cl:coerce sequence 'cl:string)
+      (cl:coerce sequence 'cl:vector)))
+
 (defmethod as ((type (eql 'cl:vector))(sequence cl:vector) &key &allow-other-keys)
   sequence)
 
