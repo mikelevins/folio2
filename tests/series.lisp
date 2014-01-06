@@ -16,7 +16,7 @@
   (:use :cl :net.bardcode.folio.as :net.bardcode.folio.make :net.bardcode.folio.series :lift)
   (:import-from :net.bardcode.folio.sequences
                 :add-first :by :dispose :drop :drop-while :element :filter 
-                :head :image :indexes :interleave
+                :head :image :indexes :interleave :interpose
                 :take)
   (:shadowing-import-from :net.bardcode.folio.sequences
                           :first))
@@ -115,6 +115,11 @@
   test-interleave
   (ensure-same '(a x b x) (as 'cl:list (take 4 (interleave '(a b c d) (repeat 'x)))))
   (ensure-same "a1b2" (as 'cl:string (take 4 (interleave '(#\a #\b #\c) "123")))))
+
+(addtest (series-tests)
+  test-interpose
+  (ensure-same '(a x b x) (as 'cl:list (take 4 (interpose 'x '(a b c d)))))
+  (ensure-same "a b c" (as 'cl:string (take 5 (interpose #\space '(#\a #\b #\c))))))
 
 ;;; ---------------------------------------------------------------------
 ;;; run tests
