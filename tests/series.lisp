@@ -15,11 +15,13 @@
 (defpackage :net.bardcode.folio.series.tests
   (:use :cl :net.bardcode.folio.as :net.bardcode.folio.make :net.bardcode.folio.series :lift)
   (:import-from :net.bardcode.folio.sequences
-                :add-first :by :dispose :drop :drop-while :element :filter 
-                :head :image :indexes :interleave :interpose
-                :take)
+                :add-first :by :dispose :drop :drop-while :element :empty? :filter 
+                :head :image :indexes :interleave :interpose :partition
+                :prefix-match? :select :subsequence :tail :tails :take :take-by :take-while
+                :unzip :zip)
   (:shadowing-import-from :net.bardcode.folio.sequences
-                          :first))
+                          :first :remove :remove-if :remove-if-not :rest
+                          :second :substitute :substitute-if :substitute-if-not))
 
 (in-package :net.bardcode.folio.series.tests)
 
@@ -121,6 +123,110 @@
   (ensure-same '(a x b x) (as 'cl:list (take 4 (interpose 'x '(a b c d)))))
   (ensure-same "a b c" (as 'cl:string (take 5 (interpose #\space '(#\a #\b #\c))))))
 
+(addtest (series-tests)
+  test-partition
+  (multiple-value-bind (odds evens)(partition 'cl:oddp (series 0 1 2 3 4 5 6 7 8 9))
+    (ensure-same '(1 3 5 7 9) (as 'cl:list odds))
+    (ensure-same '(0 2 4 6 8) (as 'cl:list evens))))
+
+(addtest (series-tests)
+  test-prefix-match?
+  (ensure (prefix-match? nil (scan '(0 1 2 3))))
+  (ensure (prefix-match? '(0 1) (scan '(0 1 2 3))))
+  (ensure (prefix-match? (fset:wb-seq 0 1) (scan '(0 1 2 3)))))
+
+(addtest (series-tests)
+  test-remove
+  (ensure-same (as 'cl:list (series 0 1 3))
+               (as 'cl:list (remove 2 (series 0 1 2 3)))))
+
+(addtest (series-tests)
+  test-remove-if
+  (ensure-same (as 'cl:list (series 0 2 4 6 8))
+               (as 'cl:list (remove-if 'oddp (series 0 1 2 3 4 5 6 7 8 9)))))
+
+(addtest (series-tests)
+  test-remove-if-not
+  (ensure-same (as 'cl:list (series 0 2 4 6 8))
+               (as 'cl:list (remove-if-not 'evenp (series 0 1 2 3 4 5 6 7 8 9)))))
+
+(addtest (series-tests)
+  test-rest
+  (ensure-same (as 'cl:list (series 1 2 3))
+               (as 'cl:list (rest (series 0 1 2 3)))))
+
+(addtest (series-tests)
+  test-second
+  (ensure-same 1 (second (series 0 1 2 3))))
+
+(addtest (series-tests)
+  test-select
+  (ensure-same nil (as 'cl:list (select (scan '(a b c d e f g)) nil)))
+  (ensure-same '(a c) (as 'cl:list (select (scan '(a b c d e f g)) '(0 2)))))
+
+(addtest (series-tests)
+  test-subsequence
+  (ensure-same 2 (first (subsequence (scan '(0 1 2 3 4)) 2)))
+  (ensure-same "oo" (as 'cl:string (subsequence (scan "Foobar") 1 3))))
+
+(addtest (series-tests)
+  test-substitute
+  (ensure-same '(0 1 2 x 4 5) (as 'cl:list (substitute 'x 3 (scan '(0 1 2 3 4 5))))))
+
+(addtest (series-tests)
+  test-substitute-if
+  (ensure-same '(0 x 2 x 4 x) (as 'cl:list (substitute-if 'x 'oddp (scan '(0 1 2 3 4 5))))))
+
+(addtest (series-tests)
+  test-substitute-if-not
+  (ensure-same '(0 x 2 x 4 x) (as 'cl:list (substitute-if-not 'x 'evenp (scan '(0 1 2 3 4 5))))))
+
+(addtest (series-tests)
+  test-tail
+  (ensure-same (as 'cl:list (series 1 2 3))
+               (as 'cl:list (tail (series 0 1 2 3)))))
+
+(addtest (series-tests)
+  test-tails
+  (ensure-same #\h (first (element (tails (scan "Archimedes")) 3)))
+  (ensure-same 6 (first (element (tails (scan '(0 1 2 3 4 5 6 7 8 9)) :by 3)
+                                 2))))
+
+(addtest (series-tests)
+  test-take
+  (ensure-same "arc" (as 'cl:string (take 3 (scan "archimedes")))))
+
+(addtest (series-tests)
+  test-take-by
+  (ensure-same "chi" (element (as 'cl:list (take-by 3 1 "Archimedes")) 2)))
+
+(addtest (series-tests)
+  test-take-while
+  (ensure-same '(1 3 5 7 9) (as 'cl:list (take-while 'cl:oddp (scan '(1 3 5 7 9 10 11 12 13 14 15 16))))))
+
+(addtest (series-tests)
+  test-unzip
+  (multiple-value-bind (keys vals)(unzip (zip (scan '(a b c d)) (scan '(0 1 2 3))))
+    (ensure-same 'b (element keys 1))
+    (ensure-same 1 (element vals 1))))
+
+(addtest (series-tests)
+  test-zip
+  (ensure-same '(c . 2)(element (zip (scan '(a b c d)) (scan '(0 1 2 3))) 2)))
+
+(addtest (series-tests)
+  test-coalesce
+  (ensure-same '(0 2 4 6) (as 'cl:list (coalesce 'cl:+ '(0 1 2 3) '(0 1 2 3)))))
+
+(addtest (series-tests)
+  test-range-from
+  (ensure-same 13
+               (element (range-from 10)
+                        3))
+  (ensure-same 6
+               (element (range-from 0 :by 2)
+                        3)))
+
 ;;; ---------------------------------------------------------------------
 ;;; run tests
 ;;; ---------------------------------------------------------------------
@@ -131,4 +237,3 @@
 
 ;;; (net.bardcode.folio.series.tests::run-series-tests)
 ;;; (lift:describe-test-result lift:*test-result* t)
-

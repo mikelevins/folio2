@@ -325,8 +325,10 @@
 ;;; (subsequence sequence start &optional end) => sequence'
 ;;; ---------------------------------------------------------------------
 
-(defmethod subsequence ((sequence foundation-series) (start integer) &optional (end nil))
-  (series:subseries sequence start end))
+(defmethod subsequence ((sequence foundation-series) (start integer) &optional (end nil endp))
+  (if endp 
+      (series:subseries sequence start end)
+      (series:subseries sequence start)))
 
 ;;; function substitute
 ;;;
