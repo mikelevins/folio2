@@ -177,22 +177,29 @@
   nil)
 
 (defmethod assoc (item (sequence cl:cons) &key (key 'cl:identity) (test 'cl:eql))
-  (cl:assoc item sequence :test test :key key))
-
-(defmethod assoc (item (sequence cl:vector) &key (key 'cl:identity) (test 'cl:eql))
   (block searching
     (progn
-      (loop for x across sequence
-         do (when (funcall test item (funcall key (left x)))
+      (loop for x in sequence
+         do (when (funcall test (funcall key item) (funcall key (head x)))
               (return-from searching x)))
+      nil)))
+
+(defmethod assoc (item (sequence cl:sequence) &key (key 'cl:identity) (test 'cl:eql))
+  (block searching
+    (progn
+      (loop for i from 0 below (cl:length sequence)
+         do (let ((x (cl:elt sequence i)))
+              (when (funcall test (funcall key item) (funcall key (head x)))
+                (return-from searching x))))
       nil)))
 
 (defmethod assoc (item (sequence wb-seq) &key (key 'cl:identity) (test 'cl:eql))
   (block searching
     (progn
       (loop for i from 0 below (fset:size sequence)
-         do (when (funcall test item (funcall key (left (fset:@ sequence i))))
-              (return-from searching (fset:@ sequence i))))
+         do (let ((x (fset:@ sequence i)))
+              (when (funcall test (funcall key item) (funcall key (head x)))
+                (return-from searching x))))
       nil)))
 
 ;;; function assoc-if [bounded]
@@ -204,23 +211,30 @@
   (declare (ignore predicate sequence key))
   nil)
 
-(defmethod assoc-if (predicate (sequence cl:cons) &key (key 'cl:identity))
-  (cl:assoc-if predicate sequence :key key))
-
-(defmethod assoc-if (predicate (sequence cl:vector) &key (key 'cl:identity))
+(defmethod assoc-if (predicate (sequence cl:cons) &key (key 'cl:identity) (test 'cl:eql))
   (block searching
     (progn
-      (loop for x across sequence
-         do (when (funcall predicate (funcall key (left x)))
+      (loop for x in sequence
+         do (when (funcall predicate (funcall key (head x)))
               (return-from searching x)))
+      nil)))
+
+(defmethod assoc-if (predicate (sequence cl:sequence) &key (key 'cl:identity) (test 'cl:eql))
+  (block searching
+    (progn
+      (loop for i from 0 below (cl:length sequence)
+         do (let ((x (cl:elt sequence i)))
+              (when (funcall predicate (funcall key (head x)))
+                (return-from searching x))))
       nil)))
 
 (defmethod assoc-if (predicate (sequence wb-seq) &key (key 'cl:identity))
   (block searching
     (progn
       (loop for i from 0 below (fset:size sequence)
-         do (when (funcall predicate (funcall key (left (fset:@ sequence i))))
-              (return-from searching (fset:@ sequence i))))
+         do (let ((x (fset:@ sequence i)))
+              (when (funcall predicate (funcall key (head x)))
+                (return-from searching x))))
       nil)))
 
 ;;; function assoc-if-not [bounded]
@@ -381,13 +395,13 @@
 
 (defmethod drop-while (predicate (sequence cl:null))(declare (ignore predicate sequence)) nil)
 (defmethod drop-while (predicate (sequence cl:sequence))
-  (let ((pos (count-if predicate sequence)))
+  (let ((pos (position-if-not predicate sequence)))
     (if pos
         (drop pos sequence)
         (drop (cl:length sequence) sequence))))
 
 (defmethod drop-while (predicate (sequence wb-seq))
-  (let ((pos (count-if predicate sequence)))
+  (let ((pos (position-if-not predicate sequence)))
     (if pos
         (drop pos sequence)
         (drop (fset:size sequence) sequence))))
@@ -486,8 +500,11 @@
 (defmethod first ((sequence cl:null))
   nil)
 
-(defmethod first ((sequence cl:sequence))
+(defmethod first ((sequence cl:cons))
   (cl:first sequence))
+
+(defmethod first ((sequence cl:sequence))
+  (cl:elt sequence 0))
 
 (defmethod first ((sequence wb-seq))
   (fset:@ sequence 0))
@@ -500,8 +517,11 @@
 (defmethod head ((sequence cl:null))
   nil)
 
-(defmethod head ((sequence cl:sequence))
+(defmethod head ((sequence cl:cons))
   (cl:first sequence))
+
+(defmethod head ((sequence cl:sequence))
+  (cl:elt sequence 0))
 
 (defmethod head ((sequence wb-seq))
   (fset:@ sequence 0))
@@ -994,8 +1014,11 @@
   (declare (ignore sequence))
   nil)
 
-(defmethod second ((sequence cl:sequence))
+(defmethod second ((sequence cl:cons))
   (cl:second sequence))
+
+(defmethod second ((sequence cl:sequence))
+  (cl:elt sequence 1))
 
 (defmethod second ((sequence wb-seq))
   (fset:@ sequence 1))
