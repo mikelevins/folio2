@@ -597,6 +597,10 @@
   (cl:coerce (loop for x across sequence1 for y across sequence2 append (list x y))
              'cl:vector))
 
+(defmethod interleave ((sequence1 cl:string)(sequence2 cl:string)) 
+  (cl:coerce (loop for x across sequence1 for y across sequence2 append (list x y))
+             'cl:string))
+
 (defmethod interleave ((sequence1 cl:vector)(sequence2 wb-seq)) 
   (interleave sequence1 (as 'cl:vector sequence2)))
 

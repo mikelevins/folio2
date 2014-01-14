@@ -51,6 +51,34 @@
                           :position :position-if :position-if-not 
                           :reduce :remove :remove-duplicates :remove-if :remove-if-not :rest :reverse
                           :search :sequence :second :sort :substitute :substitute-if :substitute-if-not)
-  (:use :net.bardcode.folio.series))
+  (:use :net.bardcode.folio.series)
+  (:export  :alist :alist? :contains-key? :contains-value?
+            :get-key :keys :map? :plist :plist? :put-key :wb-map :wb-map? :values :merge :map
+            :add-first :add-last :any :apportion
+            :binary-append :binary-join :by
+            :dispose :drop :drop-while
+            :element :empty? :every?
+            :filter
+            :head
+            :image :indexes :interleave :interpose
+            :join
+            :leave
+            :make
+            :partition :penult :prefix-match?
+            :range
+            :select :sequence? :shuffle :some?
+            :split :subsequence :suffix-match?
+            :tail :tails :take :take-by :take-while
+            :unzip 
+            :wb-seq :wb-seq?
+            :zip
+            :acons :assoc :assoc-if :assoc-if-not :append
+            :count :count-if :count-if-not
+            :find :find-if :find-if-not :first
+            :last :length 
+            :mismatch
+            :position :position-if :position-if-not 
+            :reduce :remove :remove-duplicates :remove-if :remove-if-not :rest :reverse
+            :search :sequence :second :sort :substitute :substitute-if :substitute-if-not))
 
 

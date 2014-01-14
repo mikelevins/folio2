@@ -191,39 +191,70 @@
 
 (addtest (sequence-tests)
   test-find
-  )
+  (ensure (not (find 'a nil)))
+  (ensure-same 'c (find 'c '(a b c d)))
+  (ensure-same 'c (find 'c (vector 'a 'b 'c 'd)))
+  (ensure-same #\c (find #\c "abcd"))
+  (ensure-same 'c (find 'c (wb-seq 'a 'b 'c 'd))))
 
 (addtest (sequence-tests)
   test-find-if
-  )
+  (ensure (not (find-if 'oddp nil)))
+  (ensure-same 1 (find-if 'oddp '(0 1 2 3)))
+  (ensure-same 1 (find-if 'oddp (vector 0 1 2 3)))
+  (ensure-same #\1 (find-if 'digit-char-p "ab1cd"))
+  (ensure-same 1 (find-if 'oddp (wb-seq 0 1 2 3))))
 
 (addtest (sequence-tests)
   test-find-if-not
-  )
+  (ensure (not (find-if-not 'oddp nil)))
+  (ensure-same 0 (find-if-not 'oddp '(0 1 2 3)))
+  (ensure-same 0 (find-if-not 'oddp (vector 0 1 2 3)))
+  (ensure-same #\a (find-if-not 'digit-char-p "11ab1cd"))
+  (ensure-same 0 (find-if-not 'oddp (wb-seq 0 1 2 3))))
 
 (addtest (sequence-tests)
   test-first
-  )
+  (ensure (not (first nil)))
+  (ensure-same 0 (first '(0 1 2 3)))
+  (ensure-same 0 (first (vector 0 1 2 3)))
+  (ensure-same #\0 (first "0123"))
+  (ensure-same 0 (first (wb-seq 0 1 2 3))))
 
 (addtest (sequence-tests)
   test-head
-  )
+  (ensure (not (head nil)))
+  (ensure-same 0 (head '(0 1 2 3)))
+  (ensure-same 0 (head (vector 0 1 2 3)))
+  (ensure-same #\0 (head "0123"))
+  (ensure-same 0 (head (wb-seq 0 1 2 3))))
 
 (addtest (sequence-tests)
   test-image
-  )
+  (ensure (not (image '1+ nil)))
+  (ensure-same '(1 2 3) (image '1+ '(0 1 2)))
+  (ensure-same (vector 1 2 3) (image '1+ (vector 0 1 2)) :test 'equalp)
+  (ensure-same (wb-seq 1 2 3) (image '1+ (wb-seq 0 1 2)) :test 'equalp))
 
 (addtest (sequence-tests)
   test-indexes
-  )
+  (ensure (not (indexes nil)))
+  (ensure-same '(0 1 2) (indexes '(a b c)))
+  (ensure-same '(0 1 2) (indexes (vector 'a 'b 'c)))
+  (ensure-same '(0 1 2) (indexes (wb-seq 'a 'b 'c))))
 
 (addtest (sequence-tests)
   test-interleave
-  )
+  (ensure-same '(a x b x) (interleave '(a b) '(x x)))
+  (ensure-same "a1b2" (interleave "ab" "12"))
+  (ensure-same (wb-seq :a 1 :b 2 :c 3) (interleave (wb-seq :a :b :c)(wb-seq 1 2 3)) :test 'equalp))
 
 (addtest (sequence-tests)
   test-interpose
-  )
+  (ensure (not (interpose :x nil)))
+  (ensure-same '(:a :x :b :x :c) (interpose :x '(:a :b :c)))
+  (ensure-same (vector :a :x :b :x :c) (interpose :x (vector :a :b :c)) :test 'equalp)
+  (ensure-same (wb-seq :a :x :b :x :c) (interpose :x (wb-seq :a :b :c)) :test 'equalp))
 
 (addtest (sequence-tests)
   test-join
