@@ -1,199 +1,399 @@
-# folio
+# folio reference
+version 2.0
 
-folio is a collection of small libraries that provide support for
-functional idioms and data structures and a common set of APIs for
-working with them.
+## as
 
-folio offers the following features:
+A generic, extensible conversion utility.
 
-- series and pure-functional maps and sequences
-- extension of Common Lisp sequence functions to support the new types
-- extensible generic versions of many Common Lisp  functions
-- an extensible type-conversion utility
-- an extensible contructor function for arbitrary values
-- extensible comparison functions
+**Package:** net.bardcode.folio.as<br>
+**Exports:** as
 
-## Types
+**as** exports a single symbol named **as**, which names a generic function. The function **as** is an extensible type-conversion utility. It can be specialized as-needed to provide  conversions among arbitrary types.
 
-A **box** is a simple, mutable container for a value. The most common
-use for a box is to store a mutable value in an immutable data
-structure, enabling you to introduce just as much mutability as you
-need into an otherwise pure-functional algorithm or data structure.
+The exportation of a single name is intentional. It's meant to make it easy and convenient to `USE` or `IMPORT` the **as** function and extend it as-needed.
 
-A **pair** is an object that associates two values, called its
-**left** and **right** elements. The most obvious example of a
-pair is Common Lisp's `CONS` type, but the folio pair API is
-generic and extensible; you can add your own pair types.
+### Reference
 
-The **Maps** package provides functional implementations of finite
-maps, and provides a common, extensible API for several different
-representations.
+**as** *type* *value* &key &allow-other-keys  => Anything  &nbsp;&nbsp;&nbsp;&nbsp;[*Generic function*]<br>
+Returns a new value of type *type* that is in some sense equivalent
+to *value*. 
 
-The **Sequences** package provides a uniform API for constructing and
-manipulating ordered collections of values, including both standard
-Common Lisp sequence types and additional types, including functional
-collection types provided by Scott Burson's FSet package.
+**#[&lt;type&gt;]** &nbsp;&nbsp;&nbsp;&nbsp;[*Reader macro*]<br>
+The reader macro #[&lt;type&gt;] is a **type constraint**. It attempts to convert the next value read to the specified type. For example, 
 
-The **Series** package extends **Sequences** to work with Richard
-Waters' SERIES package, and to conveniently handle series as unbounded
-sequences.
+    CL-USER> '(1 2)
+    (1 2)
+    
+but:
+    
+    CL-USER> #[vector]'(1 2)
+    #(1 2)
 
-## Functions and conveniences
+The reader macro works only when there is a method defined on **as** that is applicable to the supplied value and type.
 
-**As** provides a single extensible generic function, `as`, for
-converting values from one type to another.
+## boxes
+Mutable containers.
 
-**Functions** provides various conveniences for working with
-functions, including partial application and composition operators. It
-also offers a compact shorthand for Common Lisp's LAMBDA, to reduce
-the visual clutter of using anonymous functions.
+**Package:** net.bardcode.folio.boxes<br>
+**Exports:** box box? set-box! unbox
 
-**Make** provides a single extensible generic function for
-constructing values.
+The **box** type is a mutable container for arbitrary values. The functions **unbox** and **set-box!** can be used to retrieve and replace the value stored in a **box**.
 
-A **Tap** is a function that constructs a series that produces values
-by reading some data structure or stream. The **Taps** package
-provides a set of such functions, For example, the `characters`
-function returns a series of the characters from a file or a
-string. The `slots` function returns a series of pairs whose left
-elements are the names of slots on a map, a hash-table, or an instance
-of a CLOS class, and whose right elements are the associated values.
+Boxes provide a way to introduce mutability piecemeal into immutable and pure-functional data structures. As an example, we can use a pure-functional implementation of finite maps, but store the value elements in boxes so that they can be destructively updated. All operations on the finite map as a whole and on its keys remain purely functional, but we can destructively modify the values stored on the keys.
 
-## Included libraries
+A type definition establishes the **box** type as a synonym for a **cons** cell whose **car** element is the keyword **:BOX**.
 
-folio depends on four other libraries: QuickLisp, FSet, SERIES, and Alexandria. The features provided by these libraries are available when folio is loaded. In particular, the full range od functional data structures from FSet, and the functions and macros provided for working with them, are available in the FSET package. Similarly, the series, generator, and gatherer data structures from the SERIES library, and all of the documented functions and macros for working with them are available in the SERIES package.
+### Reference
 
-### FSet
+**as** 'box *value* => *box*  &nbsp;&nbsp;&nbsp;&nbsp;[*Generic function*]<br>
+Returns a new box that contains *value*.
 
-For documentation and other information about FSet, see the FSet Tutorial:
+**box**  &nbsp;&nbsp;&nbsp;&nbsp;[*Type*]<br>
+A **box** is a mutable container for a value. folio represents a **box** as a
+**cons** whose **car** is the keyword **:box**.
 
-http://common-lisp.net/project/fset/Site/FSet-Tutorial.html
+**box** *value* => *box*  &nbsp;&nbsp;&nbsp;&nbsp;[*Generic function*]<br>
+Returns a new **box** containing *value*.
 
-### SERIES
+**box?** *value* => Generalized Boolean  &nbsp;&nbsp;&nbsp;&nbsp;[*Generic function*]<br>
+Returns a true value if *value* is a **box**, and a false value otherwise.
 
-For documentation and other information about SERIES, see the SERIES homepage:
+**make** 'box &key (*value* nil) => Anything  &nbsp;&nbsp;&nbsp;&nbsp;[*Generic function*]<br>
+Returns a new **box** whose initial value is *value*.
 
-http://series.sourceforge.net/
+**set-box!** *box* *value* => Anything  &nbsp;&nbsp;&nbsp;&nbsp;[*Generic function*]<br>
+Replaces the value of *box* with *value*, returning *value*.
 
-and appendices A and B of *Common Lisp the Language, 2nd Edition*:
+**unbox** box => Anything  &nbsp;&nbsp;&nbsp;&nbsp;[*Generic function*]<br>
+Returns the value stored in *box*.
 
-http://www.cs.cmu.edu/Groups/AI/html/cltl/clm/node347.html#SECTION003400000000000000000
+**setf** (unbox *box*) *value* => *value*  &nbsp;&nbsp;&nbsp;&nbsp;[*Generic function*]<br>
+Replaces the value of *box* with *value*, returning *value*.
 
-http://www.cs.cmu.edu/Groups/AI/html/cltl/clm/node362.html#SECTION003500000000000000000
+## functions
+Tools for working with functions.
 
-## Style and conventions
+**Package:** net.bardcode.folio.functions<br>
+* **Exports:** $ ^ -> cascade compose conjoin disjoin flip fn function? functional?
+           generic-function? method? partial rpartial
 
-folio code has its own style and flavor, which emphasizes generating
-collections of values and mapping functions over them. This style is
-derived from the experimental Lisp dialect Bard, which in turn owes a
-considerable debt to Dylan, ML, Scheme, and Haskell.
+The **functions** package provides a set of tools for working with functions and for making functional style more convenient in Common Lisp.
 
-For examples of folio style, see the sample code provided in the
-examples directory.
+### Reference
 
-folio itself observes a few conventions in its code. When computing new sequences, maps, and series from inputs that are sequences, maps, or series, folio in most cases makes an effort to return a result that is of the type as the first input. In a few cases, where this convention seems clearly contrary to the spirit of the function, this rule is broken.
+**$** (*fn* *arg1* ... *argk*) *body*  => Anything  &nbsp;&nbsp;&nbsp;&nbsp;[*Macro*]<br>
+A compact synonym for Common Lisp FUNCALL. This macro is not intended as a replacement for FUNCALL, but as a convenience for cases where the longer name would be bulky or awkward, or when the clarity of functional code benefits from brevity.
 
+**^** (*arg1* *arg2* ... *argk*) *body*  => Anything  &nbsp;&nbsp;&nbsp;&nbsp;[*Macro*]<br>
+Returns a newly-created function. **^** is shorthand for **lambda**; it accepts the same arguments and has the same effect. Its purpose is to provide a more succinct version of **lambda** for those cases when the longer form would be verbose. An example is in passing an anonymous function inline to a search.
 
-## Using folio
+A synonym for **^** is **fn**.
 
-folio includes an umbrella system definition in folio.asd. If you want to use all of folio, the easiest way to do it is to depend on that system definition. All of the function, macros, and type names defined in folio are exported from the package `net.bardcode.folio`, which defines the nickname `folio`. With the umbrella system loaded, you can use any folio feature by prefixing its name with the package nickname `folio`. For example:
+**->** *f1*..*fk* => *fx*  &nbsp;&nbsp;&nbsp;&nbsp;[*Macro*]<br>
+Returns a function *fx* that accepts *k* arguments. When applied to *k*
+values, the function yields *k* results, applying *f1* to the first argument,
+*f2* to the second, and so on. Combines usefully with **cascade**, e.g:
 
-    CL-USER> (folio:any (as 'cl:list (folio:scan "abcdefgh")))
-    #\h
+    (cascade (a b c) 
+      (-> f1 f2 f3)
+      (-> g1 g2 g3)
+      (-> h1 h2 h3)) 
+    => v1 v2 v3
 
-On the other hand, experience has taught me that people using folio often want to use some specific part of the library, but not all of it. For that reason, folio 2 is organized so that you can load parts of folio without requiring the whole thing. There are a few dependencies within the library. The **as** and **make** subsystems are used by all of the data-structure sections. **taps** relies on **series**, which in turn relies on **sequences**. You shouldn't need to concern yourself with these dependencies, though. The ASDF system definitions declare the needed dependencies, so you can simply load the folio subsystem you want, and rely on ASDF to ensure that any needed dependencies are also loaded.
+where *v1* is `(h1 (g1 (f1 a)))`, *v2* is `(h2 (g2 (f2 b)))`, and  *v3* is `(h3 (g3 (f3 c)))`.
 
-### Reader macros
+<br>
+**cascade** (*arg1*..*argk*) *f1*..*fn*) => *val1*..*valk*  &nbsp;&nbsp;&nbsp;&nbsp;[*Macro*]<br>
+*f1* through *fn* are all functions that accept *k* arguments and return
+*k* values. **cascade** applies *f1* to arguments *arg1*..*argk*. The *k*
+output values become the inputs to *f2*. *f2*'s outputs are the inputs
+to *f3*, and so on. The outputs of *fn* are *val1*..*valk*
 
-Three folio subsystems provide reader macros that extend the lexical syntax of Common Lisp with notational conveniences. Common Lisp programmers don't always like reader macros. Although they can be very convenient, they can also conflict with locally-defined reader macros.
+<br>
+**compose** *fn1*...*fnk* => *fnx*  &nbsp;&nbsp;&nbsp;&nbsp;[*Macro*]<br>
+Returns a new function *fnx* which performs the computations represented by the functions *fn1* through *fnk*.
 
-In order to avoid problems caused by reader-macro conflicts, the folio reader macros are entirely optional. You can choose not to load them if they would cause problems for you, or if you simply don't like reader macros. Each syntax extension is loaded by its own separate ASDF system definition. If you want to avoid loading the reader macros, simply don;t load those systems. You can see examples of controlling subsystem loading in the definitions of the various "load-*" functions in folio.asd.
+Passing an argument A to *fnx* has the same effect as evaluating this expression:
 
-### Systems and packages
+    (*fn1* (*fn2* (*fn3*...(*fnk* A))))
 
-Following are the subsystems and packages provided by folio:
+<br>
+**conjoin** *fn1*...*fnk* => *fnx*  &nbsp;&nbsp;&nbsp;&nbsp;[*Macro*]<br>
+Returns a new function *fnx* which performs the computations represented by the functions *fn1* through *fnk* as if they are arguments to an **and** expression.
 
-| subsystem | type | purpose |
-|-----------|------|---------|
-| as[1] | a single generic function | extensible type-conversion utility |
-| boxes | data structures and API | mutable container |
-|functions | functions and macros | functional idioms |
-| make | a single generic function | extensible value constructor |
-| maps[1] | data structures and API | functional finite maps |
-| pairs | data structures and API | common extensible pair API |
-| sequences[1] | data structures and API | common extensible sequences API |
-| series | data structures and API | extends the sequences API to work with unbounded series |
-| taps | data structures and API | an API for constructing series from inputs and data structures |
+Passing an argument A to *fnx* has the same effect as evaluating this expression:
 
-[1] these subsystems provide optional reader macros
+    (and (*fn1* A)
+         (*fn2* A)
+         ...
+         (*fnk* A))
 
-folio's subsystems have the following library dependencies:
+<br>
+**disjoin** *fn1*...*fnk* => *fnx*  &nbsp;&nbsp;&nbsp;&nbsp;[*Macro*]<br>
+Returns a new function *fnx* which performs the computations represented by the functions *fn1* through *fnk* as if they are arguments to an **or** expression.
 
-| subsystem | dependencies |
-|-----------|------|---------|
-|functions | Alexandria
-| maps | FSet
-| sequences | FSet
-| series | FSet, SERIES
-| taps | FSet, SERIES
+Passing an argument A to *fnx* has the same effect as evaluating this expression:
 
+    (or (*fn1* A)
+         (*fn2* A)
+         ...
+         (*fnk* A))
 
 
-The most convenient way to use folio is usually to just load the umbrella system, `net.bardcode.folio`. If you prefer to customize loading and control which names are exported to your code, you may want to make your own umbrella system. In that case, the definition of `net.bardcode.folio` in folio.asd serves as a guide. You will probably also want to define your own package in order to control the visibility of names from the folio subsystems. You can find guidance on how to do that by examining folio-package.lisp, which defines the umbrella package for folio.
+<br>
+**flip** *fn1*  => *fn2*  &nbsp;&nbsp;&nbsp;&nbsp;[*Function*]<br>
+Returns a new function *fn2* that performs the same computation as *fn1*, but taking its arguments in the opposite order. *fn1* must be a function that accepts two required arguments.
 
-An approach that works well is to define a common package for your code, use the COMMON-LISP package, and import the folio symbols you want to be accessible. Again, folio-package.lisp can offer some guidance. Symbols in the :shadowing-inport-from lists in that file are defined in the COMMON-LISP package, and you'll need to similarly use shadowing import if you want to import them. Symbols in the :import-from lists are defined in the folio sources or the libraries it depends on, and should be safe to import directly, assuming they don't conflict with any symbols you've defined yourself.
+<br>
+**flip** is a somewhat specialized combinator, but its use-case is surprisingly common. As an example, consider filtering a list values for those that are members of another list. You can write that code this way:
 
-The **as** and **make** subsystems should be safe to `USE`, unless you;ve defined your own functions or macros named `as` and `make`. Each of those subsystems defines just one function and exports just one symbol. They are intended to be safe for `USE`.
+    (filter (partial (flip 'member) $the-list)
+            the-values)
+            
+The reason the call to **flip** is needed is that **member** takes its arguments in the wrong order: its first argument is the object you're testing for membership; its second is the list you're searching for members. **flip** enables us to reverse the order of arguments. (Another approach would be to use **rpartial** instead of **partial** to construct the filter function.)
 
-For an example of code that uses the folio umbrella package, see examples/name-generator.lisp.
+Because circumstances like this one arise often, **flip** is often useful.
 
-## The name
+<br>
+**fn**   => Anything  &nbsp;&nbsp;&nbsp;&nbsp;[*Macro*]<br>
+Returns a newly-created function. **fn** is shorthand for **lambda**; it accepts the same arguments and has the same effect. Its purpose is to provide a more succinct version of **lambda** for those cases when the longer form would be verbose. An example is in passing an anonymous function inline to a search.
 
-The name "folio" is a little obscure and arbitrary. It's a term from the craft of printing that refers to certain esoteric details about how books are printed, but I chose it for its relation to the works of Shakespeare: the **First Folio** is an early printed edition of Shakespeare's plays, published in 1623.
+A synonym for **fn** is **^**.
 
-What has William Shakespeare to do with Lisp libraries? Nothing in particular; the choice of "folio" as a name for this library encapsulates a little bit of personal history.
+<br>
+**function?**  *thing*  => Boolean  &nbsp;&nbsp;&nbsp;&nbsp;[*Generic function*]<br>
+Returns true if *thing* is a  function and false otherwise.
 
-The folio library has its origin in work I've done on an experimental dialect of Lisp named **Bard**. The folio library reflects the style and design of Bard in several respects.
+<br>
+**functional?**  *thing*  => Boolean  &nbsp;&nbsp;&nbsp;&nbsp;[*Generic function*]<br>
+Returns true if *thing* is a funcallable object of type function, generic function, or method, and false otherwise.
 
-Bard in turn incorporates influences from several programming languages, but undoubtedly the most important is Dylan. Although Bard no longer closely resembles Dylan in its design, it began years ago as a simple Dylan clone, based on the versions of Dylan before it lost its s-expression syntax.
+<br>
+**generic-function?**  *thing*  => Boolean  &nbsp;&nbsp;&nbsp;&nbsp;[*Generic function*]<br>
+Returns true if *thing* is a generic function and false otherwise.
+<br>
+**method?** *thing*  => Boolean  &nbsp;&nbsp;&nbsp;&nbsp;[*Generic function*]<br>
+Returns true if *thing* is a method and false otherwise.
 
-Dylan got its name during an extended discussion among its designers and users at Apple, Inc. During development it was called "Ralph", after Ralph Ellison, but the consensus was that it needed a more euphonious name. Many were proposed, most of them not as good as "Ralph". Late in the game, some of us raised the point that there was a venerable tradition of naming languages for inspiring people--for scientists such as Blaise Pascal, mathematicians such as Haskell Curry, and intellectual pioneers such as Lady Ada Lovelace. In that context, the name "Dylan" was proposed. It seemed  apropos because, on the one hand it was a reference to Dylan Thomas, a poet that many of us loved, and on the other hand it was easy to conceive of it as a contraction of "Dynamic Language", which it most certainly was.
+<br>
+**partial** *f1* *arg1*..*argk* => *f2*  &nbsp;&nbsp;&nbsp;&nbsp;[*Function*]<br>
+Returns a left section of the function *f1*, created by partially applying *f1* to the arguments *arg1* through *argk*. These arguments must be some of the arguments required by *f1*; *rpartial* partially applies *f1* to them binding them to the leftmost required arguments. 
 
-In later years, when I was trying to think of a name for the Dylan-influenced language I'd been working on, I hit upon the idea of calling it "Bard". A bard is a poet, which made the name an oblique reference to its ancestor, Dylan. It seemed appropriate that the reference was oblique and general, because the language had evolved away from Dylan as I worked on it.
+As an example, if the function **foo** requires four arguments named a, b, c, and d, then
 
-At the same time, "the Bard" (or "the Bard of Avon") is of course a conventional way to refer to William Shakespeare. Besides working on Dylan and the Newton, I spent part of my time at Apple working on SK8, a very powerful authoring and application-development tool that was written in Common Lisp--one of Dylan's immediate ancestors. Metaphors drawn from theater and acting were common in SK8--for example, the abstract container that represented all the objects visible on the screen during a session was called the **stage**.
+    (partial 'foo 1 2)
+    
+creates a left section in which the parameters a and b are bound to the values 1 and 2. Applying the left section to the values 3 and 4 then bind c and d to 3 and 4 and then compute and return the result of the call to foo.
 
-It's always been my ultimate goal to recapitulate some of the best features of these older programming tools, including SK8. That being the case, it seemed satisfying to give my experimental programming language a name that referred to Shakespeare as well as the poetic tradition, and that thereby connected it, however loosely, with both Dylan and SK8. "Bard" seemed like a good choice.
+<br>
+**rpartial** *f1* *arg1*..*argk* => *f2*  &nbsp;&nbsp;&nbsp;&nbsp;[*Function*]<br>
+Returns a right section of the function *f1*, created by partially applying *f1* to the arguments *arg1* through *argk*. These arguments must be some of the arguments required by *f1*; *rpartial* partially applies *f1* to them binding them to the rightmost required arguments.
 
-When it came time to give a name to the Common Lisp library I was using to support and expedite my work on Bard, I naturally turned to thoughts of the literary, of poets, and of Shakespeare. "folio" is the name that fell out.
+As an example, if the function **foo** requires four arguments named a, b, c, and d, then
 
-## Dependencies and Acknowledgements
+    (rpartial 'foo 3 4)
+    
+creates a right section in which the parameters c and d are bound to the values 3 and 4. Applying the right section to the values 1 and 2 then bind a and b to 1 and 2 and then compute and return the result of the call to foo.
 
-folio depends on several other Common Lisp libraries. 
 
-**Quicklisp** is Zach Beane's indispensible Lisp library manager. All of
-folio's dependencies are available through QuickLisp.
+## make
+A generic, extensible utility for constructing values.
 
-http://www.quicklisp.org/beta/
+**Package:** net.bardcode.folio.make<br>
+**Exports:** make
 
-**FSet** is Scott Burson's library of efficient pure-functional data
-structures. folio relies on FSet structures to implement
-pure-functional maps and sequences.
+The **make** package exports the extensible generic function **make**. By specializing this generic function you can implement custom constructors for arbitrary types.
 
-http://common-lisp.net/project/fset/Site/index.html
+**make** is defined to accept keyword arguments, so that your specializations can use keyword parameters to exercise fine control over constructor behavior.
 
-**SERIES** is Richard Waters' set of tools for describing loops and
-iterative processes as functions mapped over (possibly unbounded)
-sequential data structures. In folio, series are simply sequences that
-happen to be capable of being infinitely long.
+The exportation of a single name is intentional. It's meant to make it easy and convenient to `USE` or `IMPORT` the **make** function and extend it as-needed.
 
-http://series.sourceforge.net/
+### Reference
 
-**Alexandria** is a collection of portable public-domain utilities for
-Common Lisp designed to provide some common conveniences in a
-conservative manner. folio 2 uses Alexandria versions of some
-utilities--notably partial application--rather than relying on
-homegrown versions.
+**make** *type* &key &allow-other-keys  => Anything  &nbsp;&nbsp;&nbsp;&nbsp;[*Generic function*]<br>
+Returns a new instance of *type*, constructed according to the specifications passed in the keyword parameters.
 
-http://common-lisp.net/project/alexandria/
+## maps
+Finite map types with a common API
 
+**Package:** net.bardcode.folio.maps<br>
+**Exports:** alist alist?
+   contains-key? contains-value?
+   get-key
+   keys
+   map map? :merge
+   plist plist? put-key
+   values
+   wb-map wb-map?
+
+The **maps** package provides implementations of functional finite maps and a uniform API for working with them. Implementations of the **maps** functions are provided for **alists**, **plists**, and FSet's **wb-map** representation of finite maps. Adding additional representations of maps is a simple matter of specializing the generic functions in the **Maps** package.
+
+An obvious question is why the **Maps** functions are not specialized on Common Lisp's **hash-table** type; surely a hash-table is a kind of finite map? 
+
+The reason that folio doesn't specialize the **Maps** functions for **hash-table** is that the **Maps** protocol is a functional protocol; it assumes the maps it operates on are immutable. The whole advantage of a hash-table is that it provides efficient lookup and update through destructive modification of the table. It's certainly *possible* to implement a purely-functional API for Common Lisp's hash-tables, but it would be perverse to do so, since it would squander all of the performance advantages of hash-tables.
+
+
+### Reference
+
+<br>
+**alist**   &nbsp;&nbsp;&nbsp;&nbsp;[*Type*]<br>
+A Lisp list whose elements are pairs, represented as **cons** cells. The left element of each pair is a key; the right element is a value associated with the key.
+
+<br>
+**alist** (*key1* . *value1*) (*key2* . *value2*) ...  (*keyk* . *valuek*) => *alist* &nbsp;&nbsp;&nbsp;&nbsp;[*Macro*]<br>
+Returns a new **map** represented as an **alist**. The keys and values are as given by *key1*...*keyk* and *value1*...*valuek*.
+
+<br>
+**alist?** *thing* => Boolean  &nbsp;&nbsp;&nbsp;&nbsp;[*Generic function*]<br>
+Returns true if *thing* appears to be an **alist**, and false otherwise. **alist?** considers a value an **alist** if it's a **cons**, if it's a proper list, and if each element is also a **cons**.
+
+<br>
+**contains-key?** *map* *key* &key (test 'eql) =>   &nbsp;&nbsp;&nbsp;&nbsp;[*Generic function*]<br>
+Returns true if *map* contains *key*, and false otherwise. The function passed in the **test** parameter is used to test whether *key* matches a key in *map*.
+
+**test** is ignored when *map* is a **wb-map**.
+
+<br>
+**contains-value?** *map* *value* &key (test 'eql)  &nbsp;&nbsp;&nbsp;&nbsp;[*Generic function*]<br>
+Returns true if *map* contains *value*, and false otherwise. The function passed in the **test** parameter is used to test whether *value* matches a value in *map*.
+
+**test** is ignored when *map* is a **wb-map**.
+
+<br>
+**get-key** *map* *key* &key (test 'eql)(default nil) =>   &nbsp;&nbsp;&nbsp;&nbsp;[*Generic function*]<br>
+Returns the value associated in *map* with *key*, or, if *key* is not present in *map*, returns *default*.
+
+**test** is ignored when *map* is a **wb-map**.
+
+<br>
+**keys** *map* => *keys*  &nbsp;&nbsp;&nbsp;&nbsp;[*Generic function*]<br>
+Returns a sequence of *keys* that appear in *map*.
+
+<br>
+**make** 'map &key (contents nil) => *map* &nbsp;&nbsp;&nbsp;&nbsp;[*Generic function*]<br>
+Returns a new **map** instance. The keys and values of the new **map** are given as a **plist** passed in **contents**. The representation of the **map** is chosen by folio, but you can pass it to **as** to obtain a particular type of **map**.
+
+<br>
+**map?** *thing* => Boolean  &nbsp;&nbsp;&nbsp;&nbsp;[*Generic function*]<br>
+Returns true is *thing* is a **map**, and false otherwise.
+
+<br>
+**merge** *map1* *map2* => *map3*  &nbsp;&nbsp;&nbsp;&nbsp;[*Generic function*]<br>
+Returns a new **map** of the same type as *map1*. The new **map** contains all the keys present in both *map1* and *map2*. Where a key is present in both **maps*, the value from *map2* is chosen to be in *map3*. 
+
+The function passed in the **test** parameter is used to test whether a *key* in *map2* matches a key in *map1*.
+
+<br>
+**plist**   &nbsp;&nbsp;&nbsp;&nbsp;[*Type*]<br>
+A Lisp list with an even number of elements, representing a **map**. Elements at even-numbered indexes must be atoms, and are treated as keys. Elements at odd-numbered indexes are treated as the values associated with the keys, with each one associated with the atom that immediately precedes it.
+
+<br>
+**plist** *key1* *value1* *key2* *value2* ... *keyk* *valuek* => *plist*  &nbsp;&nbsp;&nbsp;&nbsp;[*Function*]<br>
+Returns a new **map** represented as a **plist**. The keys and values are as given by *key1*...*keyk* and *value1*...*valuek*.
+
+<br>
+**plist?** *thing* => Boolean  &nbsp;&nbsp;&nbsp;&nbsp;[*Function*]<br>
+Returns true if *thing* appears to be a **plist**, and false otherwise. **plist?** considers a vaue to be a **plist** if it's a **cons**, if it's a proper list, and if every even-indexed element is an atom.
+
+<br>
+**put-key** *map1* *key* *value* &key (test 'eql) => *map2*  &nbsp;&nbsp;&nbsp;&nbsp;[*Generic function*]<br>
+Returns a new map that contains all the keys in *map1*, but in addition contains *key* with the associated value *value*. If *map1* contains *key* then its associated value is replaced in *map2* by *value*.
+
+<br>
+**values** *map* => *sequence*  &nbsp;&nbsp;&nbsp;&nbsp;[*Generic function*]<br>
+Returns a sequence of all the values contained in *map*.
+
+<br>
+**wb-map**   &nbsp;&nbsp;&nbsp;&nbsp;[*Type*]<br>
+A weight-balanced tree that represents a finite map. This type is provided by the FSet library and supported by folio's **Maps** API.
+
+<br>
+**wb-map?** *thing* => Boolean  &nbsp;&nbsp;&nbsp;&nbsp;[*Generic function*]<br>
+Returns true if *thing* is an instance of an FSet **wb-map**, and false otherwise.
+
+**{ *key1* *val1* ... *keyK* *valK* }** &nbsp;&nbsp;&nbsp;&nbsp;[*Reader macro*]<br>
+The reader macro { *key1* *val1* ... *keyK* *valK* } constructs a **Map** value whose keys are *key1* ... *keyK* and whose corresponding values are *val1* ...  *valK*.
+
+    CL-USER> { :a 1 :b 2}
+    { :A 1 :B 2 }
+
+folio chooses the type of map created, but you can use the **as** utility to convert to a type of your choice. In version 2.0, the default map type is FSET:WB-MAP.
+
+## pairs
+
+A simple data structure with left and right slots. An extensible synonym for `cons`.
+
+**Package:** `net.bardcode.folio.pair`<br>
+**Exports:** `left pair pair? right set-left! set-right!`
+
+The `pair` type is an extensible synonym for Lisp's `cons` type. Any type for which the `pair` functions are specialized is a pair, which means that you can implement your own representations of pairs. 
+
+A second use for the `pair` functions is to clearly communicate intent: using the `pair` functions with `cons` cells communicates that the programmer intends to treat them as pairs of values, as opposed to any of the many other uses to which `cons` cells can be put.
+
+### Reference
+
+**`as`** *Generic function* <br>
+`as 'pair value => pair`<br>
+Returns a new `pair` equivalent to `value`. As an example, `(as 'pair (vector 1 2 3))` returns `(1 2 3)`.
+
+**`left`** *Generic function* <br>
+`left pair => Anything`<br>
+Returns the value of the `left` slot of `pair`.
+
+**`make`** *Generic function* <br>
+`make 'pair &key (left nil)(right nil) => pair`<br>
+Returns a newly-constructed `pair` whose `left` slot contains `left`, and whose `right` slot contains `right`.
+
+**`pair`** *Generic function* <br>
+`pair left right => pair`<br>
+Returns a newly-constructed `pair` whose `left` slot contains `left`, and whose `right` slot contains `right`.
+
+**`pair?`** *Generic function* <br>
+`pair? p => Generalized Boolean`<br>
+Returns a true value if `p` is a `pair`, and a false value otherwise.
+
+**`right`** *Generic function* <br>
+`right pair => Anything`<br>
+Returns the value of the `right` slot of `pair`.
+
+**`set-left!`** *Generic function* <br>
+`set-left! p value => value`<br>
+Replaces the value of the `left` slot of `p` with `value`, returning `value`.
+
+**`setf left`** *Generic function* <br>
+`setf (left p) val => val`<br>
+Replaces the value of the `left` slot of `p` with `value`, returning `value`.
+
+**`set-right!`** *Generic function* <br>
+`set-right! p value => value`<br>
+Replaces the value of the `right` slot of `p` with `value`, returning `value`.
+
+**`setf right`** *Generic function* <br>
+`setf (right p) val => val`<br>
+Replaces the value of the `right` slot of `p` with `value`, returning `value`.
+
+## sequences
+
+Objects that represent ordered sequences of values. An extension and generalization of Common Lisp's sequence type.
+
+## series
+
+Objects that represent ordered sequences of values whose length may be unbounded. An extension of sequences to represent collections with possibly infinite numbers of members. An extension to sequences that enables us to conveniently treat iterative procedures as the mapping of functions over (possibly infinite) sequences.
+
+### Reference
+
+<br>
+**iterate** *fn* *arg*  => *series*  &nbsp;&nbsp;&nbsp;&nbsp;[*Macro*]<br>
+Returns a series whose elements are successive results from the application of *fn*. The series' elements are:
+
+    (*fn* *arg*)
+    (*fn* (*fn* *arg*))
+    (*fn* (*fn* (*fn* *arg*)))
+    ...
+    
+...and so on.
+
+
+## taps
+
+Functions that generate series of values from streams, sequences, and other data structures.
