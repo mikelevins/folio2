@@ -405,79 +405,111 @@
 
 (addtest (sequence-tests)
   test-search
-  )
+  (ensure-same 2 (search '(c d) '(a b c d e f)))
+  (ensure-same 2 (search (vector 'c 'd) (vector 'a 'b 'c 'd 'e 'f)))
+  (ensure-same 2 (search "cd" "abcdefg"))
+  (ensure-same 2 (search (wb-seq 'c 'd) (wb-seq 'a 'b 'c 'd 'e 'f))))
 
 (addtest (sequence-tests)
   test-second
-  )
+  (ensure-same 1 (second '(0 1 2 3)))
+  (ensure-same 1 (second (vector 0 1 2 3)))
+  (ensure-same #\1 (second "0123"))
+  (ensure-same 1 (second (wb-seq 0 1 2 3))))
 
 (addtest (sequence-tests)
   test-select
-  )
-
-(addtest (sequence-tests)
-  test-shuffle
-  )
+  (ensure-same '(1 3 5)(select '(0 1 2 3 4 5 6) '(1 3 5)))
+  (ensure-same '(1 3 5)(select (vector 0 1 2 3 4 5 6) '(1 3 5)))
+  (ensure-same '(1 3 5)(select (vector 0 1 2 3 4 5 6) (vector 1 3 5)))
+  (ensure-same '(1 3 5)(select (wb-seq 0 1 2 3 4 5 6) (vector 1 3 5)))
+  (ensure-same '(1 3 5)(select '(0 1 2 3 4 5 6) (wb-seq 1 3 5))))
 
 (addtest (sequence-tests)
   test-some?
-  )
+  (ensure (some? 'oddp '(2 4 6 8 9)))
+  (ensure (not (some? 'oddp '(2 4 6 8 10))))
+  (ensure (some? 'digit-char-p "abcdef11"))
+  (ensure (not (some? 'oddp (wb-seq 2 4 6 8 10)))))
 
 (addtest (sequence-tests)
   test-sort
-  )
+  (ensure-same '(1 2 3 4 5 6 7 8 9) (sort '(2 1 8 7 4 5 3 6 9) '<))
+  (ensure-same (vector 1 2 3 4 5 6 7 8 9) (sort (vector 2 1 8 7 4 5 3 6 9) '<) :test 'equalp)
+  (ensure-same "abcdefg" (sort "dbeagcf" 'char<))
+  (ensure-same (wb-seq 1 2 3 4 5 6 7 8 9) (sort (wb-seq 2 1 8 7 4 5 3 6 9) '<) :test 'equalp))
 
 (addtest (sequence-tests)
   test-split
-  )
+  (ensure-same '((0 1)(3 4 5)) (split '(0 1 2 3 4 5) '(2)))
+  (ensure-same (vector (vector 0 1)(vector 3 4 5)) (split (vector 0 1 2 3 4 5) (vector 2)) :test 'equalp)
+  (ensure-same (wb-seq (wb-seq 0 1)(wb-seq 3 4 5)) (split (wb-seq 0 1 2 3 4 5) (wb-seq 2)) :test 'equalp))
 
 (addtest (sequence-tests)
   test-subsequence
-  )
+  (ensure-same '(b c) (subsequence '(a b c) 1))
+  (ensure-same "bc" (subsequence "abcdefgh" 1 3))
+  (ensure-same (wb-seq 'b 'c) (subsequence (wb-seq 'a 'b 'c 'd) 1 3) :test 'equalp))
 
 (addtest (sequence-tests)
   test-substitute
-  )
+  (ensure-same '(:a :b 0 :d :e 0 :g :h) (substitute 0 :x '(:a :b :x :d :e :x :g :h)))
+  (ensure-same (wb-seq :a :b 0 :d :e 0 :g :h) (substitute 0 :x (wb-seq :a :b :x :d :e :x :g :h)) :test 'equalp))
 
 (addtest (sequence-tests)
   test-substitute-if
-  )
+  (ensure-same '(0 :_ 2 :_ 4) (substitute-if :_ 'oddp '(0 1 2 3 4)))
+  (ensure-same (wb-seq 0 :_ 2 :_ 4) (substitute-if :_ 'oddp (wb-seq 0 1 2 3 4)) :test 'equalp))
 
 (addtest (sequence-tests)
   test-substitute-if-not
-  )
+  (ensure-same '(0 :_ 2 :_ 4) (substitute-if-not :_ 'evenp '(0 1 2 3 4)))
+  (ensure-same (wb-seq 0 :_ 2 :_ 4) (substitute-if-not :_ 'evenp (wb-seq 0 1 2 3 4)) :test 'equalp))
 
 (addtest (sequence-tests)
   test-suffix-match?
-  )
+  (ensure (suffix-match? '(a b c) nil))
+  (ensure (not (suffix-match? nil '(a b c))))
+  (ensure (suffix-match? '(a b c d e f g) '(e f g)))
+  (ensure (suffix-match? (vector :a :b :c :d :e :f :g) (vector :e :f :g)))
+  (ensure (suffix-match? (wb-seq :a :b :c :d :e :f :g) (wb-seq :e :f :g))))
 
 (addtest (sequence-tests)
   test-tail
-  )
+  (ensure-same '(b c) (tail '(a b c)))
+  (ensure-same "bc" (tail "abc"))
+  (ensure-same (wb-seq 'b 'c) (tail (wb-seq 'a 'b 'c)) :test 'equalp))
 
 (addtest (sequence-tests)
   test-tails
-  )
+  (ensure-same 'c (first (third (tails '(a b c d e f)))))
+  (ensure-same "y" (element (tails "Barney") 5)))
 
 (addtest (sequence-tests)
   test-take
-  )
+  (ensure-same '(1 2 3) (take 3 '(1 2 3 4 5 6 7 8 9)))
+  (ensure-same "Foo" (take 3 "Foobar"))
+  (ensure-same (wb-seq :a :b) (take 2 (wb-seq :a :b :c :d :e)) :test 'equalp))
 
 (addtest (sequence-tests)
   test-take-by
-  )
+  (ensure-same "bc" (second (take-by 2 1 "abcdefghij"))))
 
 (addtest (sequence-tests)
   test-take-while
-  )
+  (ensure-same '(0 0 0) (take-while 'zerop '(0 0 0 1 2 3)))
+  (ensure-same "abcd" (take-while 'alpha-char-p "abcd11111efgh")))
 
 (addtest (sequence-tests)
   test-unzip
-  )
+  (multiple-value-bind (keys vals)(unzip (zip (vector :a :b :c)(wb-seq 1 2 3)))
+    (ensure-same (vector :a :b :c) keys :test 'equalp)
+    (ensure-same (vector 1 2 3) vals :test 'equalp)))
 
 (addtest (sequence-tests)
   test-zip
-  )
+  (ensure-same '((:a . 1)(:b . 2)(:c . 3)) (zip '(:a :b :c) '(1 2 3)))
+  (ensure-same (vector '(:a . 1) '(:b . 2) '(:c . 3))(zip (vector :a :b :c)(wb-seq 1 2 3)) :test 'equalp))
 
 ;;; ---------------------------------------------------------------------
 ;;; run tests

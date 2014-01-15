@@ -48,16 +48,6 @@
   sequence)
 
 ;;; ---------------------------------------------------------------------
-;;; copying
-;;; ---------------------------------------------------------------------
-
-(defmethod deep-copy ((sequence wb-seq) &key &allow-other-keys) 
-  (fset:image 'deep-copy sequence))
-
-(defmethod shallow-copy ((sequence wb-seq) &key &allow-other-keys) 
-  (fset:image 'cl:identity sequence))
-
-;;; ---------------------------------------------------------------------
 ;;; constructions: make
 ;;; ---------------------------------------------------------------------
 
@@ -1060,10 +1050,10 @@
 (defmethod select ((sequence1 cl:null)(sequence2 wb-seq)) nil)
 
 (defmethod select ((sequence1 cl:sequence)(sequence2 wb-seq)) 
-  (fset:convert 'cl:vector (fset:image (lambda (i)(fset:@ sequence1 i)) sequence2)))
+  (fset:convert 'cl:list (fset:image (lambda (i)(fset:@ sequence1 i)) sequence2)))
 
 (defmethod select ((sequence1 wb-seq)(sequence2 wb-seq)) 
-  (fset:image (lambda (i)(fset:@ sequence1 i)) sequence2))
+  (fset:convert 'cl:list (fset:image (lambda (i)(fset:@ sequence1 i)) sequence2)))
 
 ;;;sequence 
 
@@ -1091,7 +1081,11 @@
 ;;; ---------------------------------------------------------------------
 
 (defmethod shuffle ((sequence cl:null))(declare (ignore sequence)) nil)
-(defmethod shuffle ((sequence cl:sequence)) (cl:sort (copy sequence) (lambda (x y)(declare (ignore x y))(cl:elt '(nil t)(random 2)))))
+(defmethod shuffle ((sequence cl:cons)) (cl:sort (copy-tree sequence) (lambda (x y)(declare (ignore x y))(cl:elt '(nil t)(random 2)))))
+(defmethod shuffle ((sequence cl:vector)) 
+  (let ((sequence* (cl:map (type-of sequence) 'cl:identity sequence)))
+    (cl:sort sequence*
+             (lambda (x y)(declare (ignore x y))(cl:elt '(nil t)(random 2))))))
 (defmethod shuffle ((sequence wb-seq)) (fset:sort sequence (lambda (x y)(declare (ignore x y))(cl:elt '(nil t)(random 2)))))
 
 ;;;some?  [bounded]
@@ -1121,8 +1115,10 @@
   (declare (ignore sequence predicate key))
   nil)
 
-(defmethod sort ((sequence cl:sequence) predicate &key (key 'cl:identity))
-  (cl:sort (copy sequence) predicate :key key))
+(defmethod sort ((sequence cl:sequence) predicate &key (key 'cl:identity)) 
+  (let ((sequence* (cl:map (type-of sequence) 'cl:identity sequence)))
+    (cl:sort sequence* predicate :key key)))
+
 
 (defmethod sort ((sequence wb-seq) predicate &key (key 'cl:identity))
   (fset:sort sequence predicate :key key))
