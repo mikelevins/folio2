@@ -258,79 +258,150 @@
 
 (addtest (sequence-tests)
   test-join
-  )
+  (ensure (not (join nil (list nil nil))))
+  (ensure-same '(:a :b :c :x :d :e :f) (join '(:x) '((:a :b :c)(:d :e :f))))
+  (ensure-same "the quick brown fox jumped over the lazy dog"
+               (join " " '("the quick brown fox" "jumped over" "the lazy dog")))
+  (ensure-same (wb-seq :a :b :c :x :d :e :f)
+               (join (wb-seq :x) (list (wb-seq :a :b :c)(wb-seq :d :e :f)))
+               :test 'equalp))
 
 (addtest (sequence-tests)
   test-last
-  )
+  (ensure-error (last nil))
+  (ensure-same 3 (last '(0 1 2 3)))
+  (ensure-same 3 (last (vector 0 1 2 3)))
+  (ensure-same #\3 (last "0123"))
+  (ensure-same 3 (last (wb-seq 0 1 2 3))))
 
 (addtest (sequence-tests)
   test-leave
-  )
+  (ensure-error (leave 2 nil))
+  (ensure-same '(2 3) (leave 2 '(0 1 2 3)))
+  (ensure-same (vector 2 3) (leave 2 (vector 0 1 2 3)) :test 'equalp)
+  (ensure-same "23" (leave 2 "0123"))
+  (ensure-same (wb-seq 2 3) (leave 2 (wb-seq 0 1 2 3)) :test 'equalp))
 
 (addtest (sequence-tests)
   test-length
-  )
+  (ensure (zerop (length nil)))
+  (ensure-same 3 (length (list 0 1 2)))
+  (ensure-same 3 (length "abc"))
+  (ensure-same 3 (length (wb-seq 0 1 2))))
 
 (addtest (sequence-tests)
   test-mismatch
-  )
+  (ensure (not (mismatch nil nil)))
+  (ensure-same 0 (mismatch '(a b c) nil))
+  (ensure-same 0 (mismatch nil '(a b c)))
+  (ensure-same 2 (mismatch '(a b c d) '(a b d e)))
+  (ensure-same 2 (mismatch "abcd" "abde"))
+  (ensure-same 2 (mismatch (vector 'a 'b 'c 'd) (vector 'a 'b 'd 'e)))
+  (ensure-same 2 (mismatch (wb-seq 'a 'b 'c 'd) (wb-seq 'a 'b 'd 'e)))
+  (ensure-same 2 (mismatch (vector 'a 'b 'c 'd) (wb-seq 'a 'b 'd 'e))))
 
 (addtest (sequence-tests)
   test-partition
-  )
+  (multiple-value-bind (odds evens)(partition 'oddp '(0 1 2 3 4 5))
+    (ensure-same '(1 3 5) odds)
+    (ensure-same '(0 2 4) evens))
+  (multiple-value-bind (odds evens)(partition 'oddp (vector 0 1 2 3 4 5))
+    (ensure-same (vector 1 3 5) odds :test 'equalp)
+    (ensure-same (vector 0 2 4) evens :test 'equalp))
+  (multiple-value-bind (odds evens)(partition 'oddp (wb-seq 0 1 2 3 4 5))
+    (ensure-same (wb-seq 1 3 5) odds :test 'equalp)
+    (ensure-same (wb-seq 0 2 4) evens :test 'equalp)))
 
 (addtest (sequence-tests)
   test-penult
-  )
+  (ensure-error (penult nil))
+  (ensure-same 2 (penult '(0 1 2 3)))
+  (ensure-same 2 (penult (vector 0 1 2 3)))
+  (ensure-same #\2 (penult "0123"))
+  (ensure-same 2 (penult (wb-seq 0 1 2 3))))
 
 (addtest (sequence-tests)
   test-position
-  )
+  (ensure (not (position 'e nil)))
+  (ensure-same 1 (position 'e '(b e e r)))
+  (ensure-same 1 (position 'e (vector 'b 'e 'e 'r)))
+  (ensure-same 1 (position #\e "beer"))
+  (ensure-same 1 (position 'e (wb-seq 'b 'e 'e 'r))))
 
 (addtest (sequence-tests)
   test-position-if
-  )
+  (ensure (not (position-if 'oddp nil)))
+  (ensure-same 1 (position-if 'oddp '(0 1 2 3 4)))
+  (ensure-same 1 (position-if 'oddp (vector 0 1 2 3 4)))
+  (ensure-same 1 (position-if 'digit-char-p "a1b2c3"))
+  (ensure-same 1 (position-if 'oddp (wb-seq 0 1 2 3 4))))
 
 (addtest (sequence-tests)
   test-position-if-not
-  )
+  (ensure (not (position-if-not 'oddp nil)))
+  (ensure-same 1 (position-if-not 'evenp '(0 1 2 3 4)))
+  (ensure-same 1 (position-if-not 'evenp (vector 0 1 2 3 4)))
+  (ensure-same 1 (position-if-not 'digit-char-p "1a2bcoddp3"))
+  (ensure-same 1 (position-if-not 'evenp (wb-seq 0 1 2 3 4))))
 
 (addtest (sequence-tests)
   test-prefix-match?
-  )
+  (ensure (prefix-match? nil '(a b c)))
+  (ensure (not (prefix-match? '(a b c) nil)))
+  (ensure (prefix-match? '(a b c) '(a b c d e f g)))
+  (ensure (prefix-match? (vector :a :b :c) (vector :a :b :c :d :e :f :g)))
+  (ensure (prefix-match? (wb-seq :a :b :c) (wb-seq :a :b :c :d :e :f :g))))
 
 (addtest (sequence-tests)
   test-range
-  )
+  (ensure-same '(0 1 2 3) (range 0 4))
+  (ensure-same '(0 2 4 6 8) (range 0 10 :by 2))
+  (ensure-same '(10 8 6 4 2) (range 10 0 :by 2)))
 
 (addtest (sequence-tests)
   test-reduce
-  )
+  (ensure-same 10 (reduce '+ '(1 2 3 4) :initial-value 0))
+  (ensure-same 10 (reduce '+ (vector 1 2 3 4) :initial-value 0))
+  (ensure-same 10 (reduce '+ (wb-seq 1 2 3 4) :initial-value 0)))
 
 (addtest (sequence-tests)
   test-remove
-  )
+  (ensure-same nil (remove 'a nil))
+  (ensure-same '(1 2 3 4) (remove 'and '(1 and 2 and 3 and 4)))
+  (ensure-same (vector 1 2 3 4) (remove 'and (vector 1 'and 2 'and 3 'and 4)) :test 'equalp)
+  (ensure-same (wb-seq 1 2 3 4) (remove 'and (wb-seq 1 'and 2 'and 3 'and 4)) :test 'equalp))
 
 (addtest (sequence-tests)
   test-remove-if
-  )
+  (ensure-same nil (remove-if 'oddp nil))
+  (ensure-same '(0 2 4) (remove-if 'oddp '(0 1 2 3 4 5)))
+  (ensure-same (vector 0 2 4) (remove-if 'oddp (vector 0 1 2 3 4 5)) :test 'equalp)
+  (ensure-same (wb-seq 0 2 4) (remove-if 'oddp (wb-seq 0 1 2 3 4 5)) :test 'equalp))
 
 (addtest (sequence-tests)
   test-remove-if-not
-  )
+  (ensure-same nil (remove-if-not 'oddp nil))
+  (ensure-same '(1 3 5) (remove-if-not 'oddp '(0 1 2 3 4 5)))
+  (ensure-same (vector 1 3 5) (remove-if-not 'oddp (vector 0 1 2 3 4 5)) :test 'equalp)
+  (ensure-same (wb-seq 1 3 5) (remove-if-not 'oddp (wb-seq 0 1 2 3 4 5)) :test 'equalp))
 
 (addtest (sequence-tests)
   test-remove-duplicates
-  )
+  (ensure-same '(a b c) (remove-duplicates '(a a b b c c)))
+  (ensure-same "abc" (remove-duplicates "aabbcc"))
+  (ensure-same (wb-seq 'a 'b 'c) (remove-duplicates (wb-seq 'a 'a 'b 'b 'c 'c)) :test 'equalp))
 
 (addtest (sequence-tests)
   test-rest
-  )
+  (ensure-same '(b c) (rest '(a b c)))
+  (ensure-same "bc" (rest "abc"))
+  (ensure-same (wb-seq 'b 'c) (rest (wb-seq 'a 'b 'c)) :test 'equalp))
 
 (addtest (sequence-tests)
   test-reverse
-  )
+  (ensure-same '(c b a) (reverse '(a b c)))
+  (ensure-same "cba" (reverse "abc"))
+  (ensure-same (wb-seq 'c 'b 'a) (reverse (wb-seq 'a 'b 'c)) :test 'equalp))
 
 (addtest (sequence-tests)
   test-search
