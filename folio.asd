@@ -14,6 +14,10 @@
 (require :asdf)
 
 ;;; ---------------------------------------------------------------------
+;;; FOLIO
+;;; ---------------------------------------------------------------------
+
+;;; ---------------------------------------------------------------------
 ;;; AS
 ;;; ---------------------------------------------------------------------
 
@@ -453,7 +457,8 @@
                      :net.bardcode.folio.taps)
   :components ((:module "src"
                         :serial t
-                        :components ((:file "folio-package")))))
+                        :components ((:file "folio-package")
+                                     (:file "version")))))
 
 (asdf:defsystem :net.bardcode.folio.tests
   :serial t
@@ -475,8 +480,11 @@
 ;;; loaders
 ;;; ---------------------------------------------------------------------
 
+(ql:quickload :series)
+
 (defun load-folio ()
-  (asdf:oos 'asdf:load-op :net.bardcode.folio))
+  (let ((series:*suppress-series-warnings* t))
+    (asdf:oos 'asdf:load-op :net.bardcode.folio)))
 
 (defun load-folio-tests ()
   (asdf:oos 'asdf:load-op :net.bardcode.folio.tests))

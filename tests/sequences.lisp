@@ -100,8 +100,8 @@
 
 (addtest (sequence-tests)
   test-assoc-if-not
-  (ensure-same "aardvark" (assoc-if-not 'digit-char-p (vector "aardvark" "1 baboon" "coatimundi")))
-  (ensure-same (vector 0 1 2 3) (assoc-if-not 'oddp (list (vector 0 1 2 3)(vector 1 2 3 4)(vector 2 3 4 5))) :test 'cl:equalp))
+  (ensure-same "aardvark" (assoc-if-not #'digit-char-p (vector "aardvark" "1 baboon" "coatimundi")))
+  (ensure-same (vector 0 1 2 3) (assoc-if-not #'oddp (list (vector 0 1 2 3)(vector 1 2 3 4)(vector 2 3 4 5))) :test 'cl:equalp))
 
 (addtest (sequence-tests)
   test-by
@@ -125,20 +125,20 @@
 
 (addtest (sequence-tests)
   test-count-if-not
-  (ensure-same 0 (count-if-not 'evenp nil))
-  (ensure-same 3 (count-if-not 'evenp '(0 1 2 3 4 5)))
-  (ensure-same 26 (count-if-not 'digit-char-p "1: money 2: show 3: get ready"))
-  (ensure-same 2 (count-if-not 'symbolp (wb-seq "a" 'b "c" 'd))))
+  (ensure-same 0 (count-if-not #'evenp nil))
+  (ensure-same 3 (count-if-not #'evenp '(0 1 2 3 4 5)))
+  (ensure-same 26 (count-if-not #'digit-char-p "1: money 2: show 3: get ready"))
+  (ensure-same 2 (count-if-not #'symbolp (wb-seq "a" 'b "c" 'd))))
 
 (addtest (sequence-tests)
   test-dispose
-  (multiple-value-bind (odds evens)(dispose '(0 1 2 3) 'oddp 'evenp)
+  (multiple-value-bind (odds evens)(dispose '(0 1 2 3) #'oddp #'evenp)
     (ensure-same '(nil t nil t) odds)
     (ensure-same '(t nil t nil) evens))
-  (multiple-value-bind (odds evens)(dispose (vector 0 1 2 3) 'oddp 'evenp)
+  (multiple-value-bind (odds evens)(dispose (vector 0 1 2 3) #'oddp #'evenp)
     (ensure-same (vector nil t nil t) odds :test 'cl:equalp)
     (ensure-same (vector t nil t nil) evens :test 'cl:equalp))
-  (multiple-value-bind (odds evens)(dispose (wb-seq 0 1 2 3) 'oddp 'evenp)
+  (multiple-value-bind (odds evens)(dispose (wb-seq 0 1 2 3) #'oddp #'evenp)
     (ensure-same (wb-seq nil t nil t) odds :test 'cl:equalp)
     (ensure-same (wb-seq t nil t nil) evens :test 'cl:equalp)))
 
@@ -152,10 +152,10 @@
 
 (addtest (sequence-tests)
   test-drop-while
-  (ensure-same nil (drop-while 'oddp nil))
-  (ensure-same '(1 2 3) (drop-while 'evenp '(0 1 2 3)))
+  (ensure-same nil (drop-while #'oddp nil))
+  (ensure-same '(1 2 3) (drop-while #'evenp '(0 1 2 3)))
   (ensure-same "cdef" (drop 2 "abcdef"))
-  (ensure-same (wb-seq 'd 'e 'f)(drop-while 'numberp (wb-seq 1 2 3 'd 'e 'f)) :test 'cl:equalp))
+  (ensure-same (wb-seq 'd 'e 'f)(drop-while #'numberp (wb-seq 1 2 3 'd 'e 'f)) :test 'cl:equalp))
 
 (addtest (sequence-tests)
   test-element
@@ -207,11 +207,11 @@
 
 (addtest (sequence-tests)
   test-find-if-not
-  (ensure (not (find-if-not 'oddp nil)))
-  (ensure-same 0 (find-if-not 'oddp '(0 1 2 3)))
-  (ensure-same 0 (find-if-not 'oddp (vector 0 1 2 3)))
-  (ensure-same #\a (find-if-not 'digit-char-p "11ab1cd"))
-  (ensure-same 0 (find-if-not 'oddp (wb-seq 0 1 2 3))))
+  (ensure (not (find-if-not #'oddp nil)))
+  (ensure-same 0 (find-if-not #'oddp '(0 1 2 3)))
+  (ensure-same 0 (find-if-not #'oddp (vector 0 1 2 3)))
+  (ensure-same #\a (find-if-not #'digit-char-p "11ab1cd"))
+  (ensure-same 0 (find-if-not #'oddp (wb-seq 0 1 2 3))))
 
 (addtest (sequence-tests)
   test-first
@@ -231,10 +231,10 @@
 
 (addtest (sequence-tests)
   test-image
-  (ensure (not (image '1+ nil)))
-  (ensure-same '(1 2 3) (image '1+ '(0 1 2)))
-  (ensure-same (vector 1 2 3) (image '1+ (vector 0 1 2)) :test 'equalp)
-  (ensure-same (wb-seq 1 2 3) (image '1+ (wb-seq 0 1 2)) :test 'equalp))
+  (ensure (not (image #'1+ nil)))
+  (ensure-same '(1 2 3) (image #'1+ '(0 1 2)))
+  (ensure-same (vector 1 2 3) (image #'1+ (vector 0 1 2)) :test #'equalp)
+  (ensure-same (wb-seq 1 2 3) (image #'1+ (wb-seq 0 1 2)) :test #'equalp))
 
 (addtest (sequence-tests)
   test-indexes
@@ -338,11 +338,11 @@
 
 (addtest (sequence-tests)
   test-position-if-not
-  (ensure (not (position-if-not 'oddp nil)))
-  (ensure-same 1 (position-if-not 'evenp '(0 1 2 3 4)))
-  (ensure-same 1 (position-if-not 'evenp (vector 0 1 2 3 4)))
-  (ensure-same 1 (position-if-not 'digit-char-p "1a2bcoddp3"))
-  (ensure-same 1 (position-if-not 'evenp (wb-seq 0 1 2 3 4))))
+  (ensure (not (position-if-not #'oddp nil)))
+  (ensure-same 1 (position-if-not #'evenp '(0 1 2 3 4)))
+  (ensure-same 1 (position-if-not #'evenp (vector 0 1 2 3 4)))
+  (ensure-same 1 (position-if-not #'digit-char-p "1a2bcoddp3"))
+  (ensure-same 1 (position-if-not #'evenp (wb-seq 0 1 2 3 4))))
 
 (addtest (sequence-tests)
   test-prefix-match?
@@ -380,10 +380,10 @@
 
 (addtest (sequence-tests)
   test-remove-if-not
-  (ensure-same nil (remove-if-not 'oddp nil))
-  (ensure-same '(1 3 5) (remove-if-not 'oddp '(0 1 2 3 4 5)))
-  (ensure-same (vector 1 3 5) (remove-if-not 'oddp (vector 0 1 2 3 4 5)) :test 'equalp)
-  (ensure-same (wb-seq 1 3 5) (remove-if-not 'oddp (wb-seq 0 1 2 3 4 5)) :test 'equalp))
+  (ensure-same nil (remove-if-not #'oddp nil))
+  (ensure-same '(1 3 5) (remove-if-not #'oddp '(0 1 2 3 4 5)))
+  (ensure-same (vector 1 3 5) (remove-if-not #'oddp (vector 0 1 2 3 4 5)) :test 'equalp)
+  (ensure-same (wb-seq 1 3 5) (remove-if-not #'oddp (wb-seq 0 1 2 3 4 5)) :test 'equalp))
 
 (addtest (sequence-tests)
   test-remove-duplicates
@@ -463,8 +463,8 @@
 
 (addtest (sequence-tests)
   test-substitute-if-not
-  (ensure-same '(0 :_ 2 :_ 4) (substitute-if-not :_ 'evenp '(0 1 2 3 4)))
-  (ensure-same (wb-seq 0 :_ 2 :_ 4) (substitute-if-not :_ 'evenp (wb-seq 0 1 2 3 4)) :test 'equalp))
+  (ensure-same '(0 :_ 2 :_ 4) (substitute-if-not :_ #'evenp '(0 1 2 3 4)))
+  (ensure-same (wb-seq 0 :_ 2 :_ 4) (substitute-if-not :_ #'evenp (wb-seq 0 1 2 3 4)) :test #'equalp))
 
 (addtest (sequence-tests)
   test-suffix-match?
@@ -497,8 +497,8 @@
 
 (addtest (sequence-tests)
   test-take-while
-  (ensure-same '(0 0 0) (take-while 'zerop '(0 0 0 1 2 3)))
-  (ensure-same "abcd" (take-while 'alpha-char-p "abcd11111efgh")))
+  (ensure-same '(0 0 0) (take-while #'zerop '(0 0 0 1 2 3)))
+  (ensure-same "abcd" (take-while #'alpha-char-p "abcd11111efgh")))
 
 (addtest (sequence-tests)
   test-unzip

@@ -143,12 +143,12 @@
 (addtest (series-tests)
   test-remove-if
   (ensure-same (as 'cl:list (series 0 2 4 6 8))
-               (as 'cl:list (remove-if 'oddp (series 0 1 2 3 4 5 6 7 8 9)))))
+               (as 'cl:list (remove-if #'oddp (series 0 1 2 3 4 5 6 7 8 9)))))
 
 (addtest (series-tests)
   test-remove-if-not
   (ensure-same (as 'cl:list (series 0 2 4 6 8))
-               (as 'cl:list (remove-if-not 'evenp (series 0 1 2 3 4 5 6 7 8 9)))))
+               (as 'cl:list (remove-if-not #'evenp (series 0 1 2 3 4 5 6 7 8 9)))))
 
 (addtest (series-tests)
   test-rest

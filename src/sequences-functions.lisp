@@ -117,14 +117,16 @@
 ;;; (any sequence) => anything
 ;;; ---------------------------------------------------------------------
 
+(defparameter *any-random-state* (make-random-state))
+
 (defmethod any ((sequence cl:null))
   nil)
 
 (defmethod any ((sequence cl:sequence))
-  (elt sequence (cl:random (cl:length sequence))))
+  (elt sequence (cl:random (cl:length sequence) *any-random-state*)))
 
 (defmethod any ((sequence wb-seq))
-  (fset:@ sequence (cl:random (fset:size sequence))))
+  (fset:@ sequence (cl:random (fset:size sequence) *any-random-state*)))
 
 ;;; function append [bounded]
 ;;;
@@ -1246,7 +1248,7 @@
 
 ;;; function substitute
 ;;;
-;;; (substitute new-item old-item sequence &key key) => sequence'
+;;; (substitute new-item old-item sequence &key key test) => sequence'
 ;;; ---------------------------------------------------------------------
 
 (defmethod substitute (new-item old-item (sequence cl:sequence) &key (test 'cl:eql) (key 'cl:identity))

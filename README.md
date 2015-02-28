@@ -1,8 +1,22 @@
 # folio
 
 folio is a collection of small libraries that provide support for
-functional idioms and data structures and a common set of APIs for
-working with them.
+functional idioms and data structures in Common Lisp and a common set
+of APIs for working with them.
+
+folio is oragnized so that users can load and use the entire
+collections of functions, macros, and types, or just those parts of
+the library that are needed. It provides several purely-optional
+syntactic extensions for convenience.
+
+folio includes a small but nontrivial example program that illustrates
+the use of several of its features to provide good epxressive power in
+compact, readable code.
+
+folio 2.0 has been tested with SBCL, Clozure Common Lisp, and
+Lispworks 6.1.
+
+## Features
 
 folio offers the following features:
 
@@ -11,6 +25,7 @@ folio offers the following features:
 - extensible generic versions of many Common Lisp  functions
 - an extensible type-conversion utility
 - an extensible contructor function for arbitrary values
+- seamless integration of the SERIES and FSet libraries
 
 ## Types
 
@@ -60,9 +75,15 @@ of a CLOS class, and whose right elements are the associated values.
 
 ## Included libraries
 
-folio depends on four other libraries: **QuickLisp**, **FSet**, **SERIES**, and **Alexandria**. The features provided by these libraries are available when folio is loaded. In particular, the full range of functional data structures from FSet, and the functions and macros provided for working with them, are available in the FSET package. Similarly, the series, generator, and gatherer data structures from the SERIES library, and all of the documented functions and macros for working with them are available in the SERIES package.
-
-folio also relies on ASDF for loading the system.
+folio depends on six other libraries: **QuickLisp**, **FSet**,
+**SERIES**, **Alexandria**, **Closer-MOP**, and **ASDF**. The features
+provided by these libraries are available when folio is loaded. In
+particular, the full range of functional data structures from FSet,
+and the functions and macros provided for working with them, are
+available in the FSET package. Similarly, the series, generator, and
+gatherer data structures from the SERIES library, and all of the
+documented functions and macros for working with them are available in
+the SERIES package.
 
 ### FSet
 
@@ -142,36 +163,95 @@ folio's subsystems have the following library dependencies:
 | maps | FSet
 | sequences | FSet
 | series | FSet, SERIES
-| taps | FSet, SERIES
+| taps | FSet, SERIES, Closer-MOP
 
 
 
-The most convenient way to use folio is usually to just load the umbrella system, `net.bardcode.folio`. If you prefer to customize loading and control which names are exported to your code, you may want to make your own umbrella system. In that case, the definition of `net.bardcode.folio` in folio.asd serves as a guide. You will probably also want to define your own package in order to control the visibility of names from the folio subsystems. You can find guidance on how to do that by examining folio-package.lisp, which defines the umbrella package for folio.
+The most convenient way to use folio is usually to just load the
+umbrella system, `net.bardcode.folio`. If you prefer to customize
+loading and control which names are exported to your code, you may
+want to make your own umbrella system. In that case, the definition of
+`net.bardcode.folio` in folio.asd serves as a guide. You will probably
+also want to define your own package in order to control the
+visibility of names from the folio subsystems. You can find guidance
+on how to do that by examining folio-package.lisp, which defines the
+umbrella package for folio.
 
-An approach that works well is to define a common package for your code, use the COMMON-LISP package, and import the folio symbols you want to be accessible. Again, folio-package.lisp can offer some guidance. Symbols in the :shadowing-inport-from lists in that file are defined in the COMMON-LISP package, and you'll need to similarly use shadowing import if you want to import them. Symbols in the :import-from lists are defined in the folio sources or the libraries it depends on, and should be safe to import directly, assuming they don't conflict with any symbols you've defined yourself.
+An approach that works well is to define a common package for your
+code, use the COMMON-LISP package, and import the folio symbols you
+want to be accessible. Again, folio-package.lisp can offer some
+guidance. Symbols in the :shadowing-inport-from lists in that file are
+defined in the COMMON-LISP package, and you'll need to similarly use
+shadowing import if you want to import them. Symbols in the
+:import-from lists are defined in the folio sources or the libraries
+it depends on, and should be safe to import directly, assuming they
+don't conflict with any symbols you've defined yourself.
 
-The **as** and **make** subsystems should be safe to `USE`, unless you've defined your own functions or macros named `as` and `make`. Each of those subsystems defines just one function and exports just one symbol. They are intended to be safe for `USE`.
+The **as** and **make** subsystems should be safe to `USE`, unless
+you've defined your own functions or macros named `as` and
+`make`. Each of those subsystems defines just one function and exports
+just one symbol. They are intended to be safe for `USE`.
 
-For an example of code that uses the folio umbrella package, see examples/name-generator.lisp.
+For an example of code that uses the folio umbrella package, see
+examples/name-generator.lisp.
 
 ## The name
 
-The name "folio" is a little obscure and arbitrary. It's a term from the craft of printing that refers to certain esoteric details about how books are printed, but I chose it for its relation to the works of Shakespeare: the **First Folio** is an early printed edition of Shakespeare's plays, published in 1623.
+The name "folio" is a little obscure and arbitrary. It's a term from
+the craft of printing that refers to certain esoteric details about
+how books are printed, but I chose it for its relation to the works of
+Shakespeare: the **First Folio** is an early printed edition of
+Shakespeare's plays, published in 1623.
 
-What has William Shakespeare to do with Lisp libraries? Nothing in particular; the choice of "folio" as a name for this library encapsulates a little bit of personal history.
+What has William Shakespeare to do with Lisp libraries? Nothing in
+particular; the choice of "folio" as a name for this library
+encapsulates a little bit of personal history.
 
-The folio library has its origin in work I've done on an experimental dialect of Lisp named **Bard**. The folio library reflects the style and design of Bard in several respects.
+The folio library has its origin in work I've done on an experimental
+dialect of Lisp named **Bard**. The folio library reflects the style
+and design of Bard in several respects.
 
-Bard in turn incorporates influences from several programming languages, but undoubtedly the most important is Dylan. Although Bard no longer particularly resembles Dylan, it began years ago as a simple Dylan clone, based on the versions of Dylan before it lost its s-expression syntax.
+Bard in turn incorporates influences from several programming
+languages, but undoubtedly the most important is Dylan. Although Bard
+no longer particularly resembles Dylan, it began years ago as a simple
+Dylan clone, based on the versions of Dylan before it lost its
+s-expression syntax.
 
-Dylan got its name during an extended discussion among its designers and users at Apple, Inc. During development it was called "Ralph", after Ralph Ellison, but the consensus was that it needed a more euphonious name. Many were proposed, most of them not as good as "Ralph". Late in the game, some of us raised the point that there was a venerable tradition of naming languages for inspiring people--for scientists such as Blaise Pascal, mathematicians such as Haskell Curry, and intellectual pioneers such as Lady Ada Lovelace. In that context, the name "Dylan" was proposed. It seemed  apropos because, on the one hand it was a reference to Dylan Thomas, a poet that many of us loved, and on the other hand it was easy to conceive of it as a contraction of "dynamic language", which aptly described Dylan.
+Dylan got its name during an extended discussion among its designers
+and users at Apple, Inc. During development it was called "Ralph",
+after Ralph Ellison, but the consensus was that it needed a more
+euphonious name. Many were proposed, most of them not as good as
+"Ralph". Late in the game, some of us raised the point that there was
+a venerable tradition of naming languages for inspiring people--for
+scientists such as Blaise Pascal, mathematicians such as Haskell
+Curry, and intellectual pioneers such as Lady Ada Lovelace. In that
+context, the name "Dylan" was proposed. It seemed apropos because, on
+the one hand it was a reference to Dylan Thomas, a poet that many of
+us loved, and on the other hand it was easy to conceive of it as a
+contraction of "dynamic language", which aptly described Dylan.
 
-In later years, when I was trying to think of a name for the Dylan-influenced language I'd been working on, I hit upon the idea of calling it "Bard". A bard is a poet, which made the name an oblique reference to its ancestor, Dylan. It seemed appropriate that the reference was oblique and general, because the language had evolved away from Dylan as I worked on it.
+In later years, when I was trying to think of a name for the
+Dylan-influenced language I'd been working on, I hit upon the idea of
+calling it "Bard". A bard is a poet, which made the name an oblique
+reference to its ancestor, Dylan. It seemed appropriate that the
+reference was oblique and general, because the language had evolved
+away from Dylan as I worked on it.
 
-At the same time, "the Bard" (or "the Bard of Avon") is of course a conventional way to refer to William Shakespeare. Besides working on Dylan and the Newton, I spent part of my time at Apple working on SK8, a very powerful authoring and application-development tool that was written in Common Lisp--one of Dylan's immediate ancestors. Metaphors drawn from theater and acting were common in SK8--for example, the abstract container that represented all the objects visible on the screen during a session was called the **stage**.
+At the same time, "the Bard" (or "the Bard of Avon") is of course a
+conventional way to refer to William Shakespeare. Besides working on
+Dylan and the Newton, I spent part of my time at Apple working on SK8,
+a very powerful authoring and application-development tool that was
+written in Common Lisp--one of Dylan's immediate ancestors. Metaphors
+drawn from theater and acting were common in SK8--for example, the
+abstract container that represented all the objects visible on the
+screen during a session was called the **stage**.
 
-"Bard" was therefore an oblique reference to two past projects that had influenced and informed the design of the language.
+"Bard" was therefore an oblique reference to two past projects that
+had influenced and informed the design of the language.
 
-When it came time to give a name to the Common Lisp library I was using to support and expedite my work on Bard, I naturally turned to thoughts of the literary, of poets, and of Shakespeare. "folio" is the name that fell out.
+When it came time to give a name to the Common Lisp library I was
+using to support and expedite my work on Bard, I naturally turned to
+thoughts of the literary, of poets, and of Shakespeare. "folio" is the
+name that fell out.
 
 

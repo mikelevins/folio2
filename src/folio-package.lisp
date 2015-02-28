@@ -52,7 +52,8 @@
                           :reduce :remove :remove-duplicates :remove-if :remove-if-not :rest :reverse
                           :search :sequence :second :sort :substitute :substitute-if :substitute-if-not)
   (:use :net.bardcode.folio.series)
-  (:export  :alist :alist? :contains-key? :contains-value?
+  (:export  :*folio-version*
+            :alist :alist? :contains-key? :contains-value?
             :get-key :keys :map? :plist :plist? :put-key :wb-map :wb-map? :values :merge :map
             :add-first :add-last :any :apportion
             :binary-append :binary-join :by

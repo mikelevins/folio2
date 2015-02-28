@@ -237,7 +237,7 @@
 ;;; (remove item sequence &key test start end key) => anything
 ;;; ---------------------------------------------------------------------
 
-(defmethod remove (item (sequence foundation-series) &key (test 'eql) (start 0) (end nil endp) (key 'cl:identity))
+(defmethod remove (item (sequence foundation-series) &key (test #'eql) (start 0) (end nil endp) (key 'cl:identity))
   (let* ((segment (if endp
                       (series:subseries sequence start end)
                       (series:subseries sequence start)))

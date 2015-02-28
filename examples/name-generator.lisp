@@ -11,58 +11,65 @@
 
 (in-package :folio)
 
-(defparameter +maximum-name-length+ 12)
+(defmethod read-samples ((path pathname))
+  (as 'cl:list
+      (filter (complement #'empty?)
+              (lines path))))
 
-(defun pending? (nm)(right nm))
-(defun name-part (nm)(left nm))
-(defmethod triples ((s cl:sequence)) (take-by 3 1 s))
+(defmethod read-samples ((path string))
+  (read-samples (pathname path)))
 
-(defmethod read-names ((path pathname)) (lines path))
+(defun triples (s)
+  (take-by 3 1 s))
 
-(defmethod read-names ((path string)) 
-  (filter (compose (partial 'cl:<= 3) 'length)
-          (as 'cl:sequence (read-names (pathname path)))))
+(defmethod parse-samples ((path pathname))
+  (image #'triples
+         (read-samples path)))
 
-(defmethod rules ((names cl:sequence))
-  (multiple-value-bind (starts parts)(dispose (image 'triples names) 'left 'right)
-    (cl:values starts (reduce 'append parts))))
+(defmethod parse-samples ((path string))
+  (parse-samples (pathname path)))
 
-(defun find-extension (nm parts)
-  (any (filter (partial 'prefix-match? (leave 2 nm))
-               parts)))
+(defun joinable? (left right)
+  (equal (drop 1 left)
+         (take 2 right)))
 
-(defun merge-name (nm segment)
-  (if  (< (length segment) 3)
-       (append nm segment)
-       (append nm (drop 2 segment))))
+(defun join-chunks (left right)
+  (append (take 2 left)
+          (drop 1 right)))
 
-(defun make-name-builder (parts)
-  (lambda (start)
-    (let* ((nm (left start))
-           (pending (right start))
-           (extension (find-extension nm parts)))
-      (let ((next-nm (merge-name nm extension)))
-        (if (or (< (length extension) 3)
-                (> (length next-nm) +maximum-name-length+))
-            (pair next-nm nil)
-            (pair next-nm t))))))
+(defun find-extension (stem blocks)
+  (any (filter (^ (b) (joinable? stem b))
+               blocks)))
 
-(defmethod build-name ((starts cl:sequence)(parts cl:sequence))
-  (name-part (last (as 'cl:list
-                       (take-while 'pending?
-                                   (iterate (make-name-builder parts)
-                                       (pair (any starts) t)))))))
+(defun collect-extensions (stem extensions)
+  (as 'cl:list
+      (take-while (complement #'empty?)
+                  (iterate (^ (x)(when x (find-extension x extensions)))
+                      stem))))
 
+(defun assemble-name (chunks)
+  (reduce #'join-chunks (rest chunks)
+          :initial-value (first chunks)))
 
-(defmethod names ((path string) &optional (number 10))
-  (multiple-value-bind (starts parts)(rules (read-names path))
-    (as 'cl:list (take number (repeat (build-name starts parts))))))
+(defun build-name (building-blocks)
+  (let* ((extensions (reduce #'append (image #'rest building-blocks)))
+         (start ($ (compose #'first #'any) building-blocks))
+         (chunks (filter (^ (chunk)(> (length chunk) 2))
+                         (collect-extensions start extensions))))
+    (when chunks
+      (assemble-name chunks))))
 
+(defmethod gen-names ((path pathname)(count integer))
+  (let ((building-blocks (image #'triples (read-samples path))))
+    (take count
+          (repeat (build-name building-blocks)))))
 
-;;; (multiple-value-setq ($starts $parts) (rules (read-names "/Users/mikel/Workshop/folio2/examples/namefiles/dickens.names")))
-;;; (build-name $starts $parts)
-;;; (names "/Users/mikel/Workshop/folio2/examples/namefiles/dickens.names" 10)
-;;; (dolist (nm (names "/Users/mikel/Workshop/folio2/examples/namefiles/dickens.names" 30) (terpri))(terpri)(princ nm))
-;;; (dolist (nm (names "/Users/mikel/Workshop/folio2/examples/namefiles/gnome-female.names" 30) (terpri))(terpri)(princ nm))
-;;; (dolist (nm (names "/Users/mikel/Workshop/folio2/examples/namefiles/gnome-male.names" 30) (terpri))(terpri)(princ nm))
-;;; (dolist (nm (names "/Users/mikel/Workshop/folio2/examples/namefiles/us.names" 100) (terpri))(terpri)(princ nm))
+(defmethod gen-names ((path string)(count integer))
+  (gen-names (pathname path) count))
+
+;;; (defparameter $dickens "/Users/mikel/Workshop/programming/folio2/examples/namefiles/dickens.names")
+;;; (defparameter $sindarin "/Users/mikel/Workshop/programming/folio2/examples/namefiles/sindarin.names")
+;;; (defparameter $us "/Users/mikel/Workshop/programming/folio2/examples/namefiles/us.names")
+;;; (gen-names $dickens 10)
+;;; (gen-names $sindarin 10)
+;;; (gen-names $us 10)
