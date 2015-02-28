@@ -5,7 +5,7 @@ functional idioms and data structures in Common Lisp and a common set
 of APIs for working with them.
 
 folio is organized so that users can load and use the entire
-collections of functions, macros, and types, or just those parts of
+collection of functions, macros, and types, or just those parts of
 the library that are needed. It provides several purely-optional
 syntactic extensions for convenience.
 
