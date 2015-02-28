@@ -36,6 +36,7 @@
 (asdf:defsystem :net.bardcode.folio.as.syntax
   :serial t
   :description "reader syntax for type conversions"
+  :author "mikel evins <mevins@me.com>"
   :license "Lisp Lesser GNU Public License"
   :depends-on (:net.bardcode.folio.as)
   :components ((:module "src"
@@ -46,7 +47,7 @@
 ;;; tests
 (asdf:defsystem :net.bardcode.folio.as.tests
   :serial t
-  :description "converting tests"
+  :description "tests of the AS subsystem"
   :author "mikel evins <mevins@me.com>"
   :license "Lisp Lesser GNU Public License"
   :depends-on (:net.bardcode.folio.as :net.bardcode.folio.as.syntax :lift)
@@ -76,6 +77,7 @@
 (asdf:defsystem :net.bardcode.folio.boxes
   :serial t
   :description "wrapping values in mutable containers"
+  :author "mikel evins <mevins@me.com>"
   :license "Lisp Lesser GNU Public License"
   :depends-on (:net.bardcode.folio.as :net.bardcode.folio.make)
   :components ((:module "src"
@@ -88,6 +90,7 @@
 (asdf:defsystem :net.bardcode.folio.boxes.tests
   :serial t
   :description "box tests"
+  :author "mikel evins <mevins@me.com>"
   :license "Lisp Lesser GNU Public License"
   :depends-on (:net.bardcode.folio.boxes :lift)
   :components ((:module "tests"
@@ -113,7 +116,8 @@
 ;;; system
 (asdf:defsystem :net.bardcode.folio.functions
   :serial t
-  :description "associating paris of values"
+  :description "tools for working with functions as values"
+  :author "mikel evins <mevins@me.com>"
   :license "Lisp Lesser GNU Public License"
   :depends-on (:alexandria)
   :components ((:module "src"
@@ -124,7 +128,8 @@
 ;;; syntax
 (asdf:defsystem :net.bardcode.folio.functions.syntax
   :serial t
-  :description "associating paris of values"
+  :description "syntax for working with functions as values"
+  :author "mikel evins <mevins@me.com>"
   :license "Lisp Lesser GNU Public License"
   :depends-on (:alexandria :net.bardcode.folio.functions)
   :components ((:module "src"
@@ -135,7 +140,8 @@
 ;;; tests
 (asdf:defsystem :net.bardcode.folio.functions.tests
   :serial t
-  :description "function tests"
+  :description "tests of the FUNCTIONS subsystem"
+  :author "mikel evins <mevins@me.com>"
   :license "Lisp Lesser GNU Public License"
   :depends-on (:net.bardcode.folio.functions :net.bardcode.folio.functions.syntax :lift)
   :components ((:module "tests"
@@ -162,7 +168,8 @@
 ;;; system
 (asdf:defsystem :net.bardcode.folio.make
   :serial t
-  :description "uniform tools for converting values from one type to another"
+  :description "uniform tools for constructing arbitrary values"
+  :author "mikel evins <mevins@me.com>"
   :author "mikel evins <mevins@me.com>"
   :license "Lisp Lesser GNU Public License"
   :components ((:module "src"
@@ -173,7 +180,7 @@
 ;;; tests
 (asdf:defsystem :net.bardcode.folio.make.tests
   :serial t
-  :description "converting tests"
+  :description "tests of MAKE"
   :author "mikel evins <mevins@me.com>"
   :license "Lisp Lesser GNU Public License"
   :depends-on (:net.bardcode.folio.make :lift)
@@ -199,7 +206,8 @@
 ;;; system
 (asdf:defsystem :net.bardcode.folio.maps
   :serial t
-  :description "associating paris of values"
+  :description "tools for working with finite maps"
+  :author "mikel evins <mevins@me.com>"
   :license "Lisp Lesser GNU Public License"
   :depends-on (:fset :net.bardcode.folio.as :net.bardcode.folio.make)
   :components ((:module "src"
@@ -212,6 +220,7 @@
 (asdf:defsystem :net.bardcode.folio.maps.syntax
   :serial t
   :description "reader syntax for maps"
+  :author "mikel evins <mevins@me.com>"
   :license "Lisp Lesser GNU Public License"
   :depends-on (:net.bardcode.folio.maps)
   :components ((:module "src"
@@ -223,6 +232,7 @@
 (asdf:defsystem :net.bardcode.folio.maps.tests
   :serial t
   :description "map tests"
+  :author "mikel evins <mevins@me.com>"
   :license "Lisp Lesser GNU Public License"
   :depends-on (:net.bardcode.folio.maps :net.bardcode.folio.maps.syntax :lift)
   :components ((:module "tests"
@@ -251,7 +261,8 @@
 ;;; system
 (asdf:defsystem :net.bardcode.folio.pairs
   :serial t
-  :description "associating paris of values"
+  :description "tools for working with pairs of values"
+  :author "mikel evins <mevins@me.com>"
   :license "Lisp Lesser GNU Public License"
   :depends-on (:net.bardcode.folio.as :net.bardcode.folio.make)
   :components ((:module "src"
@@ -263,6 +274,7 @@
 (asdf:defsystem :net.bardcode.folio.pairs.tests
   :serial t
   :description "pair tests"
+  :author "mikel evins <mevins@me.com>"
   :license "Lisp Lesser GNU Public License"
   :depends-on (:net.bardcode.folio.pairs :lift)
   :components ((:module "tests"
@@ -289,6 +301,7 @@
 (asdf:defsystem :net.bardcode.folio.sequences
   :serial t
   :description "operations on sequences of values"
+  :author "mikel evins <mevins@me.com>"
   :license "Lisp Lesser GNU Public License"
   :depends-on (:net.bardcode.folio.as
                :net.bardcode.folio.make
@@ -303,6 +316,7 @@
 (asdf:defsystem :net.bardcode.folio.sequences.syntax
   :serial t
   :description "reader syntax for sequences"
+  :author "mikel evins <mevins@me.com>"
   :license "Lisp Lesser GNU Public License"
   :depends-on (:net.bardcode.folio.sequences)
   :components ((:module "src"
@@ -314,6 +328,7 @@
 (asdf:defsystem :net.bardcode.folio.sequences.tests
   :serial t
   :description "sequence and series tests"
+  :author "mikel evins <mevins@me.com>"
   :license "Lisp Lesser GNU Public License"
   :depends-on (:net.bardcode.folio.sequences :net.bardcode.folio.sequences.syntax :lift)
   :components ((:module "tests"
@@ -341,7 +356,8 @@
 ;;; system
 (asdf:defsystem :net.bardcode.folio.series
   :serial t
-  :description "operations on series of values"
+  :description "operations on (possibly unbounded) series of values"
+  :author "mikel evins <mevins@me.com>"
   :license "Lisp Lesser GNU Public License"
   :depends-on (:net.bardcode.folio.as
                :net.bardcode.folio.make
@@ -356,7 +372,8 @@
 ;;; syntax
 (asdf:defsystem :net.bardcode.folio.series.syntax
   :serial t
-  :description "reader syntax for sequences"
+  :description "reader syntax for series"
+  :author "mikel evins <mevins@me.com>"
   :license "Lisp Lesser GNU Public License"
   :depends-on (:net.bardcode.folio.series)
   :components ((:module "src"
@@ -368,6 +385,7 @@
 (asdf:defsystem :net.bardcode.folio.series.tests
   :serial t
   :description "sequence and series tests"
+  :author "mikel evins <mevins@me.com>"
   :license "Lisp Lesser GNU Public License"
   :depends-on (:net.bardcode.folio.series :net.bardcode.folio.series.syntax :lift)
   :components ((:module "tests"
@@ -395,7 +413,8 @@
 ;;; system
 (asdf:defsystem :net.bardcode.folio.taps
   :serial t
-  :description "operations on taps of values"
+  :description "tools for treating objects as streams of values"
+  :author "mikel evins <mevins@me.com>"
   :license "Lisp Lesser GNU Public License"
   :depends-on (:fset :closer-mop
                :net.bardcode.folio.as
@@ -413,6 +432,7 @@
 (asdf:defsystem :net.bardcode.folio.taps.tests
   :serial t
   :description "sequence and taps tests"
+  :author "mikel evins <mevins@me.com>"
   :license "Lisp Lesser GNU Public License"
   :depends-on (:net.bardcode.folio.taps :lift)
   :components ((:module "tests"
@@ -439,6 +459,7 @@
 (asdf:defsystem :net.bardcode.folio
   :serial t
   :description "the folio umbrella system"
+  :author "mikel evins <mevins@me.com>"
   :license "Lisp Lesser GNU Public License"
   :depends-on (:fset :series :alexandria 
                      :net.bardcode.folio.as
@@ -463,6 +484,7 @@
 (asdf:defsystem :net.bardcode.folio.tests
   :serial t
   :description "the folio umbrella system"
+  :author "mikel evins <mevins@me.com>"
   :license "Lisp Lesser GNU Public License"
   :depends-on (:net.bardcode.folio.as.tests
                :net.bardcode.folio.boxes.tests
