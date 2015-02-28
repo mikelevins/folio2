@@ -4,7 +4,7 @@ folio is a collection of small libraries that provide support for
 functional idioms and data structures in Common Lisp and a common set
 of APIs for working with them.
 
-folio is oragnized so that users can load and use the entire
+folio is organized so that users can load and use the entire
 collections of functions, macros, and types, or just those parts of
 the library that are needed. It provides several purely-optional
 syntactic extensions for convenience.
