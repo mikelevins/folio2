@@ -203,7 +203,7 @@
   (declare (ignore predicate sequence key))
   nil)
 
-(defmethod assoc-if (predicate (sequence cl:cons) &key (key 'cl:identity) (test 'cl:eql))
+(defmethod assoc-if (predicate (sequence cl:cons) &key (key 'cl:identity))
   (block searching
     (progn
       (loop for x in sequence
@@ -211,7 +211,7 @@
               (return-from searching x)))
       nil)))
 
-(defmethod assoc-if (predicate (sequence cl:sequence) &key (key 'cl:identity) (test 'cl:eql))
+(defmethod assoc-if (predicate (sequence cl:sequence) &key (key 'cl:identity))
   (block searching
     (progn
       (loop for i from 0 below (cl:length sequence)
@@ -1027,8 +1027,6 @@
 ;;; null
 (defmethod select ((sequence1 cl:null)(sequence2 cl:null)) nil)
 (defmethod select ((sequence1 cl:null)(sequence2 cl:cons)) nil)
-(defmethod select ((sequence1 cl:null)(sequence2 cl:vector)) (vector))
-(defmethod select ((sequence1 cl:null)(sequence2 wb-seq)) (wb-seq))
 
 ;;; cons
 (defmethod select ((sequence1 cl:cons)(sequence2 cl:null)) nil)

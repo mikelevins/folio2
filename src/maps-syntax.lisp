@@ -20,6 +20,7 @@
 
 (set-macro-character #\{
                 (lambda (stream char)
+                  (declare (ignore char))
                   (let ((elts (read-delimited-list #\} stream t)))
                     ` (as 'wb-map (cl:list ,@elts)))))
 

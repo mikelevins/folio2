@@ -12,7 +12,7 @@
 (in-package :net.bardcode.folio.as)
 
 (defun read-type-constraint (stream subchar num)
-  (declare (ignore num))
+  (declare (ignore num subchar))
   (let* ((constraint-spec (read-delimited-list #\] stream t))
          (type-constraint (first constraint-spec))
          (expr (read stream nil nil nil)))

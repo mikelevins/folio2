@@ -24,7 +24,7 @@
 
 (addtest (as-tests)
          test-as-symbol
-         (ensure-same '|Foo| (as 'cl:symbol "Foo")))
+         (ensure-same '|Foo| (as 'cl:symbol "Foo" :package :net.bardcode.folio.as.tests)))
 
 (addtest (as-tests)
          test-as-string

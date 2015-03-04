@@ -1,11 +1,10 @@
 ;;;; ***********************************************************************
-;;;; FILE IDENTIFICATION
 ;;;;
 ;;;; Name:          name-generator.lisp
 ;;;; Project:       folio - Bard features in Common Lisp
 ;;;; Purpose:       the name-generator example program
 ;;;; Author:        mikel evins
-;;;; Copyright:     2013 by mikel evins
+;;;; Copyright:     2015 by mikel evins
 ;;;;
 ;;;; ***********************************************************************
 

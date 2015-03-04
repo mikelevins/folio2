@@ -57,7 +57,7 @@
 
 (addtest (series-tests)
   test-as
-  (ensure (folio::series? (as 'foundation-series '(1 2 3))))
+  (ensure (net.bardcode.folio.series::series? (as 'foundation-series '(1 2 3))))
   (ensure (cl:listp (as 'cl:list (series 1 2 3)))))
 
 (addtest (series-tests)

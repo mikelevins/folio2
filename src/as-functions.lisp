@@ -19,8 +19,8 @@
 
 (defgeneric as (type val &key &allow-other-keys))
 
-(defmethod as ((type (eql 'cl:symbol)) (val cl:string) &key &allow-other-keys)
-  (intern val))
+(defmethod as ((type (eql 'cl:symbol)) (val cl:string) &key (package :cl-user) &allow-other-keys)
+  (intern val package))
 
 (defmethod as ((type (eql 'cl:string)) (val cl:symbol) &key &allow-other-keys)
   (symbol-name val))

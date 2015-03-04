@@ -10,10 +10,10 @@ the library that are needed. It provides several purely-optional
 syntactic extensions for convenience.
 
 folio includes a small but nontrivial example program that illustrates
-the use of several of its features to provide good epxressive power in
+the use of several of its features to provide good expressive power in
 compact, readable code.
 
-folio 2.0 has been tested with SBCL, Clozure Common Lisp, and
+folio 2.0 has been tested with SBCL, Clozure Common Lisp 1.10, and
 Lispworks 6.1.
 
 ## Features
@@ -22,7 +22,7 @@ folio offers the following features:
 
 - series and pure-functional maps and sequences
 - extension of Common Lisp sequence functions to support the new types
-- extensible generic versions of many Common Lisp  functions
+- extensible generic versions of many Common Lisp functions
 - an extensible type-conversion utility
 - an extensible contructor function for arbitrary values
 - seamless integration of the SERIES and FSet libraries
@@ -75,7 +75,7 @@ of a CLOS class, and whose right elements are the associated values.
 
 ## Included libraries
 
-folio depends on six other libraries: **QuickLisp**, **FSet**,
+folio depends on six other libraries: **Quicklisp**, **FSet**,
 **SERIES**, **Alexandria**, **Closer-MOP**, and **ASDF**. The features
 provided by these libraries are available when folio is loaded. In
 particular, the full range of functional data structures from FSet,
@@ -119,23 +119,53 @@ considerable debt to Dylan, ML, Scheme, and Haskell.
 For examples of folio style, see the sample code provided in the
 examples directory.
 
-folio tries to produce results of predictable type. Its usual convention is that when its inputs are sequences or series, the output will be of the same type as the leftmost input. In a few cases, folio breaks this rule in order to avoid results that would be inconvenient or at odds with the spirit of a function.
+folio tries to produce results of predictable type. Its usual
+convention is that when its inputs are sequences or series, the output
+will be of the same type as the leftmost input. In a few cases, folio
+breaks this rule in order to avoid results that would be inconvenient
+or at odds with the spirit of a function.
 
 
 ## Using folio
 
-folio includes an umbrella system definition in folio.asd. If you want to use all of folio, the easiest way to do it is to depend on that system definition. All of the function, macros, and type names defined in folio are exported from the package `net.bardcode.folio`, which defines the nickname `folio`. With the umbrella system loaded, you can use any folio feature by prefixing its name with the package nickname `folio`. For example:
+folio includes an umbrella system definition in folio.asd. If you want
+to use all of folio, the easiest way to do it is to depend on that
+system definition. All of the function, macros, and type names defined
+in folio are exported from the package `net.bardcode.folio`, which
+defines the nickname `folio`. With the umbrella system loaded, you can
+use any folio feature by prefixing its name with the package nickname
+`folio`. For example:
 
     CL-USER> (folio:any (as 'cl:list (folio:scan "abcdefgh")))
     #\h
 
-On the other hand, experience has taught me that people using folio often want to use some specific part of the library, but not all of it. For that reason, folio 2 is organized so that you can load parts of folio without requiring the whole thing. There are a few dependencies within the library. The **as** and **make** subsystems are used by all of the data-structure sections. **taps** relies on **series**, which in turn relies on **sequences**. You shouldn't need to concern yourself with these dependencies, though. The ASDF system definitions declare the needed dependencies, so you can simply load the folio subsystem you want, and rely on ASDF to ensure that any needed dependencies are also loaded.
+On the other hand, experience has taught me that people using folio
+often want to use some specific part of the library, but not all of
+it. For that reason, folio 2 is organized so that you can load parts
+of folio without requiring the whole thing. There are a few
+dependencies within the library. The **as** and **make** subsystems
+are used by all of the data-structure sections. **taps** relies on
+**series**, which in turn relies on **sequences**. You shouldn't need
+to concern yourself with these dependencies, though. The ASDF system
+definitions declare the needed dependencies, so you can simply load
+the folio subsystem you want, and rely on ASDF to ensure that any
+needed dependencies are also loaded.
 
 ### Reader macros
 
-Three folio subsystems provide reader macros that extend the lexical syntax of Common Lisp with notational conveniences. Common Lisp programmers don't always like reader macros. Although they can be very convenient, they can also conflict with locally-defined reader macros.
+Three folio subsystems provide reader macros that extend the lexical
+syntax of Common Lisp with notational conveniences. Common Lisp
+programmers don't always like reader macros. Although they can be very
+convenient, they can also conflict with locally-defined reader macros.
 
-In order to avoid problems caused by reader-macro conflicts, the folio reader macros are entirely optional. You can choose not to load them if they would cause problems for you, or if you simply don't like reader macros. Each syntax extension is loaded by its own separate ASDF system definition. If you want to avoid loading the reader macros, simply don't load those systems. You can see examples of controlling subsystem loading in the definitions of the various "load-*" functions in folio.asd.
+In order to avoid problems caused by reader-macro conflicts, the folio
+reader macros are entirely optional. You can choose not to load them
+if they would cause problems for you, or if you simply don't like
+reader macros. Each syntax extension is loaded by its own separate
+ASDF system definition. If you want to avoid loading the reader
+macros, simply don't load those systems. You can see examples of
+controlling subsystem loading in the definitions of the various
+"load-*" functions in folio.asd.
 
 ### Systems and packages
 
@@ -166,16 +196,14 @@ folio's subsystems have the following library dependencies:
 | taps | FSet, SERIES, Closer-MOP
 
 
-
 The most convenient way to use folio is usually to just load the
-umbrella system, `net.bardcode.folio`. If you prefer to customize
-loading and control which names are exported to your code, you may
-want to make your own umbrella system. In that case, the definition of
-`net.bardcode.folio` in folio.asd serves as a guide. You will probably
-also want to define your own package in order to control the
-visibility of names from the folio subsystems. You can find guidance
-on how to do that by examining folio-package.lisp, which defines the
-umbrella package for folio.
+umbrella system, `folio`. If you prefer to customize loading and
+control which names are exported to your code, you may want to make
+your own umbrella system. In that case, the definition of `folio` in
+folio.asd serves as a guide. You will probably also want to define
+your own package in order to control the visibility of names from the
+folio subsystems. You can find guidance on how to do that by examining
+folio-package.lisp, which defines the umbrella package for folio.
 
 An approach that works well is to define a common package for your
 code, use the COMMON-LISP package, and import the folio symbols you
