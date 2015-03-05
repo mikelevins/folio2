@@ -21,13 +21,6 @@
 (defun triples (s)
   (take-by 3 1 s))
 
-(defmethod parse-samples ((path pathname))
-  (image #'triples
-         (read-samples path)))
-
-(defmethod parse-samples ((path string))
-  (parse-samples (pathname path)))
-
 (defun joinable? (left right)
   (equal (drop 1 left)
          (take 2 right)))
@@ -76,3 +69,5 @@
 ;;; (gen-names $dickens 20)
 ;;; (gen-names $sindarin 20)
 ;;; (gen-names $us 20)
+
+
