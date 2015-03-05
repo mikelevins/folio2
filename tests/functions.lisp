@@ -1,21 +1,20 @@
 ;;;; ***********************************************************************
-;;;; FILE IDENTIFICATION
 ;;;;
 ;;;; Name:          functions.lisp
-;;;; Project:       folio - Bard features for Common Lisp
+;;;; Project:       folio2 - Functional idioms for Common Lisp
 ;;;; Purpose:       function tests
 ;;;; Author:        mikel evins
-;;;; Copyright:     2014 by mikel evins
+;;;; Copyright:     2015 by mikel evins
 ;;;;
 ;;;; ***********************************************************************
 
 
 (in-package :cl-user)
 
-(defpackage :net.bardcode.folio.functions.tests
-  (:use :cl :net.bardcode.folio.functions :lift))
+(defpackage :net.bardcode.folio2.functions.tests
+  (:use :cl :net.bardcode.folio2.functions :lift))
 
-(in-package :net.bardcode.folio.functions.tests)
+(in-package :net.bardcode.folio2.functions.tests)
 
 ;;; ---------------------------------------------------------------------
 ;;; common suite class
@@ -112,5 +111,5 @@
   (let ((*TEST-DESCRIBE-IF-NOT-SUCCESSFUL?* t))
     (lift:run-tests :suite 'function-tests)))
 
-;;; (net.bardcode.folio.functions.tests::run-function-tests)
+;;; (net.bardcode.folio2.functions.tests::run-function-tests)
 ;;; (lift:describe-test-result lift:*test-result* t)

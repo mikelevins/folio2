@@ -1,18 +1,17 @@
 ;;;; ***********************************************************************
-;;;; FILE IDENTIFICATION
 ;;;;
 ;;;; Name:          package.lisp
-;;;; Project:       folio - Bard features in Common Lisp
+;;;; Project:       folio2 - Functional idioms for Common Lisp
 ;;;; Purpose:       sequences package
 ;;;; Author:        mikel evins
-;;;; Copyright:     2013 by mikel evins
+;;;; Copyright:     2015 by mikel evins
 ;;;;
 ;;;; ***********************************************************************
 
 (in-package :cl-user)
 
-(defpackage :net.bardcode.folio.sequences
-  (:use :cl :net.bardcode.folio.as :net.bardcode.folio.make :net.bardcode.folio.pairs)
+(defpackage :net.bardcode.folio2.sequences
+  (:use :cl :net.bardcode.folio2.as :net.bardcode.folio2.make :net.bardcode.folio2.pairs)
   (:shadow :acons :assoc :assoc-if :assoc-if-not :append
            :count :count-if :count-if-not
            :find :find-if :find-if-not :first

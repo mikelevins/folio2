@@ -1,5 +1,5 @@
-(in-package :folio)
+(in-package :folio2)
 
-(defparameter *folio-version* "2.0.1")
+(defparameter *folio-version* "2.0.2")
 
 

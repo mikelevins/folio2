@@ -15,7 +15,7 @@ not trivial, illustration of the use of a variety of folio
 features. With luck, the implementation of this travesty generator in
 70 lines of code--which are not particularly optimized for
 terseness--should demonstrate some opportunities for expressiveness
-that folio offers.
+that folio 2 offers.
 
 
 

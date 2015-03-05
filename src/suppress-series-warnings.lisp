@@ -1,15 +1,14 @@
 ;;;; ***********************************************************************
 ;;;;
-;;;; Name:          package.lisp
+;;;; Name:          suppress-series-warnings.lisp
 ;;;; Project:       folio2 - Functional idioms for Common Lisp
-;;;; Purpose:       boxes package
+;;;; Purpose:       series functions
 ;;;; Author:        mikel evins
 ;;;; Copyright:     2015 by mikel evins
 ;;;;
 ;;;; ***********************************************************************
 
-(in-package :cl-user)
+(in-package :series)
 
-(defpackage :net.bardcode.folio2.boxes
-  (:use :cl :net.bardcode.folio2.as :net.bardcode.folio2.make)
-  (:export :box :box? :set-box! :unbox))
+;;; suppress series warnings so that SBCL can load the folio series functions
+#+sbcl(setf *suppress-series-warnings* t)

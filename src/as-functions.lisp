@@ -1,15 +1,14 @@
 ;;;; ***********************************************************************
-;;;; FILE IDENTIFICATION
 ;;;;
 ;;;; Name:          package.lisp
-;;;; Project:       folio - the Bard runtime
+;;;; Project:       folio2 - Functional idioms for Common Lisp
 ;;;; Purpose:       uniform extensible tools for converting values from one type to another
 ;;;; Author:        mikel evins
-;;;; Copyright:     2013 by mikel evins
+;;;; Copyright:     2015 by mikel evins
 ;;;;
 ;;;; ***********************************************************************
 
-(in-package :net.bardcode.folio.as)
+(in-package :net.bardcode.folio2.as)
 
 ;;; function as
 ;;;

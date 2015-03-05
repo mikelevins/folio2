@@ -1,8 +1,8 @@
 ;;;; ***********************************************************************
 ;;;;
-;;;; Name:          folio-functions.asd
-;;;; Project:       folio - Functional idioms for Common Lisp
-;;;; Purpose:       folio-functions: combinators and higher-order functions
+;;;; Name:          folio2-functions-syntax.asd
+;;;; Project:       folio2 - Functional idioms for Common Lisp
+;;;; Purpose:       optional syntax extensions for folio2-functions
 ;;;; Author:        mikel evins
 ;;;; Copyright:     2015 by mikel evins
 ;;;;
@@ -11,15 +11,15 @@
 (in-package :cl-user)
 
 
-(asdf:defsystem :folio-functions
+(asdf:defsystem :folio2-functions-syntax
   :serial t
-  :description "tools for working with functions as values"
+  :description "syntax for working with functions as values"
   :author "mikel evins <mevins@me.com>"
   :license "Lisp Lesser GNU Public License"
-  :depends-on (:alexandria)
+  :depends-on (:alexandria :folio2-functions)
   :components ((:module "src"
                         :serial t
                         :components ((:file "functions-package")
-                                     (:file "functions-functions")))))
+                                     (:file "functions-syntax")))))
 
-;;; (asdf:load-system :folio-functions)
+;;; (asdf:load-system :folio2-functions-syntax)

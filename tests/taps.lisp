@@ -1,21 +1,20 @@
 ;;;; ***********************************************************************
-;;;; FILE IDENTIFICATION
 ;;;;
 ;;;; Name:          taps.lisp
-;;;; Project:       folio - Bard features for Common Lisp
+;;;; Project:       folio2 - Functional idioms for Common Lisp
 ;;;; Purpose:       tap tests
 ;;;; Author:        mikel evins
-;;;; Copyright:     2013 by mikel evins
+;;;; Copyright:     2015 by mikel evins
 ;;;;
 ;;;; ***********************************************************************
 
 
 (in-package :cl-user)
 
-(defpackage :net.bardcode.folio.taps.tests
-  (:use :cl :net.bardcode.folio.as :net.bardcode.folio.taps :net.bardcode.folio.make :lift))
+(defpackage :net.bardcode.folio2.taps.tests
+  (:use :cl :net.bardcode.folio2.as :net.bardcode.folio2.taps :net.bardcode.folio2.make :lift))
 
-(in-package :net.bardcode.folio.taps.tests)
+(in-package :net.bardcode.folio2.taps.tests)
 
 ;;; ---------------------------------------------------------------------
 ;;; common suite class
@@ -71,6 +70,6 @@
   (let ((*TEST-DESCRIBE-IF-NOT-SUCCESSFUL?* t))
     (lift:run-tests :suite 'tap-tests)))
 
-;;; (net.bardcode.folio.taps.tests::run-tap-tests)
+;;; (net.bardcode.folio2.taps.tests::run-tap-tests)
 ;;; (lift:describe-test-result lift:*test-result* t)
 

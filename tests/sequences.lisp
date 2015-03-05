@@ -1,20 +1,19 @@
 ;;;; ***********************************************************************
-;;;; FILE IDENTIFICATION
 ;;;;
 ;;;; Name:          sequences.lisp
-;;;; Project:       folio - Bard features for Common Lisp
+;;;; Project:       folio2 - Functional idioms for Common Lisp
 ;;;; Purpose:       sequence tests
 ;;;; Author:        mikel evins
-;;;; Copyright:     2013 by mikel evins
+;;;; Copyright:     2015 by mikel evins
 ;;;;
 ;;;; ***********************************************************************
 
 
 (in-package :cl-user)
 
-(defpackage :net.bardcode.folio.sequences.tests
-  (:use :cl :net.bardcode.folio.as :net.bardcode.folio.make :net.bardcode.folio.sequences :lift)
-  (:shadowing-import-from :net.bardcode.folio.sequences
+(defpackage :net.bardcode.folio2.sequences.tests
+  (:use :cl :net.bardcode.folio2.as :net.bardcode.folio2.make :net.bardcode.folio2.sequences :lift)
+  (:shadowing-import-from :net.bardcode.folio2.sequences
                           :acons :assoc :assoc-if :assoc-if-not :append
                           :count :count-if :count-if-not
                           :find :find-if :find-if-not :first 
@@ -24,7 +23,7 @@
                           :reduce :remove :remove-duplicates :remove-if :remove-if-not :rest :reverse
                           :sequence :search :second :sort :substitute :substitute-if :substitute-if-not))
 
-(in-package :net.bardcode.folio.sequences.tests)
+(in-package :net.bardcode.folio2.sequences.tests)
 
 ;;; ---------------------------------------------------------------------
 ;;; common suite class
@@ -519,5 +518,5 @@
   (let ((*TEST-DESCRIBE-IF-NOT-SUCCESSFUL?* t))
     (lift:run-tests :suite 'sequence-tests)))
 
-;;; (net.bardcode.folio.sequences.tests::run-sequence-tests)
+;;; (net.bardcode.folio2.sequences.tests::run-sequence-tests)
 ;;; (lift:describe-test-result lift:*test-result* t)

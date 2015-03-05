@@ -1,8 +1,8 @@
 ;;;; ***********************************************************************
 ;;;;
-;;;; Name:          folio-as.asd
-;;;; Project:       folio - Functional idioms for Common Lisp
-;;;; Purpose:       folio-as: an extensible type-conversion utility
+;;;; Name:          folio2-as.asd
+;;;; Project:       folio2 - Functional idioms for Common Lisp
+;;;; Purpose:       folio2-as: an extensible type-conversion utility
 ;;;; Author:        mikel evins
 ;;;; Copyright:     2015 by mikel evins
 ;;;;
@@ -11,7 +11,7 @@
 (in-package :cl-user)
 
 ;;; system
-(asdf:defsystem :folio-as
+(asdf:defsystem :folio2-as
   :serial t
   :description "uniform tools for converting values from one type to another"
   :author "mikel evins <mevins@me.com>"
@@ -21,4 +21,4 @@
                         :components ((:file "as-package")
                                      (:file "as-functions")))))
 
-;;; (asdf:load-system :folio-as)
+;;; (asdf:load-system :folio2-as)

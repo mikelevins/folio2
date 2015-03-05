@@ -1,18 +1,17 @@
 ;;;; ***********************************************************************
-;;;; FILE IDENTIFICATION
 ;;;;
 ;;;; Name:          package.lisp
-;;;; Project:       folio - Bard features in Common Lisp
+;;;; Project:       folio2 - Functional idioms for Common Lisp
 ;;;; Purpose:       maps package
 ;;;; Author:        mikel evins
-;;;; Copyright:     2013 by mikel evins
+;;;; Copyright:     2015 by mikel evins
 ;;;;
 ;;;; ***********************************************************************
 
 (in-package :cl-user)
 
-(defpackage :net.bardcode.folio.maps
-  (:use :cl :net.bardcode.folio.as :net.bardcode.folio.make)
+(defpackage :net.bardcode.folio2.maps
+  (:use :cl :net.bardcode.folio2.as :net.bardcode.folio2.make)
   (:shadow :map :merge :values)
   (:import-from :fset :wb-map)
   (:export 

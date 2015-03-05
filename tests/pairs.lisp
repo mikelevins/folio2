@@ -1,21 +1,20 @@
 ;;;; ***********************************************************************
-;;;; FILE IDENTIFICATION
 ;;;;
 ;;;; Name:          pairs.lisp
-;;;; Project:       folio - Bard features for Common Lisp
+;;;; Project:       folio2 - Functional idioms for Common Lisp
 ;;;; Purpose:       pair tests
 ;;;; Author:        mikel evins
-;;;; Copyright:     2013 by mikel evins
+;;;; Copyright:     2015 by mikel evins
 ;;;;
 ;;;; ***********************************************************************
 
 
 (in-package :cl-user)
 
-(defpackage :net.bardcode.folio.pairs.tests
-  (:use :cl :net.bardcode.folio.as :net.bardcode.folio.pairs :net.bardcode.folio.make :lift))
+(defpackage :net.bardcode.folio2.pairs.tests
+  (:use :cl :net.bardcode.folio2.as :net.bardcode.folio2.pairs :net.bardcode.folio2.make :lift))
 
-(in-package :net.bardcode.folio.pairs.tests)
+(in-package :net.bardcode.folio2.pairs.tests)
 
 ;;; ---------------------------------------------------------------------
 ;;; common suite class
@@ -66,4 +65,4 @@
   (let ((*TEST-DESCRIBE-IF-NOT-SUCCESSFUL?* t))
     (lift:run-tests :suite 'pair-tests)))
 
-;;; (net.bardcode.folio.pairs.tests::run-pair-tests)
+;;; (net.bardcode.folio2.pairs.tests::run-pair-tests)

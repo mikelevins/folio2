@@ -1,20 +1,19 @@
 ;;;; ***********************************************************************
-;;;; FILE IDENTIFICATION
 ;;;;
 ;;;; Name:          types.lisp
-;;;; Project:       folio - the Bard runtime
+;;;; Project:       folio2 - Functional idioms for Common Lisp
 ;;;; Purpose:       map type definitions
 ;;;; Author:        mikel evins
-;;;; Copyright:     2013 by mikel evins
+;;;; Copyright:     2015 by mikel evins
 ;;;;
 ;;;; ***********************************************************************
 
-(in-package :net.bardcode.folio.maps)
+(in-package :net.bardcode.folio2.maps)
 
 ;;; ---------------------------------------------------------------------
 ;;; alist
 ;;; ---------------------------------------------------------------------
-;;; for the purposes of folio, an alist is a list all of whose
+;;; for the purposes of folio2, an alist is a list all of whose
 ;;; elements are lists
 
 (defmethod alist? (thing)
@@ -32,7 +31,7 @@
 ;;; ---------------------------------------------------------------------
 ;;; plist
 ;;; ---------------------------------------------------------------------
-;;; for the purposes of folio, a plist is a list with an even number of
+;;; for the purposes of folio2, a plist is a list with an even number of
 ;;; elements whose even-indexed elements are atoms
 
 (defmethod plist? (thing)

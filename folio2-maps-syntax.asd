@@ -1,8 +1,8 @@
 ;;;; ***********************************************************************
 ;;;;
-;;;; Name:          folio-maps.asd
-;;;; Project:       folio - Functional idioms for Common Lisp
-;;;; Purpose:       functional finite maps
+;;;; Name:          folio2-maps-syntax.asd
+;;;; Project:       folio2 - Functional idioms for Common Lisp
+;;;; Purpose:       optional syntax extensions for maps
 ;;;; Author:        mikel evins
 ;;;; Copyright:     2015 by mikel evins
 ;;;;
@@ -10,16 +10,16 @@
 
 (in-package :cl-user)
 
-(asdf:defsystem :folio-maps
+(asdf:defsystem :folio2-maps-syntax
   :serial t
-  :description "tools for working with finite maps"
+  :description "reader syntax for maps"
   :author "mikel evins <mevins@me.com>"
   :license "Lisp Lesser GNU Public License"
-  :depends-on (:fset :folio-as :folio-make)
+  :depends-on (:folio2-maps)
   :components ((:module "src"
                         :serial t
                         :components ((:file "maps-package")
-                                     (:file "maps-types")
-                                     (:file "maps-functions")))))
+                                     (:file "maps-syntax")))))
 
-;;; (asdf:load-system :folio-maps)
+;;; (asdf:load-system :folio2-maps-syntax)
+

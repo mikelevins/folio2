@@ -1,21 +1,20 @@
 ;;;; ***********************************************************************
-;;;; FILE IDENTIFICATION
 ;;;;
 ;;;; Name:          boxes.lisp
-;;;; Project:       folio - Bard features for Common Lisp
+;;;; Project:       folio2 - Functional idioms for Common Lisp
 ;;;; Purpose:       box tests
 ;;;; Author:        mikel evins
-;;;; Copyright:     2013 by mikel evins
+;;;; Copyright:     2015 by mikel evins
 ;;;;
 ;;;; ***********************************************************************
 
 
 (in-package :cl-user)
 
-(defpackage :net.bardcode.folio.boxes.tests
-  (:use :cl :net.bardcode.folio.as :net.bardcode.folio.boxes :net.bardcode.folio.make :lift))
+(defpackage :net.bardcode.folio2.boxes.tests
+  (:use :cl :net.bardcode.folio2.as :net.bardcode.folio2.boxes :net.bardcode.folio2.make :lift))
 
-(in-package :net.bardcode.folio.boxes.tests)
+(in-package :net.bardcode.folio2.boxes.tests)
 
 ;;; ---------------------------------------------------------------------
 ;;; common suite class
@@ -80,4 +79,4 @@
   (let ((*TEST-DESCRIBE-IF-NOT-SUCCESSFUL?* t))
     (lift:run-tests :suite 'box-tests)))
 
-;;; (net.bardcode.folio.boxes.tests::run-box-tests)
+;;; (net.bardcode.folio2.boxes.tests::run-box-tests)

@@ -1,15 +1,14 @@
 ;;;; ***********************************************************************
-;;;; FILE IDENTIFICATION
 ;;;;
 ;;;; Name:          syntax.lisp
-;;;; Project:       folio - the Bard runtime
+;;;; Project:       folio2 - Functional idioms for Common Lisp
 ;;;; Purpose:       reader macro for type conversions
 ;;;; Author:        mikel evins
-;;;; Copyright:     2013 by mikel evins
+;;;; Copyright:     2015 by mikel evins
 ;;;;
 ;;;; ***********************************************************************
 
-(in-package :net.bardcode.folio.as)
+(in-package :net.bardcode.folio2.as)
 
 (defun read-type-constraint (stream subchar num)
   (declare (ignore num subchar))

@@ -1,20 +1,19 @@
 ;;;; ***********************************************************************
-;;;; FILE IDENTIFICATION
 ;;;;
 ;;;; Name:          package.lisp
-;;;; Project:       folio - the Bard runtime
+;;;; Project:       folio2 - Functional idioms for Common Lisp
 ;;;; Purpose:       uniform extensible tools for converting values from one type to another
 ;;;; Author:        mikel evins
-;;;; Copyright:     2013 by mikel evins
+;;;; Copyright:     2015 by mikel evins
 ;;;;
 ;;;; ***********************************************************************
 
 (in-package :cl-user)
 
-(defpackage :net.bardcode.folio.as.tests
-  (:use :cl :net.bardcode.folio.as :lift))
+(defpackage :net.bardcode.folio2.as.tests
+  (:use :cl :net.bardcode.folio2.as :lift))
 
-(in-package :net.bardcode.folio.as.tests)
+(in-package :net.bardcode.folio2.as.tests)
 
 ;;; ---------------------------------------------------------------------
 ;;; common suite class
@@ -24,7 +23,7 @@
 
 (addtest (as-tests)
          test-as-symbol
-         (ensure-same '|Foo| (as 'cl:symbol "Foo" :package :net.bardcode.folio.as.tests)))
+         (ensure-same '|Foo| (as 'cl:symbol "Foo" :package :net.bardcode.folio2.as.tests)))
 
 (addtest (as-tests)
          test-as-string
@@ -38,4 +37,4 @@
   (let ((*TEST-DESCRIBE-IF-NOT-SUCCESSFUL?* t))
     (lift:run-tests :suite 'as-tests)))
 
-;;; (net.bardcode.folio.as.tests::run-as-tests)
+;;; (net.bardcode.folio2.as.tests::run-as-tests)

@@ -1,24 +1,28 @@
-# folio
+# folio 2
 
-folio is a collection of small libraries that provide support for
+folio 2 is a collection of small libraries that provide support for
 functional idioms and data structures in Common Lisp and a common set
 of APIs for working with them.
 
-folio is organized so that users can load and use the entire
+It's a direct descendant of the older and simpler folio library, with
+a greatly expanded and reorganized API, and support for more data
+structures and procedures.
+
+folio 2 is organized so that users can load and use the entire
 collection of functions, macros, and types, or just those parts of
 the library that are needed. It provides several purely-optional
 syntactic extensions for convenience.
 
-folio includes a small but nontrivial example program that illustrates
-the use of several of its features to provide good expressive power in
-compact, readable code.
+folio 2 includes a small but nontrivial example program that
+illustrates the use of several of its features to provide good
+expressive power in compact, readable code.
 
-folio 2.0 has been tested with SBCL, Clozure Common Lisp 1.10, and
+folio 2 has been tested with SBCL, Clozure Common Lisp 1.10, and
 Lispworks 6.1.
 
 ## Features
 
-folio offers the following features:
+folio 2 offers the following features:
 
 - series and pure-functional maps and sequences
 - extension of Common Lisp sequence functions to support the new types
@@ -36,7 +40,7 @@ need into an otherwise pure-functional algorithm or data structure.
 
 A **pair** is an object that associates two values, called its
 **left** and **right** elements. The most obvious example of a
-pair is Common Lisp's `CONS` type, but the folio pair API is
+pair is Common Lisp's `CONS` type, but the folio 2 pair API is
 generic and extensible; you can add your own pair types.
 
 The **Maps** package provides functional implementations of finite
@@ -75,9 +79,9 @@ of a CLOS class, and whose right elements are the associated values.
 
 ## Included libraries
 
-folio depends on six other libraries: **Quicklisp**, **FSet**,
+folio 2 depends on six other libraries: **Quicklisp**, **FSet**,
 **SERIES**, **Alexandria**, **Closer-MOP**, and **ASDF**. The features
-provided by these libraries are available when folio is loaded. In
+provided by these libraries are available when folio 2 is loaded. In
 particular, the full range of functional data structures from FSet,
 and the functions and macros provided for working with them, are
 available in the FSET package. Similarly, the series, generator, and
@@ -111,65 +115,63 @@ http://common-lisp.net/project/asdf/
 
 ## Style and conventions
 
-folio code has its own style and flavor, which emphasizes generating
+folio 2 code has its own style and flavor, which emphasizes generating
 collections of values and mapping functions over them. This style is
 derived from the experimental Lisp dialect Bard, which in turn owes a
 considerable debt to Dylan, ML, Scheme, and Haskell.
 
-For examples of folio style, see the sample code provided in the
+For examples of folio 2 style, see the sample code provided in the
 examples directory.
 
-folio tries to produce results of predictable type. Its usual
+folio 2 tries to produce results of predictable type. Its usual
 convention is that when its inputs are sequences or series, the output
 will be of the same type as the leftmost input. In a few cases, folio
-breaks this rule in order to avoid results that would be inconvenient
-or at odds with the spirit of a function.
+2 breaks this rule in order to avoid results that would be
+inconvenient or at odds with the spirit of a function.
 
 
-## Using folio
+## Using folio 2
 
-folio includes an umbrella system definition in folio.asd. If you want
-to use all of folio, the easiest way to do it is to depend on that
+folio 2 includes an umbrella system definition in folio2.asd. If you want
+to use all of folio 2, the easiest way to do it is to depend on that
 system definition. All of the function, macros, and type names defined
-in folio are exported from the package `net.bardcode.folio`, which
-defines the nickname `folio`. With the umbrella system loaded, you can
-use any folio feature by prefixing its name with the package nickname
-`folio`. For example:
+in folio 2 are exported from the package `net.bardcode.folio2`, which
+defines the nickname `folio2`. With the umbrella system loaded, you can
+use any folio 2 feature by prefixing its name with the package nickname
+`folio2`. For example:
 
-    CL-USER> (folio:any (as 'cl:list (folio:scan "abcdefgh")))
+    CL-USER> (folio2:any (as 'cl:list (folio2:scan "abcdefgh")))
     #\h
 
-On the other hand, experience has taught me that people using folio
+On the other hand, experience has taught me that people using folio 2
 often want to use some specific part of the library, but not all of
 it. For that reason, folio 2 is organized so that you can load parts
-of folio without requiring the whole thing. There are a few
+of it without requiring the whole thing. There are a few
 dependencies within the library. The **as** and **make** subsystems
 are used by all of the data-structure sections. **taps** relies on
 **series**, which in turn relies on **sequences**. You shouldn't need
 to concern yourself with these dependencies, though. The ASDF system
 definitions declare the needed dependencies, so you can simply load
-the folio subsystem you want, and rely on ASDF to ensure that any
+the folio 2 subsystem you want, and rely on ASDF to ensure that any
 needed dependencies are also loaded.
 
 ### Reader macros
 
-Three folio subsystems provide reader macros that extend the lexical
+Three folio 2 subsystems provide reader macros that extend the lexical
 syntax of Common Lisp with notational conveniences. Common Lisp
 programmers don't always like reader macros. Although they can be very
 convenient, they can also conflict with locally-defined reader macros.
 
 In order to avoid problems caused by reader-macro conflicts, the folio
-reader macros are entirely optional. You can choose not to load them
+2 reader macros are entirely optional. You can choose not to load them
 if they would cause problems for you, or if you simply don't like
 reader macros. Each syntax extension is loaded by its own separate
 ASDF system definition. If you want to avoid loading the reader
-macros, simply don't load those systems. You can see examples of
-controlling subsystem loading in the definitions of the various
-"load-*" functions in folio.asd.
+macros, simply don't load those systems.
 
 ### Systems and packages
 
-Following are the subsystems and packages provided by folio:
+Following are the subsystems and packages provided by folio 2:
 
 | subsystem | type | purpose |
 |-----------|------|---------|
@@ -185,7 +187,7 @@ Following are the subsystems and packages provided by folio:
 
 [1] these subsystems provide optional reader macros
 
-folio's subsystems have the following library dependencies:
+folio 2's subsystems have the following library dependencies:
 
 | subsystem | dependencies |
 |-----------|------|---------|
@@ -196,22 +198,21 @@ folio's subsystems have the following library dependencies:
 | taps | FSet, SERIES, Closer-MOP
 
 
-The most convenient way to use folio is usually to just load the
-umbrella system, `folio`. If you prefer to customize loading and
+The most convenient way to use folio 2 is usually to just load the
+umbrella system, `folio2`. If you prefer to customize loading and
 control which names are exported to your code, you may want to make
-your own umbrella system. In that case, the definition of `folio` in
-folio.asd serves as a guide. You will probably also want to define
+your own umbrella system. In that case, the definition of `folio2` in
+folio2.asd serves as a guide. You will probably also want to define
 your own package in order to control the visibility of names from the
-folio subsystems. You can find guidance on how to do that by examining
-folio-package.lisp, which defines the umbrella package for folio.
+folio 2-package.lisp, which defines the umbrella package for folio 2.
 
 An approach that works well is to define a common package for your
-code, use the COMMON-LISP package, and import the folio symbols you
-want to be accessible. Again, folio-package.lisp can offer some
+code, use the COMMON-LISP package, and import the folio 2 symbols you
+want to be accessible. Again, folio2-package.lisp can offer some
 guidance. Symbols in the :shadowing-inport-from lists in that file are
 defined in the COMMON-LISP package, and you'll need to similarly use
 shadowing import if you want to import them. Symbols in the
-:import-from lists are defined in the folio sources or the libraries
+:import-from lists are defined in the folio 2 sources or the libraries
 it depends on, and should be safe to import directly, assuming they
 don't conflict with any symbols you've defined yourself.
 
@@ -220,10 +221,12 @@ you've defined your own functions or macros named `as` and
 `make`. Each of those subsystems defines just one function and exports
 just one symbol. They are intended to be safe for `USE`.
 
-For an example of code that uses the folio umbrella package, see
+For an example of code that uses the folio 2 umbrella package, see
 examples/name-generator.lisp.
 
 ## The name
+
+folio 2 is named for its direct predecessor, folio.
 
 The name "folio" is a little obscure and arbitrary. It's a term from
 the craft of printing that refers to certain esoteric details about

@@ -1,11 +1,10 @@
 ;;;; ***********************************************************************
-;;;; FILE IDENTIFICATION
 ;;;;
 ;;;; Name:          functions.lisp
-;;;; Project:       folio - the Bard runtime
+;;;; Project:       folio2 - Functional idioms for Common Lisp
 ;;;; Purpose:       tap functions
 ;;;; Author:        mikel evins
-;;;; Copyright:     2013 by mikel evins
+;;;; Copyright:     2015 by mikel evins
 ;;;;
 ;;;; ***********************************************************************
 
@@ -16,7 +15,7 @@
 ;;; obtained from a specified type of source--usually a string,
 ;;; stream, sequence, or map.
 
-(in-package :net.bardcode.folio.taps)
+(in-package :net.bardcode.folio2.taps)
 
 ;;; function characters
 ;;;

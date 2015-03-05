@@ -1,22 +1,21 @@
 ;;;; ***********************************************************************
-;;;; FILE IDENTIFICATION
 ;;;;
 ;;;; Name:          maps.lisp
-;;;; Project:       folio - Bard features for Common Lisp
+;;;; Project:       folio2 - Functional idioms for Common Lisp
 ;;;; Purpose:       map tests
 ;;;; Author:        mikel evins
-;;;; Copyright:     2014 by mikel evins
+;;;; Copyright:     2015 by mikel evins
 ;;;;
 ;;;; ***********************************************************************
 
 
 (in-package :cl-user)
 
-(defpackage :net.bardcode.folio.maps.tests
-  (:use :cl :net.bardcode.folio.as :net.bardcode.folio.make :net.bardcode.folio.maps :lift)
-  (:shadowing-import-from :net.bardcode.folio.maps :map :merge :values))
+(defpackage :net.bardcode.folio2.maps.tests
+  (:use :cl :net.bardcode.folio2.as :net.bardcode.folio2.make :net.bardcode.folio2.maps :lift)
+  (:shadowing-import-from :net.bardcode.folio2.maps :map :merge :values))
 
-(in-package :net.bardcode.folio.maps.tests)
+(in-package :net.bardcode.folio2.maps.tests)
 
 ;;; ---------------------------------------------------------------------
 ;;; common suite class
@@ -140,5 +139,5 @@
   (let ((*TEST-DESCRIBE-IF-NOT-SUCCESSFUL?* t))
     (lift:run-tests :suite 'map-tests)))
 
-;;; (net.bardcode.folio.maps.tests::run-map-tests)
+;;; (net.bardcode.folio2.maps.tests::run-map-tests)
 ;;; (lift:describe-test-result lift:*test-result* t)

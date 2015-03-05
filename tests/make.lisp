@@ -1,21 +1,20 @@
 ;;;; ***********************************************************************
-;;;; FILE IDENTIFICATION
 ;;;;
 ;;;; Name:          make.lisp
-;;;; Project:       folio - Bard features for Common Lisp
+;;;; Project:       folio2 - Functional idioms for Common Lisp
 ;;;; Purpose:       make tests
 ;;;; Author:        mikel evins
-;;;; Copyright:     2014 by mikel evins
+;;;; Copyright:     2015 by mikel evins
 ;;;;
 ;;;; ***********************************************************************
 
 
 (in-package :cl-user)
 
-(defpackage :net.bardcode.folio.make.tests
-  (:use :cl :net.bardcode.folio.make :lift))
+(defpackage :net.bardcode.folio2.make.tests
+  (:use :cl :net.bardcode.folio2.make :lift))
 
-(in-package :net.bardcode.folio.make.tests)
+(in-package :net.bardcode.folio2.make.tests)
 
 ;;; ---------------------------------------------------------------------
 ;;; common suite class
@@ -79,5 +78,5 @@
   (let ((*TEST-DESCRIBE-IF-NOT-SUCCESSFUL?* t))
     (lift:run-tests :suite 'make-tests)))
 
-;;; (net.bardcode.folio.make.tests::run-make-tests)
+;;; (net.bardcode.folio2.make.tests::run-make-tests)
 ;;; (lift:describe-test-result lift:*test-result* t)

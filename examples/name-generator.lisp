@@ -8,7 +8,7 @@
 ;;;;
 ;;;; ***********************************************************************
 
-(in-package :folio)
+(in-package :folio2)
 
 (defmethod read-samples ((path pathname))
   (as 'cl:list
@@ -33,7 +33,7 @@
          (take 2 right)))
 
 (defun join-chunks (left right)
-  (append (take 2 left)
+  (append (take (1- (length left)) left)
           (drop 1 right)))
 
 (defun find-extension (stem blocks)
@@ -47,16 +47,20 @@
                       stem))))
 
 (defun assemble-name (chunks)
-  (reduce #'join-chunks (rest chunks)
-          :initial-value (first chunks)))
+  (if (null chunks)
+      ""
+      (if (null (cdr chunks))
+          (car chunks)
+          (assemble-name (cons (join-chunks (car chunks)
+                                            (cadr chunks))
+                               (cddr chunks))))))
 
 (defun build-name (building-blocks)
   (let* ((extensions (reduce #'append (image #'rest building-blocks)))
          (start ($ (compose #'first #'any) building-blocks))
-         (chunks (filter (^ (chunk)(> (length chunk) 2))
+         (chunks (filter (^ (chunk)(> (length chunk) 0))
                          (collect-extensions start extensions))))
-    (when chunks
-      (assemble-name chunks))))
+    (assemble-name chunks)))
 
 (defmethod gen-names ((path pathname)(count integer))
   (let ((building-blocks (image #'triples (read-samples path))))
@@ -69,6 +73,6 @@
 ;;; (defparameter $dickens "/Users/mikel/Workshop/programming/folio2/examples/namefiles/dickens.names")
 ;;; (defparameter $sindarin "/Users/mikel/Workshop/programming/folio2/examples/namefiles/sindarin.names")
 ;;; (defparameter $us "/Users/mikel/Workshop/programming/folio2/examples/namefiles/us.names")
-;;; (gen-names $dickens 10)
-;;; (gen-names $sindarin 10)
-;;; (gen-names $us 10)
+;;; (gen-names $dickens 20)
+;;; (gen-names $sindarin 20)
+;;; (gen-names $us 20)

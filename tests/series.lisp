@@ -1,29 +1,28 @@
 ;;;; ***********************************************************************
-;;;; FILE IDENTIFICATION
 ;;;;
 ;;;; Name:          series.lisp
-;;;; Project:       folio - Bard features for Common Lisp
+;;;; Project:       folio2 - Functional idioms for Common Lisp
 ;;;; Purpose:       series tests
 ;;;; Author:        mikel evins
-;;;; Copyright:     2013 by mikel evins
+;;;; Copyright:     2015 by mikel evins
 ;;;;
 ;;;; ***********************************************************************
 
 
 (in-package :cl-user)
 
-(defpackage :net.bardcode.folio.series.tests
-  (:use :cl :net.bardcode.folio.as :net.bardcode.folio.make :net.bardcode.folio.series :lift)
-  (:import-from :net.bardcode.folio.sequences
+(defpackage :net.bardcode.folio2.series.tests
+  (:use :cl :net.bardcode.folio2.as :net.bardcode.folio2.make :net.bardcode.folio2.series :lift)
+  (:import-from :net.bardcode.folio2.sequences
                 :add-first :by :dispose :drop :drop-while :element :empty? :filter 
                 :head :image :indexes :interleave :interpose :partition
                 :prefix-match? :select :subsequence :tail :tails :take :take-by :take-while
                 :unzip :zip)
-  (:shadowing-import-from :net.bardcode.folio.sequences
+  (:shadowing-import-from :net.bardcode.folio2.sequences
                           :first :remove :remove-if :remove-if-not :rest
                           :second :substitute :substitute-if :substitute-if-not))
 
-(in-package :net.bardcode.folio.series.tests)
+(in-package :net.bardcode.folio2.series.tests)
 
 ;;; ---------------------------------------------------------------------
 ;;; common suite class
@@ -57,7 +56,7 @@
 
 (addtest (series-tests)
   test-as
-  (ensure (net.bardcode.folio.series::series? (as 'foundation-series '(1 2 3))))
+  (ensure (net.bardcode.folio2.series::series? (as 'foundation-series '(1 2 3))))
   (ensure (cl:listp (as 'cl:list (series 1 2 3)))))
 
 (addtest (series-tests)
@@ -235,5 +234,5 @@
   (let ((*TEST-DESCRIBE-IF-NOT-SUCCESSFUL?* t))
     (lift:run-tests :suite 'series-tests)))
 
-;;; (net.bardcode.folio.series.tests::run-series-tests)
+;;; (net.bardcode.folio2.series.tests::run-series-tests)
 ;;; (lift:describe-test-result lift:*test-result* t)
