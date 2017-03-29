@@ -8,9 +8,7 @@
 ;;;;
 ;;;; ***********************************************************************
 
-(in-package :cl-user)
-
-(asdf:defsystem :folio2-boxes-tests
+(defsystem "folio2-boxes-tests"
   :serial t
   :description "box tests"
   :author "mikel evins <mevins@me.com>"
@@ -18,8 +16,10 @@
   :depends-on (:folio2-boxes :lift)
   :components ((:module "tests"
                         :serial t
-                        :components ((:file "boxes")))))
+                        :components ((:file "boxes"))))
+  :perform (test-op (o c)
+             (symbol-call :net.bardcode.folio2.boxes.tests :run-box-tests)
+             (symbol-call :lift :describe-test-result
+                          (symbol-value (find-symbol* :*test-result* :lift)) t)))
 
-;;; (asdf:load-system :folio2-boxes-tests)
-;;; (net.bardcode.folio2.boxes.tests::run-box-tests)
-;;; (lift:describe-test-result lift:*test-result* t)
+;;; (asdf:test-system :folio2-boxes-tests)

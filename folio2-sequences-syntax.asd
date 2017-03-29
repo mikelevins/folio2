@@ -8,17 +8,16 @@
 ;;;;
 ;;;; ***********************************************************************
 
-(in-package :cl-user)
-
-(asdf:defsystem :folio2-sequences-syntax
+(defsystem "folio2-sequences-syntax"
   :serial t
   :description "reader syntax for sequences"
   :author "mikel evins <mevins@me.com>"
   :license "Lisp Lesser GNU Public License"
-  :depends-on (:folio2-sequences)
+  :depends-on ("folio2-sequences")
   :components ((:module "src"
                         :serial t
                         :components ((:file "sequences-package")
-                                     (:file "sequences-syntax")))))
+                                     (:file "sequences-syntax"))))
+  :in-order-to ((test-op (test-op "folio-sequences-tests"))))
 
 ;;; (asdf:load-system :folio2-sequences-syntax)

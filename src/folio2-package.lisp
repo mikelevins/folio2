@@ -8,9 +8,7 @@
 ;;;;
 ;;;; ***********************************************************************
 
-(in-package :cl-user)
-
-(defpackage :net.bardcode.folio2
+(cl:defpackage :net.bardcode.folio2
   (:nicknames :folio2)
   (:use :cl)
   (:use :net.bardcode.folio2.as)
@@ -38,16 +36,16 @@
                 :select :sequence? :shuffle :some?
                 :split :subsequence :suffix-match?
                 :tail :tails :take :take-by :take-while
-                :unzip 
+                :unzip
                 :wb-seq :wb-seq?
                 :zip)
   (:shadowing-import-from :net.bardcode.folio2.sequences
                           :acons :assoc :assoc-if :assoc-if-not :append
                           :count :count-if :count-if-not
                           :find :find-if :find-if-not :first
-                          :last :length 
+                          :last :length
                           :mismatch
-                          :position :position-if :position-if-not 
+                          :position :position-if :position-if-not
                           :reduce :remove :remove-duplicates :remove-if :remove-if-not :rest :reverse
                           :search :sequence :second :sort :substitute :substitute-if :substitute-if-not)
   (:use :net.bardcode.folio2.series)
@@ -69,16 +67,14 @@
             :select :sequence? :shuffle :some?
             :split :subsequence :suffix-match?
             :tail :tails :take :take-by :take-while
-            :unzip 
+            :unzip
             :wb-seq :wb-seq?
             :zip
             :acons :assoc :assoc-if :assoc-if-not :append
             :count :count-if :count-if-not
             :find :find-if :find-if-not :first
-            :last :length 
+            :last :length
             :mismatch
-            :position :position-if :position-if-not 
+            :position :position-if :position-if-not
             :reduce :remove :remove-duplicates :remove-if :remove-if-not :rest :reverse
             :search :sequence :second :sort :substitute :substitute-if :substitute-if-not))
-
-

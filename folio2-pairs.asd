@@ -8,17 +8,16 @@
 ;;;;
 ;;;; ***********************************************************************
 
-(in-package :cl-user)
-
-(asdf:defsystem :folio2-pairs
+(defsystem "folio2-pairs"
   :serial t
   :description "tools for working with pairs of values"
   :author "mikel evins <mevins@me.com>"
   :license "Lisp Lesser GNU Public License"
-  :depends-on (:folio2-as :folio2-make)
+  :depends-on ("folio2-as" "folio2-make")
   :components ((:module "src"
                         :serial t
                         :components ((:file "pairs-package")
-                                     (:file "pairs-functions")))))
+                                     (:file "pairs-functions"))))
+  :in-order-to ((test-op (test-op "folio-pairs-tests"))))
 
 ;;; (asdf:load-system :folio2-pairs)

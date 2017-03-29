@@ -8,10 +8,8 @@
 ;;;;
 ;;;; ***********************************************************************
 
-(in-package :cl-user)
-
 ;;; system
-(asdf:defsystem :folio2-as
+(defsystem "folio2-as"
   :serial t
   :description "uniform tools for converting values from one type to another"
   :author "mikel evins <mevins@me.com>"
@@ -19,6 +17,7 @@
   :components ((:module "src"
                         :serial t
                         :components ((:file "as-package")
-                                     (:file "as-functions")))))
+                                     (:file "as-functions"))))
+  :in-order-to ((test-op (test-op "folio-as-tests"))))
 
 ;;; (asdf:load-system :folio2-as)

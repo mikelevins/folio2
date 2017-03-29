@@ -8,18 +8,17 @@
 ;;;;
 ;;;; ***********************************************************************
 
-(in-package :cl-user)
-
-(asdf:defsystem :folio2-maps
+(defsystem "folio2-maps"
   :serial t
   :description "tools for working with finite maps"
   :author "mikel evins <mevins@me.com>"
   :license "Lisp Lesser GNU Public License"
-  :depends-on (:fset :folio2-as :folio2-make)
+  :depends-on ("fset" "folio2-as" "folio2-make")
   :components ((:module "src"
                         :serial t
                         :components ((:file "maps-package")
                                      (:file "maps-types")
-                                     (:file "maps-functions")))))
+                                     (:file "maps-functions"))))
+  :in-order-to ((test-op (test-op "folio-maps-tests"))))
 
 ;;; (asdf:load-system :folio2-maps)
