@@ -8,18 +8,18 @@
 ;;;;
 ;;;; ***********************************************************************
 
-(in-package :cl-user)
-
-(asdf:defsystem :folio2-functions-tests
+(defsystem "folio2-functions-tests"
   :serial t
   :description "tests of the FUNCTIONS subsystem"
   :author "mikel evins <mevins@me.com>"
   :license "Lisp Lesser GNU Public License"
-  :depends-on (:folio2-functions :folio2-functions-syntax :lift)
+  :depends-on ("folio2-functions" "folio2-functions-syntax" "lift")
   :components ((:module "tests"
                         :serial t
-                        :components ((:file "functions")))))
+                        :components ((:file "functions"))))
+  :perform (test-op (o c)
+             (symbol-call :net.bardcode.folio2.functions.tests :run-function-tests)
+             (symbol-call :lift :describe-test-result
+                          (symbol-value (find-symbol* :*test-result* :lift)) t)))
 
-;;; (asdf:load-system :folio2-functions-tests)
-;;; (net.bardcode.folio2.functions.tests::run-function-tests)
-;;; (lift:describe-test-result lift:*test-result* t)
+;;; (asdf:test-system :folio2-functions-tests)

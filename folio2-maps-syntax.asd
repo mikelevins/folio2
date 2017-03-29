@@ -8,18 +8,16 @@
 ;;;;
 ;;;; ***********************************************************************
 
-(in-package :cl-user)
-
-(asdf:defsystem :folio2-maps-syntax
+(defsystem "folio2-maps-syntax"
   :serial t
   :description "reader syntax for maps"
   :author "mikel evins <mevins@me.com>"
   :license "Lisp Lesser GNU Public License"
-  :depends-on (:folio2-maps)
+  :depends-on ("folio2-maps")
   :components ((:module "src"
                         :serial t
                         :components ((:file "maps-package")
-                                     (:file "maps-syntax")))))
+                                     (:file "maps-syntax"))))
+  :in-order-to ((test-op (test-op "folio-maps-tests"))))
 
 ;;; (asdf:load-system :folio2-maps-syntax)
-

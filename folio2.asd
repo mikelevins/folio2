@@ -8,35 +8,29 @@
 ;;;;
 ;;;; ***********************************************************************
 
-(in-package :cl-user)
-
-(defparameter *folio2-root*
-  (make-pathname :directory (pathname-directory *load-truename*)))
-
-;;; (push *folio2-root* asdf:*central-registry*)
-
-(asdf:defsystem :folio2
+(defsystem "folio2"
   :serial t
-  :description "the folio2 functional-idioms system"
+  :description "the folio2 umbrella system"
   :author "mikel evins <mevins@me.com>"
   :license "Lisp Lesser GNU Public License"
-  :depends-on (:fset :series :alexandria 
-                     :folio2-as
-                     :folio2-as-syntax
-                     :folio2-boxes
-                     :folio2-functions
-                     :folio2-functions-syntax
-                     :folio2-make
-                     :folio2-maps
-                     :folio2-maps-syntax
-                     :folio2-pairs
-                     :folio2-sequences
-                     :folio2-sequences-syntax
-                     :folio2-series
-                     :folio2-taps)
+  :depends-on ("fset" "series" "alexandria"
+               "folio2-as"
+               "folio2-as-syntax"
+               "folio2-boxes"
+               "folio2-functions"
+               "folio2-functions-syntax"
+               "folio2-make"
+               "folio2-maps"
+               "folio2-maps-syntax"
+               "folio2-pairs"
+               "folio2-sequences"
+               "folio2-sequences-syntax"
+               "folio2-series"
+               "folio2-taps")
   :components ((:module "src"
                         :serial t
                         :components ((:file "folio2-package")
-                                     (:file "version")))))
+                                     (:file "version"))))
+  :in-order-to ((test-op (test-op "folio2-tests"))))
 
 ;;; (asdf:load-system :folio2)

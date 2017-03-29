@@ -8,9 +8,7 @@
 ;;;;
 ;;;; ***********************************************************************
 
-(in-package :cl-user)
-
-(asdf:defsystem :folio2-make
+(defsystem "folio2-make"
   :serial t
   :description "uniform tools for constructing arbitrary values"
   :author "mikel evins <mevins@me.com>"
@@ -19,5 +17,7 @@
   :components ((:module "src"
                         :serial t
                         :components ((:file "make-package")
-                                     (:file "make-functions")))))
+                                     (:file "make-functions"))))
+  :in-order-to ((test-op (test-op "folio-make-tests"))))
+
 ;;; (asdf:load-system :folio2-make)

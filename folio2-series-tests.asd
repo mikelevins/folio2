@@ -8,18 +8,18 @@
 ;;;;
 ;;;; ***********************************************************************
 
-(in-package :cl-user)
-
-(asdf:defsystem :folio2-series-tests
+(defsystem "folio2-series-tests"
   :serial t
   :description "sequence and series tests"
   :author "mikel evins <mevins@me.com>"
   :license "Lisp Lesser GNU Public License"
-  :depends-on (:folio2-series :lift)
+  :depends-on ("folio2-series" "lift")
   :components ((:module "tests"
                         :serial t
-                        :components ((:file "series")))))
+                        :components ((:file "series"))))
+  :perform (test-op (o c)
+             (symbol-call :net.bardcode.folio2.series.tests :run-series-tests)
+             (symbol-call :lift :describe-test-result
+                          (symbol-value (find-symbol* :*test-result* :lift)) t)))
 
-;;; (asdf:load-system :folio2-series-tests)
-;;; (net.bardcode.folio2.series.tests::run-series-tests)
-;;; (lift:describe-test-result lift:*test-result* t)
+;;; (asdf:test-system :folio2-series-tests)
