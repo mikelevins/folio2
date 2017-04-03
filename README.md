@@ -190,7 +190,7 @@ Following are the subsystems and packages provided by folio 2:
 folio 2's subsystems have the following library dependencies:
 
 | subsystem | dependencies |
-|-----------|------|---------|
+|-----------|-----------|
 |functions | Alexandria |
 | maps | FSet |
 | sequences | FSet |
