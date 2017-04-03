@@ -191,11 +191,11 @@ folio 2's subsystems have the following library dependencies:
 
 | subsystem | dependencies |
 |-----------|------|---------|
-|functions | Alexandria
-| maps | FSet
-| sequences | FSet
-| series | FSet, SERIES
-| taps | FSet, SERIES, Closer-MOP
+|functions | Alexandria |
+| maps | FSet |
+| sequences | FSet |
+| series | FSet, SERIES |
+| taps | FSet, SERIES, Closer-MOP |
 
 
 The most convenient way to use folio 2 is usually to just load the
