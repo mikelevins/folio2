@@ -13,7 +13,7 @@
 (defpackage :net.bardcode.folio2.series
   (:use :cl :net.bardcode.folio2.as :net.bardcode.folio2.make)
   (:import-from :fset :wb-seq)
-  (:import-from :series :foundation-series)
+  (:import-from :series :foundation-series :cotruncate :subseries)
   (:import-from :net.bardcode.folio2.pairs :left :pair :right)
   (:shadowing-import-from :net.bardcode.folio2.sequences
                           :add-first :add-last :any :append :apportion :assoc

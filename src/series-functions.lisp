@@ -190,16 +190,16 @@
   (interleave (scan (fset:convert 'cl:vector sequence1)) sequence2))
 
 (defmethod interleave ((sequence1 foundation-series)(sequence2 foundation-series)) 
-  (series:mingle sequence1 sequence2 (%make-toggle)))
+  (multiple-value-call #'series:mingle
+    (cotruncate sequence1 sequence2) (%make-toggle)))
 
 ;;; function interpose
 ;;;
 ;;; (interpose item sequence) => sequence'
 ;;; ---------------------------------------------------------------------
 
-(defmethod interpose (item (sequence foundation-series)) 
-  (let ((items (repeat item)))
-    (interleave sequence items)))
+(defmethod interpose ((item t) (sequence foundation-series))
+  (subseries (interleave (repeat item) sequence) 1))
 
 ;;; function partition 
 ;;;
