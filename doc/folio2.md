@@ -184,6 +184,7 @@ expression:
          (fnk A))
 
 <br>
+
 **disjoin** *fn1*...*fnk* => *fnx*  &nbsp;&nbsp;&nbsp;&nbsp;[*Macro*]<br>
 
 Returns a new function *fnx* which performs the computations
@@ -200,6 +201,7 @@ expression:
 
 
 <br>
+
 **flip** *fn1*  => *fn2*  &nbsp;&nbsp;&nbsp;&nbsp;[*Function*]<br>
 
 Returns a new function *fn2* that performs the same computation as
@@ -227,6 +229,7 @@ Because circumstances like this one arise often, **flip** is often
 useful.
 
 <br>
+
 **fn**   => Anything  &nbsp;&nbsp;&nbsp;&nbsp;[*Macro*]<br>
 
 Returns a newly-created function. **fn** is shorthand for **lambda**;
@@ -238,17 +241,20 @@ anonymous function inline to a search.
 A synonym for **fn** is **^**.
 
 <br>
+
 **function?**  *thing*  => Boolean  &nbsp;&nbsp;&nbsp;&nbsp;[*Generic function*]<br>
 
 Returns true if *thing* is a function and false otherwise.
 
 <br>
+
 **functional?**  *thing*  => Boolean  &nbsp;&nbsp;&nbsp;&nbsp;[*Generic function*]<br>
 
 Returns true if *thing* is a funcallable object of type function,
 generic function, or method, and false otherwise.
 
 <br>
+
 **generic-function?**  *thing*  => Boolean  &nbsp;&nbsp;&nbsp;&nbsp;[*Generic function*]<br>
 
 Returns true if *thing* is a generic function and false otherwise.
@@ -260,6 +266,7 @@ Returns true if *thing* is a generic function and false otherwise.
 Returns true if *thing* is a method and false otherwise.
 
 <br>
+
 **partial** *f1* *arg1*..*argk* => *f2*  &nbsp;&nbsp;&nbsp;&nbsp;[*Function*]<br>
 
 Returns a left section of the function *f1*, created by partially
@@ -278,6 +285,7 @@ then bind c and d to 3 and 4 and then compute and return the result of
 the call to foo.
 
 <br>
+
 **rpartial** *f1* *arg1*..*argk* => *f2*  &nbsp;&nbsp;&nbsp;&nbsp;[*Function*]<br>
 
 Returns a right section of the function *f1*, created by partially
@@ -360,6 +368,7 @@ squander all of the performance advantages of hash-tables.
 #### Reference
 
 <br>
+
 **alist**   &nbsp;&nbsp;&nbsp;&nbsp;[*Type*]<br>
 
 A Lisp list whose elements are pairs, represented as **cons**
@@ -367,12 +376,14 @@ cells. The left element of each pair is a key; the right element is a
 value associated with the key.
 
 <br>
+
 **alist** (*key1* . *value1*) (*key2* . *value2*) ...  (*keyk* . *valuek*) => *alist* &nbsp;&nbsp;&nbsp;&nbsp;[*Macro*]<br>
 
 Returns a new **map** represented as an **alist**. The keys and values
 are as given by *key1*...*keyk* and *value1*...*valuek*.
 
 <br>
+
 **alist?** *thing* => Boolean  &nbsp;&nbsp;&nbsp;&nbsp;[*Generic function*]<br>
 
 Returns true if *thing* appears to be an **alist**, and false
@@ -381,6 +392,7 @@ otherwise. **alist?** considers a value an **alist** if it's a
 **cons**.
 
 <br>
+
 **contains-key?** *map* *key* &key (test 'eql) =>   &nbsp;&nbsp;&nbsp;&nbsp;[*Generic function*]<br>
 
 Returns true if *map* contains *key*, and false otherwise. The
@@ -390,6 +402,7 @@ function passed in the **test** parameter is used to test whether
 **test** is ignored when *map* is a **wb-map**.
 
 <br>
+
 **contains-value?** *map* *value* &key (test 'eql)  &nbsp;&nbsp;&nbsp;&nbsp;[*Generic function*]<br>
 
 Returns true if *map* contains *value*, and false otherwise. The
@@ -399,6 +412,7 @@ function passed in the **test** parameter is used to test whether
 **test** is ignored when *map* is a **wb-map**.
 
 <br>
+
 **get-key** *map* *key* &key (test 'eql)(default nil) =>   &nbsp;&nbsp;&nbsp;&nbsp;[*Generic function*]<br>
 
 Returns the value associated in *map* with *key*, or, if *key* is not
@@ -407,11 +421,13 @@ present in *map*, returns *default*.
 **test** is ignored when *map* is a **wb-map**.
 
 <br>
+
 **keys** *map* => *keys*  &nbsp;&nbsp;&nbsp;&nbsp;[*Generic function*]<br>
 
 Returns a sequence of *keys* that appear in *map*.
 
 <br>
+
 **make** 'map &key (contents nil) => *map* &nbsp;&nbsp;&nbsp;&nbsp;[*Generic function*]<br>
 
 Returns a new **map** instance. The keys and values of the new **map**
@@ -420,11 +436,13 @@ the **map** is chosen by folio, but you can pass it to **as** to
 obtain a particular type of **map**.
 
 <br>
+
 **map?** *thing* => Boolean  &nbsp;&nbsp;&nbsp;&nbsp;[*Generic function*]<br>
 
 Returns true if *thing* is a **map**, and false otherwise.
 
 <br>
+
 **merge** *map1* *map2* => *map3*  &nbsp;&nbsp;&nbsp;&nbsp;[*Generic function*]<br>
 
 Returns a new **map** of the same type as *map1*. The new **map**
@@ -436,6 +454,7 @@ The function passed in the **test** parameter is used to test whether
 a *key* in *map2* matches a key in *map1*.
 
 <br>
+
 **plist**   &nbsp;&nbsp;&nbsp;&nbsp;[*Type*]<br>
 
 A Lisp list with an even number of elements, representing a
@@ -445,12 +464,14 @@ values associated with the keys, with each one associated with the
 atom that immediately precedes it.
 
 <br>
+
 **plist** *key1* *value1* *key2* *value2* ... *keyk* *valuek* => *plist*  &nbsp;&nbsp;&nbsp;&nbsp;[*Function*]<br>
 
 Returns a new **map** represented as a **plist**. The keys and values
 are as given by *key1*...*keyk* and *value1*...*valuek*.
 
 <br>
+
 **plist?** *thing* => Boolean  &nbsp;&nbsp;&nbsp;&nbsp;[*Function*]<br>
 
 Returns true if *thing* appears to be a **plist**, and false
@@ -459,6 +480,7 @@ otherwise. **plist?** considers a vaue to be a **plist** if it's a
 an atom.
 
 <br>
+
 **put-key** *map1* *key* *value* &key (test 'eql) => *map2*  &nbsp;&nbsp;&nbsp;&nbsp;[*Generic function*]<br>
 
 Returns a new map that contains all the keys in *map1*, but in
@@ -467,17 +489,20 @@ contains *key* then its associated value is replaced in *map2* by
 *value*.
 
 <br>
+
 **values** *map* => *sequence*  &nbsp;&nbsp;&nbsp;&nbsp;[*Generic function*]<br>
 
 Returns a sequence of all the values contained in *map*.
 
 <br>
+
 **wb-map**   &nbsp;&nbsp;&nbsp;&nbsp;[*Type*]<br>
 
 A weight-balanced tree that represents a finite map. This type is
 provided by the FSet library and supported by folio's **Maps** API.
 
 <br>
+
 **wb-map?** *thing* => Boolean  &nbsp;&nbsp;&nbsp;&nbsp;[*Generic function*]<br>
 
 Returns true if *thing* is an instance of an FSet **wb-map**, and
@@ -1328,6 +1353,7 @@ alternation.
 Returns a series of elements from *series*, separated by *item*.
 
 <br>
+
 **iterate** *fn* *arg*  => *series*  &nbsp;&nbsp;&nbsp;&nbsp;[*Macro*]<br>
 
 Returns a series whose elements are successive results from the
@@ -1554,7 +1580,7 @@ Returns a series of characters read from *string-or-stream*.
 
 Returns a series of the elements of *sequence*.
 
-**lines`** *Generic function* <br>
+**`lines`** *Generic function* <br>
 `lines string-or-stream => a series of lines (strings)`
 
 Returns a series of strings read one line at a time from *string-or-stream*.
