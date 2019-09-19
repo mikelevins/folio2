@@ -155,7 +155,8 @@ is `(h3 (g3 (f3 c)))`.
 *of *fn* are *val1*..*valk*
 
 <br>
-**compose** *fn1*...*fnk* => *fnx*  &nbsp;&nbsp;&nbsp;&nbsp;[*Macro*]<br>
+
+**compose** (*fn1*...*fnk*) => *fnx*  &nbsp;&nbsp;&nbsp;&nbsp;[*Macro*]<br>
 
 Returns a new function *fnx* which performs the computations
 represented by the functions *fn1* through *fnk*.
