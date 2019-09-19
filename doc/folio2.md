@@ -178,10 +178,10 @@ arguments to an **and** expression.
 Passing an argument A to *fnx* has the same effect as evaluating this
 expression:
 
-    (and (*fn1* A)
-         (*fn2* A)
+    (and (fn1 A)
+         (fn2 A)
          ...
-         (*fnk* A))
+         (fnk A))
 
 <br>
 **disjoin** *fn1*...*fnk* => *fnx*  &nbsp;&nbsp;&nbsp;&nbsp;[*Macro*]<br>
@@ -193,10 +193,10 @@ arguments to an **or** expression.
 Passing an argument A to *fnx* has the same effect as evaluating this
 expression:
 
-    (or (*fn1* A)
-         (*fn2* A)
+    (or (fn1 A)
+         (fn2 A)
          ...
-         (*fnk* A))
+         (fnk A))
 
 
 <br>
